@@ -127,6 +127,14 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
+
+            var user = await UserManager.FindByEmailAsync(Input.Email);
+            if(user != null)
+            {
+                var tokenSuccess = await GetAndStoreJwtTokenAsync(user.Id, Input.Email, Input.Password);
+            }
+
+
             RedirectManager.RedirectTo(ReturnUrl);
         }
         else if (result.RequiresTwoFactor)
@@ -145,6 +153,17 @@
             errorMessage = "Error: Invalid login attempt.";
         }
     }
+
+    private async Task<bool> GetAndStoreJwtTokenAsync(string userId, string email, string password)
+    {
+        //Call API
+        //Get token
+        //Handle errors
+        //Store token
+
+        return true;
+    }
+
 
     private sealed class InputModel
     {
