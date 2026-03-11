@@ -1,5 +1,6 @@
 using Domain.Models.Entities;
 using LMS.Blazor.Client.Pages;
+using LMS.Blazor.Client.Services;
 using LMS.Blazor.Components;
 using LMS.Blazor.Components.Account;
 using LMS.Blazor.Data;
@@ -66,6 +67,7 @@ public class Program
         });
 
         builder.Services.AddSingleton<ITokenStorage, TokenStorageService>();
+        builder.Services.AddScoped<IApiService, ClientApiService>();
 
         var app = builder.Build();
 

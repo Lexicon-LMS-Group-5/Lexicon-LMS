@@ -1,5 +1,7 @@
 ﻿@page "/demoauth"
 @inject IApiService ApiService
+@* @rendermode InteractiveWebAssembly *@
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: true))
 
 @attribute [Authorize]
 
@@ -26,7 +28,7 @@
     {
         <span class="spinner-border spinner-border-sm me-2"></span>
     }
-    Call API
+    Refresh API
 </button>
 
 @if (error != null)
@@ -71,6 +73,13 @@
     private IEnumerable<DemoAuthDto>? users;
     private string? error;
     private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CallApi();
+    }
+
+    override 
 
     private async Task CallApi()
     {
