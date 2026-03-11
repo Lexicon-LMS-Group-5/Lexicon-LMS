@@ -7,7 +7,19 @@
 
 <h3>Demo: Calling Protected API</h3>
 
-<p>This page demonstrates calling the remote API through the BFF proxy (Blazor server) with JWT tokens.</p>
+@* <p>This page demonstrates calling the remote API through the BFF proxy (Blazor server) with JWT tokens.</p> *@
+<div class="alert alert-info mb-3">
+    <h5>How This Works</h5>
+    <p>
+        This page demonstrates calling a protected API through the BFF (Backend-for-Frontend) proxy pattern.
+        With <strong>.NET 8+ Authentication State Serialization</strong>, this works seamlessly with prerendering enabled.
+    </p>
+    <ul class="mb-0">
+        <li><strong>Prerender:</strong> Page renders on server, API call succeeds because authentication state is available</li>
+        <li><strong>WASM Load:</strong> After client loads, component re-initializes and data is already available</li>
+        <li><strong>BFF Proxy:</strong> All API calls go through the server's proxy controller, which handles JWT tokens</li>
+    </ul>
+</div>
 
 <button class="btn btn-primary" @onclick="CallApi" disabled="@isLoading">
     @if (isLoading)
