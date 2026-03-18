@@ -7,5 +7,5 @@ public class Course
     public string Description { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public List<ApplicationUser> EnrolledStudents { get; set; }
+    public ICollection<ApplicationUser> EnrolledStudents { get; set; } = [];
 }
