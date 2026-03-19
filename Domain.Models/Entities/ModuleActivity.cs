@@ -8,4 +8,7 @@ public class ModuleActivity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public ModuleActivityType Type { get; set; }
+    public ICollection<ModuleActivityParticipant> Participants { get; set; }
+    public int ModuleId { get; set; }
+    public Module Module { get; set; }
 }
