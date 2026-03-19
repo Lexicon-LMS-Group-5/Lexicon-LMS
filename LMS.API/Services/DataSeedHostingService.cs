@@ -76,12 +76,16 @@ public class DataSeedHostingService : IHostedService
     {
         var teacher = new ApplicationUser
         {
+            FirstName = "Tes",
+            LastName = "Ting",
             UserName = "teacher@test.com",
             Email = "teacher@test.com"
         };
         
         var student = new ApplicationUser
         {
+            FirstName = "Yobayer",
+            LastName = "Jobayer",
             UserName = "student@test.com",
             Email = "student@test.com"
         };
