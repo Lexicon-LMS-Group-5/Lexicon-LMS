@@ -34,6 +34,9 @@ namespace LMS.Infractructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -90,6 +93,8 @@ namespace LMS.Infractructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -126,29 +131,6 @@ namespace LMS.Infractructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.CourseParticipant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CourseParticipantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CourseParticipantId");
-
-                    b.ToTable("CourseParticipants");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.Module", b =>
@@ -198,6 +180,9 @@ namespace LMS.Infractructure.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ModuleActivityTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
@@ -208,40 +193,13 @@ namespace LMS.Infractructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ModuleActivityTypeId");
 
                     b.HasIndex("ModuleId");
 
-                    b.HasIndex("TypeId");
-
                     b.ToTable("ModuleActivities");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.ModuleActivityParticipant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ParticipantId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityId");
-
-                    b.HasIndex("ParticipantId");
-
-                    b.ToTable("ActivityParticipants");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.ModuleActivityType", b =>
@@ -262,30 +220,6 @@ namespace LMS.Infractructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ModuleActivityTypes");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.ModuleParticipant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ModuleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ParticipantId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModuleId");
-
-                    b.HasIndex("ParticipantId");
-
-                    b.ToTable("ModuleParticipants");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -421,17 +355,11 @@ namespace LMS.Infractructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Models.Entities.CourseParticipant", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("Domain.Models.Entities.Course", "Course")
                         .WithMany("Participants")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Entities.CourseParticipant", null)
-                        .WithMany("Participants")
-                        .HasForeignKey("CourseParticipantId");
+                        .HasForeignKey("CourseId");
 
                     b.Navigation("Course");
                 });
@@ -449,59 +377,21 @@ namespace LMS.Infractructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Entities.ModuleActivity", b =>
                 {
+                    b.HasOne("Domain.Models.Entities.ModuleActivityType", "Type")
+                        .WithMany("Activities")
+                        .HasForeignKey("ModuleActivityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Models.Entities.Module", "Module")
                         .WithMany("Activities")
                         .HasForeignKey("ModuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Models.Entities.ModuleActivityType", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Module");
 
                     b.Navigation("Type");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.ModuleActivityParticipant", b =>
-                {
-                    b.HasOne("Domain.Models.Entities.ModuleActivity", "Activity")
-                        .WithMany("Participants")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Entities.ApplicationUser", "Participant")
-                        .WithMany()
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-
-                    b.Navigation("Participant");
-                });
-
-            modelBuilder.Entity("Domain.Models.Entities.ModuleParticipant", b =>
-                {
-                    b.HasOne("Domain.Models.Entities.Module", "Module")
-                        .WithMany("Teachers")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Models.Entities.ApplicationUser", "Participant")
-                        .WithMany()
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Module");
-
-                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -562,21 +452,14 @@ namespace LMS.Infractructure.Migrations
                     b.Navigation("Participants");
                 });
 
-            modelBuilder.Entity("Domain.Models.Entities.CourseParticipant", b =>
-                {
-                    b.Navigation("Participants");
-                });
-
             modelBuilder.Entity("Domain.Models.Entities.Module", b =>
                 {
                     b.Navigation("Activities");
-
-                    b.Navigation("Teachers");
                 });
 
-            modelBuilder.Entity("Domain.Models.Entities.ModuleActivity", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ModuleActivityType", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("Activities");
                 });
 #pragma warning restore 612, 618
         }
