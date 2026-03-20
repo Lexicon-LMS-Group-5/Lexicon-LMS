@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Humanizer;
 using LMS.Infractructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace LMS.API.Services;
 //}
 public class DataSeedHostingService : IHostedService
 {
+    private const int Seed = 89634;
     private readonly IServiceProvider serviceProvider;
     private readonly IConfiguration configuration;
     private readonly ILogger<DataSeedHostingService> logger;
@@ -39,7 +41,6 @@ public class DataSeedHostingService : IHostedService
         if (!env.IsDevelopment()) return;
 
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        if (await context.Users.AnyAsync(cancellationToken)) return;
 
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -49,10 +50,19 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
-            await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
-            await AddRolesAsync([TeacherRole, StudentRole]);
-            await AddDemoUsersAsync();
-            await AddUsersAsync(20);
+            if (!await context.ModuleActivityTypes.AnyAsync())
+                await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
+            
+            if (!await context.Users.AnyAsync(cancellationToken))
+            {
+                await AddRolesAsync([TeacherRole, StudentRole]);
+                await AddDemoUsersAsync();
+                await AddUsersAsync(20);
+            }
+
+            if (!await context.Courses.AnyAsync())
+                await AddMockCoursesToDbAsync(3, cancellationToken);
+            
             logger.LogInformation("Seed complete");
         }
         catch (Exception ex)
@@ -130,8 +140,6 @@ public class DataSeedHostingService : IHostedService
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        if (await context.ModuleActivityTypes.AnyAsync(cancellationToken)) return;
-
         await context.ModuleActivityTypes.AddRangeAsync([
             new ModuleActivityType()
             {
@@ -154,4 +162,28 @@ public class DataSeedHostingService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
+    private async Task AddMockCoursesToDbAsync(int count, CancellationToken cancellationToken)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        Randomizer.Seed = new Random(Seed);
+
+        var courseGenerator = new Faker<Course>()
+            .Rules((f, c) =>
+            {
+                var startDate = f.Date.Recent(30);
+                var endDate = startDate.AddMonths(6);
+
+                c.Name = $"{f.Hacker.Adjective()} {f.Hacker.IngVerb()}".ApplyCase(LetterCasing.Title);
+                c.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
+                c.StartDate = startDate;
+                c.EndDate = endDate;
+            });
+
+        await context.Courses.AddRangeAsync(courseGenerator.Generate(count));
+
+        // ToDo: Use unitOfWork?
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }
