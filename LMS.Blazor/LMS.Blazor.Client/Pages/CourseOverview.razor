@@ -1,0 +1,18 @@
+﻿@page "/courses/{CourseId}"
+
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<PageTitle>Course @CourseId</PageTitle>
+<h1>Course @CourseId</h1>
+
+<AuthorizeView Roles="Teacher">
+    <div>Teacher content</div>
+</AuthorizeView>
+
+<AuthorizeView Roles="Student">
+    <div>Student content</div>
+</AuthorizeView>
+
+<div>General content</div>
