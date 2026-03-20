@@ -25,6 +25,9 @@ public class DataSeedHostingService : IHostedService
     private RoleManager<IdentityRole> roleManager = null!;
     private const string TeacherRole = "Teacher";
     private const string StudentRole = "Student";
+    private const string DemoTeacherEmail = "teacher@test.com";
+    private const string DemoStudentEmail = "student@test.com";
+    private const string DemoCourseName = "Demo Course";
 
     public DataSeedHostingService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DataSeedHostingService> logger)
     {
@@ -50,9 +53,11 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
+            // Add initial ModuleActivityTypes if none exist
             if (!await context.ModuleActivityTypes.AnyAsync())
                 await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
             
+            // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
             {
                 await AddRolesAsync([TeacherRole, StudentRole]);
@@ -60,9 +65,16 @@ public class DataSeedHostingService : IHostedService
                 await AddUsersAsync(20);
             }
 
+            // Add mock Courses if none exist
             if (!await context.Courses.AnyAsync())
                 await AddMockCoursesToDbAsync(3, cancellationToken);
-            
+
+            // Add demo Course if it does not exist
+            if (await context.Courses.FirstOrDefaultAsync(c => c.Name == DemoCourseName, cancellationToken) is null)
+            {
+                await AddDemoCourseToDbAsync(scope, cancellationToken);
+            }
+
             logger.LogInformation("Seed complete");
         }
         catch (Exception ex)
@@ -89,16 +101,16 @@ public class DataSeedHostingService : IHostedService
         {
             FirstName = "Tes",
             LastName = "Ting",
-            UserName = "teacher@test.com",
-            Email = "teacher@test.com"
+            UserName = DemoTeacherEmail,
+            Email = DemoTeacherEmail
         };
         
         var student = new ApplicationUser
         {
             FirstName = "Yobayer",
             LastName = "Jobayer",
-            UserName = "student@test.com",
-            Email = "student@test.com"
+            UserName = DemoStudentEmail,
+            Email = DemoStudentEmail
         };
 
         await AddUserToDb([teacher, student]);
@@ -184,6 +196,34 @@ public class DataSeedHostingService : IHostedService
         await context.Courses.AddRangeAsync(courseGenerator.Generate(count));
 
         // ToDo: Use unitOfWork?
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
+        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
+
+        Randomizer.Seed = new Random(Seed);
+
+        var courseGenerator = new Faker<Course>()
+            .Rules((f, c) => {
+                var startDate = f.Date.Soon(30);
+                var endDate = startDate.AddMonths(6);
+
+                c.Name = DemoCourseName;
+                c.Description = "A demo course to help with development of Lexicon LMS";
+                c.StartDate = startDate;
+                c.EndDate = endDate;
+            });
+
+        var demoCourse = courseGenerator.Generate(1).First();
+        demoCourse.Participants.Add(demoTeacher);
+        demoCourse.Participants.Add(demoStudent);
+
+        await context.Courses.AddAsync(demoCourse, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 }
