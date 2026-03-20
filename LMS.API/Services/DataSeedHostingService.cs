@@ -49,6 +49,7 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
+            await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
             await AddRolesAsync([TeacherRole, StudentRole]);
             await AddDemoUsersAsync();
             await AddUsersAsync(20);
@@ -103,6 +104,8 @@ public class DataSeedHostingService : IHostedService
     {
         var faker = new Faker<ApplicationUser>("sv").Rules((f, e) =>
         {
+            e.FirstName = f.Person.FirstName;
+            e.LastName = f.Person.LastName;
             e.Email = f.Person.Email;
             e.UserName = f.Person.Email;
         });
@@ -121,6 +124,34 @@ public class DataSeedHostingService : IHostedService
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
         }
     }
+
+    private async Task AddInitialModuleActivityTypesToDbAsync(CancellationToken cancellationToken)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (await context.ModuleActivityTypes.AnyAsync(cancellationToken)) return;
+
+        await context.ModuleActivityTypes.AddRangeAsync([
+            new ModuleActivityType()
+            {
+                Name = "Assignment",
+            },
+            new ModuleActivityType()
+            {
+                Name = "E-learning",
+            },
+            new ModuleActivityType()
+            {
+                Name = "Lecture",
+                TimeExclusive = true,
+            }
+        ]);
+
+        // ToDo: Use unitOfWork?
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
 }
