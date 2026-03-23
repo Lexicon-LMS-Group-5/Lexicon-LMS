@@ -1,4 +1,4 @@
-﻿namespace LMS.API;
+﻿namespace LMS.Presentation;
 
 public class LoginModel
 {

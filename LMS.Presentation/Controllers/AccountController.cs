@@ -1,48 +1,48 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using LMS.Shared.DTOs.AuthDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using Service.Contracts;
 
-namespace LMS.Presentation;
-
+[Route("api/account")]
 [ApiController]
-[Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
+	private readonly IAuthService _authService;
 
-	//private readonly SignInManager<ApplicationUser> _signInManager;
-	//private readonly UserManager<ApplicationUser> _userManager;
+	public AccountController(IAuthService authService)
+	{
+		_authService = authService;
+	}
 
-	//public AccountController(
-	//	SignInManager<ApplicationUser> signInManager,
-	//	UserManager<ApplicationUser> userManager)
-	//{
-	//	_signInManager = signInManager;
-	//	_userManager = userManager;
-	//}
+	[HttpPost("register")]
+	public async Task<IActionResult> Register(UserRegistrationDto dto)
+	{
+		var result = await _authService.RegisterUserAsync(dto);
+		return result.Succeeded ? StatusCode(201) : BadRequest(result.Errors);
+	}
 
-	//[HttpPost("login")] 
-	//public async Task<IActionResult> Login(LoginModel model)
-	//{
-	//	var user = await _userManager.FindByEmailAsync(model.Email);
-	//	if (user == null)
-	//		return Unauthorized("Invalid login credentials");
+	[HttpPost("login")]
+	[AllowAnonymous]
+	public async Task<IActionResult> Login(UserAuthDto dto)
+	{
+		if (!await _authService.ValidateUserAsync(dto))
+			return Unauthorized();
 
-	//	var result = await _signInManager.PasswordSignInAsync(
-	//		user.UserName,
-	//		model.Password,
-	//		isPersistent: true,
-	//		lockoutOnFailure: false);
+		var token = await _authService.CreateTokenAsync(addTime: true);
+		return Ok(token);
+	}
 
-	//	if (result.Succeeded)
-	//		return Ok("Logged in");
-
-	//	return Unauthorized("Invalid login credentials");
-	//}
-
-	//[HttpPost("logout")]
-	//public async Task<IActionResult> Logout()
-	//{
-	//	await _signInManager.SignOutAsync();
-	//	return Ok("Logged out");
-	//}
+	[HttpPost("refresh")]
+	public async Task<IActionResult> Refresh(TokenDto token)
+	{
+		try
+		{
+			var newToken = await _authService.RefreshTokenAsync(token);
+			return Ok(newToken);
+		}
+		catch
+		{
+			return Unauthorized();
+		}
+	}
 }
