@@ -82,6 +82,7 @@ public static class ServiceExtensions
     public static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
     }
 
     public static void AddServiceLayer(this IServiceCollection services)
