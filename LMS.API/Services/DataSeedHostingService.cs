@@ -25,6 +25,9 @@ public class DataSeedHostingService : IHostedService
     private RoleManager<IdentityRole> roleManager = null!;
     private const string TeacherRole = "Teacher";
     private const string StudentRole = "Student";
+    private const string DemoTeacherEmail = "teacher@test.com";
+    private const string DemoStudentEmail = "student@test.com";
+    private const string DemoCourseName = "Demo Course";
 
     public DataSeedHostingService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DataSeedHostingService> logger)
     {
@@ -42,6 +45,10 @@ public class DataSeedHostingService : IHostedService
 
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+        // // Uncomment to drop current database and re-seed with mock data
+        // await context.Database.EnsureDeletedAsync(cancellationToken);
+        // await context.Database.MigrateAsync(cancellationToken);
+
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -50,9 +57,11 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
+            // Add initial ModuleActivityTypes if none exist
             if (!await context.ModuleActivityTypes.AnyAsync())
                 await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
             
+            // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
             {
                 await AddRolesAsync([TeacherRole, StudentRole]);
@@ -60,9 +69,16 @@ public class DataSeedHostingService : IHostedService
                 await AddUsersAsync(20);
             }
 
+            // Add mock Courses if none exist
             if (!await context.Courses.AnyAsync())
                 await AddMockCoursesToDbAsync(3, cancellationToken);
-            
+
+            // Add demo Course if it does not exist
+            if (await context.Courses.FirstOrDefaultAsync(c => c.Name == DemoCourseName, cancellationToken) is null)
+            {
+                await AddDemoCourseToDbAsync(scope, cancellationToken);
+            }
+
             logger.LogInformation("Seed complete");
         }
         catch (Exception ex)
@@ -89,16 +105,16 @@ public class DataSeedHostingService : IHostedService
         {
             FirstName = "Tes",
             LastName = "Ting",
-            UserName = "teacher@test.com",
-            Email = "teacher@test.com"
+            UserName = DemoTeacherEmail,
+            Email = DemoTeacherEmail
         };
         
         var student = new ApplicationUser
         {
             FirstName = "Yobayer",
             LastName = "Jobayer",
-            UserName = "student@test.com",
-            Email = "student@test.com"
+            UserName = DemoStudentEmail,
+            Email = DemoStudentEmail
         };
 
         await AddUserToDb([teacher, student]);
@@ -184,6 +200,72 @@ public class DataSeedHostingService : IHostedService
         await context.Courses.AddRangeAsync(courseGenerator.Generate(count));
 
         // ToDo: Use unitOfWork?
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
+        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
+        var moduleActivityTypes = await context.ModuleActivityTypes.ToListAsync(cancellationToken);
+
+        Randomizer.Seed = new Random(Seed);
+
+        var faker = new Faker();
+        var courseStartDate = faker.Date.Soon(30);
+        DateTime courseEndDate;
+
+        var timeOffset = courseStartDate;
+        var moduleActivityIteration = 0;
+        var moduleActivityGenerator = new Faker<ModuleActivity>()
+            .Rules((f, a) =>
+            {
+                var startTime = timeOffset;
+                var endTime = startTime.AddHours(f.Random.Int(1,4));
+
+                a.Name = f.Company.Bs().ApplyCase(LetterCasing.Title);
+                a.Description = f.Hacker.Phrase().ApplyCase(LetterCasing.Sentence);
+                a.StartDate = startTime;
+                a.EndDate = f.Date.Soon(refDate: startTime);
+                a.Type = f.PickRandom(moduleActivityTypes);
+
+                timeOffset = endTime.AddDays(moduleActivityIteration++);
+            });
+
+        var moduleIteration = 0;
+        var moduleGenerator = new Faker<Module>()
+            .Rules((f, m) =>
+            {
+                var startDate = courseStartDate.AddMonths(moduleIteration++);
+                courseEndDate = startDate.AddMonths(1);
+
+                m.Name = $"{f.Hacker.Adjective()} {f.Hacker.IngVerb()}".ApplyCase(LetterCasing.Title);
+                m.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
+                m.StartDate = startDate;
+                m.EndDate = courseEndDate;
+                m.Activities = moduleActivityGenerator.Generate(f.Random.Int(3,8));
+            });
+
+        var courseGenerator = new Faker<Course>()
+            .Rules((f, c) => {
+                var startDate = courseStartDate;
+                var endDate = startDate.AddMonths(6);
+                var modules = moduleGenerator.Generate(4);
+
+                c.Name = DemoCourseName;
+                c.Description = "A demo course to help with development of Lexicon LMS";
+                c.StartDate = startDate;
+                c.Modules = modules;
+                c.EndDate = modules.Last().EndDate;
+            });
+
+        var demoCourse = courseGenerator.Generate(1).First();
+        demoCourse.Participants.Add(demoTeacher);
+        demoCourse.Participants.Add(demoStudent);
+
+        await context.Courses.AddAsync(demoCourse, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 }
