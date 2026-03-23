@@ -183,8 +183,6 @@ public class DataSeedHostingService : IHostedService
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        Randomizer.Seed = new Random(Seed);
-
         var courseGenerator = new Faker<Course>()
             .Rules((f, c) =>
             {
@@ -197,7 +195,7 @@ public class DataSeedHostingService : IHostedService
                 c.EndDate = endDate;
             });
 
-        await context.Courses.AddRangeAsync(courseGenerator.Generate(count));
+        await context.Courses.AddRangeAsync(courseGenerator.UseSeed(Seed).Generate(count));
 
         // ToDo: Use unitOfWork?
         await context.SaveChangesAsync(cancellationToken);
@@ -210,8 +208,6 @@ public class DataSeedHostingService : IHostedService
         var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
         var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
         var moduleActivityTypes = await context.ModuleActivityTypes.ToListAsync(cancellationToken);
-
-        Randomizer.Seed = new Random(Seed);
 
         var faker = new Faker();
         var courseStartDate = faker.Date.Soon(30);
@@ -245,14 +241,14 @@ public class DataSeedHostingService : IHostedService
                 m.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
                 m.StartDate = startDate;
                 m.EndDate = courseEndDate;
-                m.Activities = moduleActivityGenerator.Generate(f.Random.Int(3,8));
+                m.Activities = moduleActivityGenerator.UseSeed(Seed).Generate(f.Random.Int(3,8));
             });
 
         var courseGenerator = new Faker<Course>()
             .Rules((f, c) => {
                 var startDate = courseStartDate;
                 var endDate = startDate.AddMonths(6);
-                var modules = moduleGenerator.Generate(4);
+                var modules = moduleGenerator.UseSeed(Seed).Generate(4);
 
                 c.Name = DemoCourseName;
                 c.Description = "A demo course to help with development of Lexicon LMS";
@@ -261,7 +257,7 @@ public class DataSeedHostingService : IHostedService
                 c.EndDate = modules.Last().EndDate;
             });
 
-        var demoCourse = courseGenerator.Generate(1).First();
+        var demoCourse = courseGenerator.UseSeed(Seed).Generate(1).First();
         demoCourse.Participants.Add(demoTeacher);
         demoCourse.Participants.Add(demoStudent);
 
