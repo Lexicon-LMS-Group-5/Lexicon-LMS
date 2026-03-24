@@ -1,0 +1,24 @@
+﻿@using LMS.Blazor.Client.Models
+
+<div class="module">
+    <h4>@Module.Name</h4>
+
+    <p>@Module.Description</p>
+
+    <small>
+        Start: @Module.StartDate.ToShortDateString() <br />
+        Slut: @Module.EndDate.ToShortDateString()
+    </small>
+
+    <div class="activities">
+        @foreach (var activity in Module.Activities)
+        {
+            <ActivityComponent Activity="activity" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Module { get; set; }
+}

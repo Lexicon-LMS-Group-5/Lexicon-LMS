@@ -1,0 +1,16 @@
+﻿@using LMS.Blazor.Client.Models
+
+<div class="activity">
+    <h5>@Activity.Name</h5>
+    <p>@Activity.Description</p>
+
+    <small>
+        @Activity.StartDate.ToString("yyyy-MM-dd") -
+        @Activity.EndDate.ToString("yyyy-MM-dd")
+    </small>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Activity { get; set; } = default!;
+}
