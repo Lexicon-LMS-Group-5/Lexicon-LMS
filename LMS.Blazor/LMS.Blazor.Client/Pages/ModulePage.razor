@@ -1,7 +1,7 @@
 @page "/module/{ModuleId:int}"
 @using LMS.Blazor.Client.Components
 @using LMS.Shared.DTOs
-@inject ClientApiService ClientApiService
+@inject IApiService ApiService
 @inject NavigationManager NavigationManager
 
 <h2>Module Details</h2>
@@ -42,9 +42,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         // Fetch module details
-        Module = await ClientApiService.GetAsync<ModuleReadDto>($"api/modules/{ModuleId}");
+        Module = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{ModuleId}");
 
         // Fetch activities for this module
-        Activities = await ClientApiService.GetAsync<List<ActivityReadDto>>($"api/modules/{ModuleId}/activities");
+        Activities = await ApiService.GetAsync<List<ActivityReadDto>>($"api/modules/{ModuleId}/activities");
     }
 }

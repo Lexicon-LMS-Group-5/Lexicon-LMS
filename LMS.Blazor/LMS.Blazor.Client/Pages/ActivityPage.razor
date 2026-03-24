@@ -1,6 +1,6 @@
 @page "/activity/{CourseId:int}/{ModuleId:int}/{ActivityId:int}"
 @using LMS.Shared.DTOs
-@inject ClientApiService ClientApiService
+@inject IApiService ApiService
 
 <h2>Activity Details</h2>
 
@@ -28,6 +28,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Activity = await ClientApiService.GetAsync<ActivityReadDto>($"api/activity/{CourseId}/{ModuleId}/{ActivityId}");
+        Activity = await ApiService.GetAsync<ActivityReadDto>($"api/activity/{CourseId}/{ModuleId}/{ActivityId}");
     }
 }
