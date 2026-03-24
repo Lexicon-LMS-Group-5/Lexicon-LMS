@@ -16,3 +16,11 @@
 </AuthorizeView>
 
 <div>General content</div>
+
+@if (CourseDetails is null)
+{
+    <div>Loading...</div>
+} else
+{
+    <div>@CourseDetails.Name</div>
+}
