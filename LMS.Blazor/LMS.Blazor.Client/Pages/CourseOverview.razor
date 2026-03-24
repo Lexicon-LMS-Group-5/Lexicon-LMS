@@ -5,22 +5,33 @@
 @attribute [Authorize]
 
 <PageTitle>@(CourseDetails?.Name ?? "Loading course details...")</PageTitle>
-<h1>@(CourseDetails?.Name ?? "Loading...")</h1>
 
-<AuthorizeView Roles="Teacher">
-    <div>Teacher content</div>
-</AuthorizeView>
 
-<AuthorizeView Roles="Student">
-    <div>Student content</div>
-</AuthorizeView>
-
-<div>General content</div>
-
-@if (CourseDetails is null)
+@if (IsLoading)
 {
-    <div>Loading...</div>
+    <div class="placeholder-glow">Loading...</div>
 } else
 {
-    <div>@CourseDetails.Name</div>
+    if (CourseDetails != null)
+    {
+        <h1>@CourseDetails.Name</h1>
+
+        <AuthorizeView Roles="Teacher">
+            <div>Teacher content</div>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Student">
+            <div>Student content</div>
+        </AuthorizeView>
+
+        <div>General content</div>
+    }
+
+    if (Error != null)
+    {
+        <div>
+            <h3>Something went wrong:</h3>
+            <p>@Error</p>
+        </div>
+    }
 }
