@@ -16,6 +16,7 @@ namespace LMS.Infractructure.Repositories
             return FindByCondition(c => c.Id == courseId, trackChanges)
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
+                    .ThenInclude(m => m.Activities)
                 .Single();
         }
 
@@ -26,6 +27,7 @@ namespace LMS.Infractructure.Repositories
             return await FindByCondition(c => c.Id == courseId, trackChanges)
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
+                    .ThenInclude(m => m.Activities)
                 .SingleAsync();
         }
     }
