@@ -15,18 +15,34 @@
     if (CourseDetails != null)
     {
         <h1>@CourseDetails.Name</h1>
+        <p>
+            Led by: @foreach(var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
+            {
+                <span>@participant.FullName </span>
+            }
+        </p>
 
         <p>@CourseDetails.Description</p>
 
-        <AuthorizeView Roles="Teacher">
-            <div>Teacher content</div>
-        </AuthorizeView>
+        <div class="mb-3">
+            <AuthorizeView Roles="Teacher">
+                <div>Teacher content</div>
+            </AuthorizeView>
+            <AuthorizeView Roles="Student">
+                <div>Student content</div>
+            </AuthorizeView>
+            <div>General content</div>
+        </div>
 
-        <AuthorizeView Roles="Student">
-            <div>Student content</div>
-        </AuthorizeView>
-
-        <div>General content</div>
+        <div>
+            <h3>Participants:</h3>
+            <div>
+                @foreach (var participant in CourseDetails.Participants.Where(p => p.Role != "Teacher"))
+                {
+                    <div>@participant.FullName</div>
+                }
+            </div>
+        </div>
 
         <div>
             <h2>Course Modules</h2>
