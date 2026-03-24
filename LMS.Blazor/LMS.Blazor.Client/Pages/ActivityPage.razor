@@ -1,0 +1,33 @@
+@page "/activity/{CourseId:int}/{ModuleId:int}/{ActivityId:int}"
+@using LMS.Shared.DTOs
+@inject HttpClient Http
+
+<h2>Activity Details</h2>
+
+<div>
+    <h3>@Activity.Name</h3>
+    <p>@Activity.Description</p>
+    <small>
+        Start: @Activity.StartDate.ToShortDateString() <br />
+        End: @Activity.EndDate.ToShortDateString()
+    </small>
+</div>
+
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+    [Parameter]
+    public int ModuleId { get; set; }
+
+    [Parameter]
+    public int ActivityId { get; set; }
+
+    private ActivityReadDto Activity { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Activity = await Http.GetFromJsonAsync<ActivityReadDto>($"api/activity/{CourseId}/{ModuleId}/{ActivityId}");
+    }
+}

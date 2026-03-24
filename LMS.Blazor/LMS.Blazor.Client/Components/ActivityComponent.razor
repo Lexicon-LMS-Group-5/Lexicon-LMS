@@ -1,16 +1,21 @@
-﻿@using LMS.Blazor.Client.Models
+﻿@using LMS.Shared.DTOs
+@inject NavigationManager NavigationManager
 
-<div class="activity">
+<div class="activity" @onclick="NavigateToActivity" style="cursor:pointer;">
     <h5>@Activity.Name</h5>
     <p>@Activity.Description</p>
-
     <small>
-        @Activity.StartDate.ToString("yyyy-MM-dd") -
-        @Activity.EndDate.ToString("yyyy-MM-dd")
+        Start: @Activity.StartDate.ToShortDateString() <br />
+        End: @Activity.EndDate.ToShortDateString()
     </small>
 </div>
 
 @code {
     [Parameter, EditorRequired]
-    public Activity { get; set; } = default!;
+    public ActivityReadDto Activity { get; set; } = default!;
+
+    private void NavigateToActivity()
+    {
+        NavigationManager.NavigateTo($"/activity/{Activity.Id}");
+    }
 }

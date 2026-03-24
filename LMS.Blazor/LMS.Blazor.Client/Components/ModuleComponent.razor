@@ -1,17 +1,16 @@
-﻿@using LMS.Blazor.Client.Models
+﻿@using LMS.Shared.DTOs
+@inject NavigationManager NavigationManager
 
-<div class="module">
+<div class="module" @onclick="NavigateToModule" style="cursor:pointer;">
     <h4>@Module.Name</h4>
-
     <p>@Module.Description</p>
-
     <small>
         Start: @Module.StartDate.ToShortDateString() <br />
-        Slut: @Module.EndDate.ToShortDateString()
+        End: @Module.EndDate.ToShortDateString()
     </small>
 
     <div class="activities">
-        @foreach (var activity in Module.Activities)
+        @foreach (var activity in Activities)
         {
             <ActivityComponent Activity="activity" />
         }
@@ -19,6 +18,14 @@
 </div>
 
 @code {
+    [Parameter, EditorRequired]
+    public ModuleReadDto Module { get; set; } = default!;
+
     [Parameter]
-    public Module { get; set; }
+    public List<ActivityReadDto> Activities { get; set; } = new();
+
+    private void NavigateToModule()
+    {
+        NavigationManager.NavigateTo($"/module/{Module.Id}");
+    }
 }
