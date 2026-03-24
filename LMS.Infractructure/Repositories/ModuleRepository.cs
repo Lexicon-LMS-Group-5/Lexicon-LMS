@@ -10,7 +10,7 @@ namespace LMS.Infractructure.Repositories
 
     public class ModuleRepository(ApplicationDbContext context) : RepositoryBase<Module>(context), IModuleRepository
     {
-        IQueryable<Module> GetModules(int courseId, bool trackChanges) =>
+        IQueryable<Module> GetModulesForCourse(int courseId, bool trackChanges) =>
             FindByCondition(m => m.CourseId == courseId, trackChanges);
     }
 }
