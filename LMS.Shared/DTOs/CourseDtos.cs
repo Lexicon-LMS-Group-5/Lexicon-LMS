@@ -21,11 +21,11 @@
 
     public class CourseDetailsDto : CourseReadDto
     {
-        IEnumerable<CourseParticipantsWithRoleInfoDto> Participants { get; set; } = [];
-        IEnumerable<CourseModuleListItemDto> Modules { get; set; } = [];
+        public IEnumerable<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
+        public IEnumerable<CourseModuleListItemDto> Modules { get; set; } = [];
     }
 
-    public class CourseParticipantsWithRoleInfoDto
+    public class CourseParticipantWithRoleInfoDto
     {
         public int Id { get; set; }
         public string FullName { get; set; } = string.Empty;
