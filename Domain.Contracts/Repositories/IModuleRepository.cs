@@ -7,5 +7,8 @@ namespace Domain.Contracts.Repositories
 {
     public interface IModuleRepository 
         : IInternalRepositoryBase<Module>,
-          IRepositoryBase<Module> {}
+          IRepositoryBase<Module>
+    {
+        public IQueryable<Module> GetModules(int courseId, bool trackChanges);
+    }
 }

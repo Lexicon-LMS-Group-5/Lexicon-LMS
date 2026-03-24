@@ -8,9 +8,10 @@ using System.Text;
 namespace LMS.Infractructure.Repositories
 {
 
-    public class ModuleRepository(ApplicationDbContext context) : RepositoryBase<Module>(context), IModuleRepository
+    public class ModuleRepository(ApplicationDbContext context)
+        : RepositoryBase<Module>(context), IModuleRepository
     {
-        IQueryable<Module> GetModules(int courseId, bool trackChanges) =>
+        public IQueryable<Module> GetModules(int courseId, bool trackChanges) =>
             FindByCondition(m => m.CourseId == courseId, trackChanges);
     }
 }
