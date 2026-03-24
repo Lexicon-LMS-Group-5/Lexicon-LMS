@@ -2,23 +2,28 @@
 using Domain.Models.Entities;
 using LMS.Infractructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace LMS.Infractructure.Repositories
 {
     public class CourseRepository(ApplicationDbContext context) : RepositoryBase<Course>(context), ICourseRepository
     {
-        ApplicationDbContext context = context;
-        public async Task<bool> CourseExistsAsync(int courseId)
-        {
-            return await context.Courses.FindAsync(courseId) is not null;
-        }
+        private readonly ApplicationDbContext context = context;
 
-        public async Task<Course?> GetCourseDetailsByConditionAsync(Expression<Func<Course, bool>> expression, bool trackChanges = false)
+        public Course? GetCourseDetailsById(int courseId, bool trackChanges = false)
         {
             var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
 
-            return await FindByCondition(expression, trackChanges)
+            return FindByCondition(c => c.Id == courseId, trackChanges)
+                .Include(c => c.Participants)
+                .Include(c => c.Modules)
+                .Single();
+        }
+
+        public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false)
+        {
+            var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
+
+            return await FindByCondition(c => c.Id == courseId, trackChanges)
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                 .SingleAsync();
