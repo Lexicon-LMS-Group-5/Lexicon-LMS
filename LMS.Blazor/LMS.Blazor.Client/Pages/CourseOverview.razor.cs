@@ -10,6 +10,9 @@ public partial class CourseOverview
     [Inject]
     private IApiService ApiService { get; set; } = default!;
 
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
     [Parameter]
     public string CourseId { get; set; } = string.Empty;
 
@@ -19,6 +22,11 @@ public partial class CourseOverview
 
     protected override async Task OnInitializedAsync()
     {
-        CourseDetails = await ApiService.GetAsync<CourseDetailsDto>("/api/courses/4", new CancellationToken());
+        // ToDo: Get courseId from logged in user
+        courseId = 4;
+        if (courseId is null)
+            Navigation.NotFound();
+
+        CourseDetails = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{courseId}");
     }
 }

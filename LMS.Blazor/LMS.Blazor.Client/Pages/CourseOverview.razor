@@ -1,11 +1,11 @@
-﻿@page "/courses/{CourseId}"
+﻿@page "/my-course"
 
 @using Microsoft.AspNetCore.Authorization
 
 @attribute [Authorize]
 
-<PageTitle>Course @CourseId</PageTitle>
-<h1>Course @CourseId</h1>
+<PageTitle>@(CourseDetails?.Name ?? "Loading course details...")</PageTitle>
+<h1>@(CourseDetails?.Name ?? "Loading...")</h1>
 
 <AuthorizeView Roles="Teacher">
     <div>Teacher content</div>
