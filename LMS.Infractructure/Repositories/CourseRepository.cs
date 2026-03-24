@@ -9,17 +9,6 @@ namespace LMS.Infractructure.Repositories
     {
         private readonly ApplicationDbContext context = context;
 
-        public Course? GetCourseDetailsById(int courseId, bool trackChanges = false)
-        {
-            var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
-
-            return FindByCondition(c => c.Id == courseId, trackChanges)
-                .Include(c => c.Participants)
-                .Include(c => c.Modules)
-                    .ThenInclude(m => m.Activities)
-                .Single();
-        }
-
         public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false)
         {
             var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
