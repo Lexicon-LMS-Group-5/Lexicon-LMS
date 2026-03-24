@@ -26,24 +26,18 @@ public class ModuleActivityService : IModuleActivityService
         return mapper.Map<List<ActivityReadDto>>(activities);
     }
 
-    public async Task<ActivityReadDto?> GetActivityAsync(int id, CancellationToken ct)
+    public async Task<ActivityReadDto> GetActivityAsync(int id, CancellationToken ct)
     {
         var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: false, ct);
+
+        if (activity == null) throw new NotFoundException($"Activity {id} not found");
 
         return mapper.Map<ActivityReadDto>(activity);
     }
 
     public async Task<ActivityReadDto> CreateActivityAsync(ActivityUpsertDto activityUpsertDto, CancellationToken ct)
     {
-        /*
-         * This should probably be in the ModuleService instead.
-         * 
-         * 
-        var selectedModule = unitOfWork.Modules.GetbyIdAsync(id: 1, trackChanges: false, ct).Result;
-        moduleRepository.GetById(id: 1, trackChanges: false);
-        if (selectedModule)
-            throw new NullReferenceException(); 
-        */
+        //This should probably be in the ModuleService instead.
         throw new NotImplementedException();
     }
 
@@ -73,22 +67,22 @@ public class ModuleActivityService : IModuleActivityService
 
     public async Task<List<ActivityReadDto>> GetActivitiesByModuleIdAsync(int moduleId, CancellationToken ct)
     {
-        var activity = await unitOfWork.Activities.GetActivitiesByModuleIdAsync(moduleId, trackChanges: false, ct);
+        var activities = await unitOfWork.Activities.GetActivitiesByModuleIdAsync(moduleId, trackChanges: false, ct);
 
-        return mapper.Map<List<ActivityReadDto>>(activity);
+        return mapper.Map<List<ActivityReadDto>>(activities);
     }
 
     public async Task<List<ActivityReadDto>> GetActivitiesByTypeIdAsync(int typeId, CancellationToken ct)
     {
-        var activity = unitOfWork.Activities.GetActivitiesByTypeIdAsync(typeId, trackChanges: false, ct);
+        var activities = await unitOfWork.Activities.GetActivitiesByTypeIdAsync(typeId, trackChanges: false, ct);
 
-        return mapper.Map<List<ActivityReadDto>>(activity);
+        return mapper.Map<List<ActivityReadDto>>(activities);
     }
 
     public async Task<List<ActivityReadDto>> GetActivitiesByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken ct)
     {
-        var activity = unitOfWork.Activities.GetActivitiesByDateRangeAsync(startDate, endDate, trackChanges: false, ct);
+        var activities = await unitOfWork.Activities.GetActivitiesByDateRangeAsync(startDate, endDate, trackChanges: false, ct);
 
-        return mapper.Map<List<ActivityReadDto>>(activity);
+        return mapper.Map<List<ActivityReadDto>>(activities);
     }
 }

@@ -1,112 +1,100 @@
-﻿/*
-using Domain.Models.Entities;
-using LMS.Infractructure.Data;
-using LMS.Shared.DTOs;
-using Microsoft.AspNetCore.Http;
+﻿using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace LMS.API;
+namespace LMS.API.Controllers;
 
-
-[Route("api/[controller]")]
 [ApiController]
-public class ModuleActivitiesController : ControllerBase
+[Route("api/[controller]")]
+public class ActivitiesController : ControllerBase
 {
-    private readonly IServiceManager serviceManager;
+    private readonly IModuleActivityService _service;
 
-    public ModuleActivitiesController(IServiceManager serviceManager)
+    public ActivitiesController(IModuleActivityService service)
     {
-        this.serviceManager = serviceManager;
+        _service = service;
     }
 
-    // GET: api/ModuleActivities
+    // GET: api/activities
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ModuleActivity>>> GetModuleActivities()
+    public async Task<ActionResult<List<ActivityReadDto>>> GetAll(CancellationToken ct)
     {
-        return await _context.ModuleActivities.ToListAsync();
+        var activities = await _service.GetAllActivitiesAsync(ct);
+        return Ok(activities);
     }
 
-    // GET: api/ModuleActivities/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ModuleActivity>> GetModuleActivity(int id)
+    // GET: api/activities/5
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<ActivityReadDto>> GetById(int id, CancellationToken ct)
     {
-        var moduleActivity = await _context.ModuleActivities.FindAsync(id);
-
-        if (moduleActivity == null)
-        {
-            return NotFound();
-        }
-
-        return moduleActivity;
+        var activity = await _service.GetActivityAsync(id, ct);
+        return Ok(activity);
     }
 
-    // PUT: api/ModuleActivities/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutModuleActivity(int id, ModuleActivity moduleActivity)
+    // This should probably be in the ModuleController.
+    //// GET: api/activities/module/3
+    //[HttpGet("module/{moduleId:int}")]
+    //public async Task<ActionResult<List<ActivityReadDto>>> GetByModuleId(int moduleId, CancellationToken ct)
+    //{
+    //    var activities = await _service.GetActivitiesByModuleIdAsync(moduleId, ct);
+    //    return Ok(activities);
+    //}
+
+    // GET: api/activities/type/2
+    [HttpGet("type/{typeId:int}")]
+    public async Task<ActionResult<List<ActivityReadDto>>> GetByTypeId(int typeId, CancellationToken ct)
     {
-        if (id != moduleActivity.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(moduleActivity).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ModuleActivityExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        var activities = await _service.GetActivitiesByTypeIdAsync(typeId, ct);
+        return Ok(activities);
     }
 
-    // POST: api/ModuleActivities
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    // GET: api/activities/daterange?startDate=...&endDate=...
+    [HttpGet("daterange")]
+    public async Task<ActionResult<List<ActivityReadDto>>> GetByDateRange(
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate,
+        CancellationToken ct)
+    {
+        var activities = await _service.GetActivitiesByDateRangeAsync(startDate, endDate, ct);
+        return Ok(activities);
+    }
+
+    // POST: api/activities
     [HttpPost]
-    public async Task<ActionResult<ModuleActivity>> PostModuleActivity(ModuleActivity moduleActivity)
+    public async Task<ActionResult<ActivityReadDto>> Create(
+        [FromBody] ActivityUpsertDto dto,
+        CancellationToken ct)
     {
-        _context.ModuleActivities.Add(moduleActivity);
-        await _context.SaveChangesAsync();
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        return CreatedAtAction("GetModuleActivity", new { id = moduleActivity.Id }, moduleActivity);
+        var created = await _service.CreateActivityAsync(dto, ct);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = created.Id },
+            created);
     }
 
-    // DELETE: api/ModuleActivities/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteModuleActivity(int id)
+    // PUT: api/activities/5
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<ActivityReadDto>> Update(
+        int id,
+        [FromBody] ActivityUpsertDto dto,
+        CancellationToken ct)
     {
-        var moduleActivity = await _context.ModuleActivities.FindAsync(id);
-        if (moduleActivity == null)
-        {
-            return NotFound();
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        _context.ModuleActivities.Remove(moduleActivity);
-        await _context.SaveChangesAsync();
+        var updated = await _service.UpdateActivityAsync(id, dto, ct);
+        return Ok(updated);
+    }
 
+    // DELETE: api/activities/5
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        await _service.DeleteActivityAsync(id, ct);
         return NoContent();
-    }
-
-    private bool ModuleActivityExists(int id)
-    {
-        return _context.ModuleActivities.Any(e => e.Id == id);
     }
 }
-*/
