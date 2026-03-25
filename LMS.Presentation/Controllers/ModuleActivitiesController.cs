@@ -15,6 +15,7 @@ public class ActivitiesController : ControllerBase
         _service = service;
     }
 
+    //This one will probably never be used.
     // GET: api/activities
     [HttpGet]
     public async Task<ActionResult<List<ActivityReadDto>>> GetAll(CancellationToken ct)
