@@ -1,6 +1,7 @@
 using LMS.API.Extensions;
 using LMS.API.Services;
 using LMS.Infractructure.Data;
+using LMS.Infractructure.Repositories;
 using Microsoft.OpenApi;
 
 namespace LMS.API;
@@ -25,6 +26,8 @@ public class Program
         builder.Services.ConfigureCors();
         builder.Services.ConfigureSwagger();
 
+        builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         var app = builder.Build();
 

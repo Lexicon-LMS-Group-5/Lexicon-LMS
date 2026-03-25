@@ -8,11 +8,11 @@ public class UnitOfWork : IUnitOfWork
 
     public IActivityRepository Activities { get; }
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(ApplicationDbContext context, IActivityRepository activities)
     {
         this.context = context ?? throw new ArgumentNullException(nameof(context));
 
-        Activities = new ActivityRepository(context);
+        this.Activities = activities;
     }
 
     public async Task CompleteAsync() => await context.SaveChangesAsync();
