@@ -3,5 +3,5 @@ public interface IServiceManager
 {
     IAuthService AuthService { get; }
 
-    IActivityService ModuleActivityService { get; }
+    IActivityService ActivityService { get; }
 }

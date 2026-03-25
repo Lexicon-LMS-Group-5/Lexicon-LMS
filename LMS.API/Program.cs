@@ -26,8 +26,6 @@ public class Program
         builder.Services.ConfigureCors();
         builder.Services.ConfigureSwagger();
 
-        builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
-        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         var app = builder.Build();
 

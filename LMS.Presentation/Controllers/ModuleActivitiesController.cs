@@ -3,16 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
 namespace LMS.API.Controllers;
-
+// TODO: FIX THIS
 [ApiController]
 [Route("api/[controller]")]
 public class ActivitiesController : ControllerBase
 {
-    private readonly IActivityService _service;
+    private readonly IServiceManager serviceManager;
 
-    public ActivitiesController(IActivityService service)
+    public ActivitiesController(IServiceManager service)
     {
-        _service = service;
+        serviceManager = service;
     }
 
     //This one will probably never be used.
@@ -20,7 +20,7 @@ public class ActivitiesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<ActivityReadDto>>> GetAll(CancellationToken ct)
     {
-        var activities = await _service.GetAllActivitiesAsync(ct);
+        var activities = await serviceManager.ActivityService.GetAllActivitiesAsync(ct);
         return Ok(activities);
     }
 
@@ -28,7 +28,7 @@ public class ActivitiesController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ActivityReadDto>> GetById(int id, CancellationToken ct)
     {
-        var activity = await _service.GetActivityAsync(id, ct);
+        var activity = await serviceManager.ActivityService.GetActivityAsync(id, ct);
         return Ok(activity);
     }
 
@@ -45,7 +45,7 @@ public class ActivitiesController : ControllerBase
     [HttpGet("type/{typeId:int}")]
     public async Task<ActionResult<List<ActivityReadDto>>> GetByTypeId(int typeId, CancellationToken ct)
     {
-        var activities = await _service.GetActivitiesByTypeIdAsync(typeId, ct);
+        var activities = await serviceManager.ActivityService.GetActivitiesByTypeIdAsync(typeId, ct);
         return Ok(activities);
     }
 
@@ -56,7 +56,7 @@ public class ActivitiesController : ControllerBase
         [FromQuery] DateTime endDate,
         CancellationToken ct)
     {
-        var activities = await _service.GetActivitiesByDateRangeAsync(startDate, endDate, ct);
+        var activities = await serviceManager.ActivityService.GetActivitiesByDateRangeAsync(startDate, endDate, ct);
         return Ok(activities);
     }
 
@@ -69,7 +69,7 @@ public class ActivitiesController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var created = await _service.CreateActivityAsync(dto, ct);
+        var created = await serviceManager.ActivityService.CreateActivityAsync(dto, ct);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -87,7 +87,7 @@ public class ActivitiesController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var updated = await _service.UpdateActivityAsync(id, dto, ct);
+        var updated = await serviceManager.ActivityService.UpdateActivityAsync(id, dto, ct);
         return Ok(updated);
     }
 
@@ -95,7 +95,7 @@ public class ActivitiesController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        await _service.DeleteActivityAsync(id, ct);
+        await serviceManager.ActivityService.DeleteActivityAsync(id, ct);
         return NoContent();
     }
 }
