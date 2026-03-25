@@ -6,13 +6,15 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext context;
 
-    public IActivityRepository Activities { get; }
+    private readonly Lazy<IActivityRepository> activities;
 
-    public UnitOfWork(ApplicationDbContext context, IActivityRepository activities)
+    public IActivityRepository Activities => activities.Value;
+
+    public UnitOfWork(ApplicationDbContext context, Lazy<IActivityRepository> activities)
     {
         this.context = context ?? throw new ArgumentNullException(nameof(context));
 
-        Activities = activities;
+        this.activities = activities;
     }
 
     public async Task CompleteAsync() => await context.SaveChangesAsync();
