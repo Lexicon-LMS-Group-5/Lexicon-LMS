@@ -1,6 +1,7 @@
 using LMS.API.Extensions;
 using LMS.API.Services;
 using LMS.Infractructure.Data;
+using LMS.Infractructure.Repositories;
 using Microsoft.OpenApi;
 
 namespace LMS.API;
