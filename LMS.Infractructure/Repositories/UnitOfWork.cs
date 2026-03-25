@@ -12,7 +12,7 @@ public class UnitOfWork : IUnitOfWork
     {
         this.context = context ?? throw new ArgumentNullException(nameof(context));
 
-        this.Activities = activities;
+        Activities = activities;
     }
 
     public async Task CompleteAsync() => await context.SaveChangesAsync();

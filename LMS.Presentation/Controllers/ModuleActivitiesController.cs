@@ -8,9 +8,9 @@ namespace LMS.API.Controllers;
 [Route("api/[controller]")]
 public class ActivitiesController : ControllerBase
 {
-    private readonly IModuleActivityService _service;
+    private readonly IActivityService _service;
 
-    public ActivitiesController(IModuleActivityService service)
+    public ActivitiesController(IActivityService service)
     {
         _service = service;
     }

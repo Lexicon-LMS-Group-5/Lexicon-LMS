@@ -7,11 +7,11 @@ public class ServiceManager : IServiceManager
     private Lazy<IAuthService> authService;
     public IAuthService AuthService => authService.Value;
 
-    private Lazy<IModuleActivityService> moduleActivityService;
+    private Lazy<IActivityService> moduleActivityService;
 
-    public IModuleActivityService ModuleActivityService => moduleActivityService.Value;
+    public IActivityService ModuleActivityService => moduleActivityService.Value;
 
-    public ServiceManager(Lazy<IAuthService> authService, Lazy<IModuleActivityService> moduleActivityService)
+    public ServiceManager(Lazy<IAuthService> authService, Lazy<IActivityService> moduleActivityService)
     {
         this.authService = authService;
         this.moduleActivityService = moduleActivityService;

@@ -2,7 +2,7 @@
 
 namespace Service.Contracts;
 
-public interface IModuleActivityService
+public interface IActivityService
 {
     Task<List<ActivityReadDto>> GetAllActivitiesAsync(CancellationToken ct);
     Task<ActivityReadDto> GetActivityAsync(int id, CancellationToken ct);

@@ -6,12 +6,12 @@ using Service.Contracts;
 
 namespace LMS.Services;
 
-public class ModuleActivityService : IModuleActivityService
+public class ActivityService : IActivityService
 {
     private readonly IMapper mapper;
     private readonly IUnitOfWork unitOfWork;
 
-    public ModuleActivityService(
+    public ActivityService(
         IMapper mapper, IUnitOfWork unitOfWork
         )
     {
