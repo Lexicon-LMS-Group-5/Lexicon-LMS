@@ -4,6 +4,6 @@ namespace Service.Contracts
 {
     public interface ICourseService
     {
-        Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query);
+        Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default);
     }
 }

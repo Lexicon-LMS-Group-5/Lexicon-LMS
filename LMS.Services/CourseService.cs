@@ -24,9 +24,9 @@ namespace LMS.Services
             this.mapper = mapper;
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await courseRepository.GetCourseDetailsByIdAsync(query.CourseId)
+            var course = await courseRepository.GetCourseDetailsByIdAsync(query.CourseId, false, ct)
                 ?? throw new CourseNotFoundException();
 
             List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];
