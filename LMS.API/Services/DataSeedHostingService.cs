@@ -136,7 +136,14 @@ public class DataSeedHostingService : IHostedService
             e.UserName = f.Person.Email;
         });
 
-        await AddUserToDb(faker.Generate(nrOfUsers));
+        var fakeUsers = faker.Generate(nrOfUsers);
+        
+        await AddUserToDb(fakeUsers);
+
+        foreach (var user in fakeUsers)
+        {
+            await userManager.AddToRoleAsync(user, StudentRole);
+        }
     }
 
     private async Task AddUserToDb(IEnumerable<ApplicationUser> users)
@@ -204,7 +211,9 @@ public class DataSeedHostingService : IHostedService
     private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        
+        var students = await userManager.GetUsersInRoleAsync(StudentRole);
         var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
         var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
         var moduleActivityTypes = await context.ModuleActivityTypes.ToListAsync(cancellationToken);
@@ -259,7 +268,11 @@ public class DataSeedHostingService : IHostedService
 
         var demoCourse = courseGenerator.UseSeed(Seed).Generate(1).First();
         demoCourse.Participants.Add(demoTeacher);
-        demoCourse.Participants.Add(demoStudent);
+
+        foreach (var student in students)
+        {
+            demoCourse.Participants.Add(student);
+        }
 
         await context.Courses.AddAsync(demoCourse, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
