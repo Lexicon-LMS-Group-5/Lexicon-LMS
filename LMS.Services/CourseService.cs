@@ -27,19 +27,18 @@ namespace LMS.Services
 
         public async Task<CoursesQueryResultDto> GetCoursesAsync(CoursesQueryDto query, CancellationToken ct = default)
         {
-            // ToDo: Validate query rules (max page size etc)?
             var courses = await unitOfWork.CourseRepository.FindAllByConditionAsync(query, false, ct);
-            
-            // Construct query result Items and MetaData
-            var totalItems = courses.Count();
 
+            // Construct query result Items and MetaData
+            var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
+            var totalItems = courses.Count();
             var metaData = mapper.Map<PagedResultMetaDataDto>(query);
             metaData.TotalCount = totalItems;
             metaData.TotalPages = (int)Math.Ceiling((double)totalItems / query.Size);
 
             return new CoursesQueryResultDto
             {
-                Items = mapper.Map<IReadOnlyList<CourseListItemDto>>(courses),
+                Items = items,
                 MetaData = metaData
             };
         }
