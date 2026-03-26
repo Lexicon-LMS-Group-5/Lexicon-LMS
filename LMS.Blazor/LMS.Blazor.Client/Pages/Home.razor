@@ -5,3 +5,17 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<div>
+    <h2>Courses</h2>
+    @if(PageState.IsLoading) {
+        <div>Loading courses...</div>
+    } else if(PageState.Data != null){
+        <ul>
+            @foreach(var course in PageState.Data.Items)
+            {
+                <li>@course.Name</li>
+            }
+        </ul>
+    }
+</div>
