@@ -2,6 +2,7 @@
 
 public interface IUnitOfWork
 {
-    public IActivityRepository Activities { get; }
+    IActivityRepository Activities { get; }
+    ICourseRepository CourseRepository { get; }
     Task CompleteAsync();
 }

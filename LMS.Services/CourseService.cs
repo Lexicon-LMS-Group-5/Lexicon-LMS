@@ -10,23 +10,23 @@ namespace LMS.Services
 {
     public class CourseService : ICourseService
     {
-        private readonly ICourseRepository courseRepository;
+        private readonly IUnitOfWork unitOfWork;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
         public CourseService(
-            ICourseRepository courseRepository, 
+             IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
-            this.courseRepository = courseRepository;
+            this.unitOfWork = unitOfWork;
             this.userManager = userManager;
             this.mapper = mapper;
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await courseRepository.GetCourseDetailsByIdAsync(query.CourseId)
+            var course = await unitOfWork.CourseRepository.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
                 ?? throw new CourseNotFoundException();
 
             List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];

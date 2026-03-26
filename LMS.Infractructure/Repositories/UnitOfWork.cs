@@ -4,17 +4,23 @@ using LMS.Infractructure.Data;
 namespace LMS.Infractructure.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext context;
+    private readonly Lazy<ICourseRepository> courseRepository;
+    public ICourseRepository CourseRepository => courseRepository.Value;
 
     private readonly Lazy<IActivityRepository> activities;
-
     public IActivityRepository Activities => activities.Value;
+    
+    private readonly ApplicationDbContext context;
 
-    public UnitOfWork(ApplicationDbContext context, Lazy<IActivityRepository> activities)
+    public UnitOfWork(
+        ApplicationDbContext context,
+        Lazy<ICourseRepository> courseRepository,
+        Lazy<IActivityRepository> activities)
+
     {
+        this.courseRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
+        this.activities = activities ?? throw new ArgumentNullException(nameof(activities));
         this.context = context ?? throw new ArgumentNullException(nameof(context));
-
-        this.activities = activities;
     }
 
     public async Task CompleteAsync() => await context.SaveChangesAsync();
