@@ -9,7 +9,7 @@ namespace LMS.Infractructure.Repositories
     {
         private readonly ApplicationDbContext context = context;
 
-        public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false)
+        public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false, CancellationToken ct = default)
         {
             var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
 
@@ -17,7 +17,7 @@ namespace LMS.Infractructure.Repositories
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
-                .SingleAsync();
+                .SingleAsync(ct);
         }
     }
 }

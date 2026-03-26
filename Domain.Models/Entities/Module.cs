@@ -9,5 +9,5 @@ public class Module
     public DateTime EndDate { get; set; }
     public int CourseId { get; set; }
     public Course Course { get; set; }
-    public ICollection<ModuleActivity> Activities { get; set; } = [];
+    public ICollection<Activity> Activities { get; set; } = [];
 }

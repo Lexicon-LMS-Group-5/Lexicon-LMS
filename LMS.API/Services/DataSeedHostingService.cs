@@ -164,15 +164,15 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await context.ModuleActivityTypes.AddRangeAsync([
-            new ModuleActivityType()
+            new ActivityType()
             {
                 Name = "Assignment",
             },
-            new ModuleActivityType()
+            new ActivityType()
             {
                 Name = "E-learning",
             },
-            new ModuleActivityType()
+            new ActivityType()
             {
                 Name = "Lecture",
                 TimeExclusive = true,
@@ -224,7 +224,7 @@ public class DataSeedHostingService : IHostedService
 
         var timeOffset = courseStartDate;
         var moduleActivityIteration = 0;
-        var moduleActivityGenerator = new Faker<ModuleActivity>()
+        var moduleActivityGenerator = new Faker<Activity>()
             .Rules((f, a) =>
             {
                 var startTime = timeOffset;
