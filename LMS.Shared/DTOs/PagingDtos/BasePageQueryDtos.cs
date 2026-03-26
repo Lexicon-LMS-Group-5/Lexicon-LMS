@@ -22,8 +22,8 @@ public class BasePageQueryDto
 
 public class BasePagedResultDto<TItem>
 {
-    public IReadOnlyList<TItem> Items { get; }
-    public PagedResultMetaDataDto MetaData { get; set; }
+    public IReadOnlyList<TItem> Items { get; init; } = [];
+    public PagedResultMetaDataDto MetaData { get; set; } = default!;
 }
 
 public class PagedResultMetaDataDto

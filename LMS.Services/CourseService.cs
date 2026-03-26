@@ -3,6 +3,7 @@ using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs.CourseDtos;
+using LMS.Shared.DTOs.PagingDtos;
 using Microsoft.AspNetCore.Identity;
 using Service.Contracts;
 
@@ -22,6 +23,25 @@ namespace LMS.Services
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
             this.mapper = mapper;
+        }
+
+        public async Task<CoursesQueryResultDto> GetCoursesAsync(CoursesQueryDto query, CancellationToken ct = default)
+        {
+            // ToDo: Validate query rules (max page size etc)?
+            var courses = await unitOfWork.CourseRepository.FindAllByConditionAsync(query, false, ct);
+            
+            // Construct query result Items and MetaData
+            var totalItems = courses.Count();
+
+            var metaData = mapper.Map<PagedResultMetaDataDto>(query);
+            metaData.TotalCount = totalItems;
+            metaData.TotalPages = (int)Math.Ceiling((double)totalItems / query.Size);
+
+            return new CoursesQueryResultDto
+            {
+                Items = mapper.Map<IReadOnlyList<CourseListItemDto>>(courses),
+                MetaData = metaData
+            };
         }
 
         public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
