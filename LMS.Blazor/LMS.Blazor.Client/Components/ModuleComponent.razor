@@ -1,19 +1,26 @@
 ﻿@using LMS.Shared.DTOs
 @inject NavigationManager NavigationManager
 
-<div class="module" @onclick="NavigateToModule" style="cursor:pointer;">
-    <h4>@Module.Name</h4>
-    <p>@Module.Description</p>
-    <small>
-        Start: @Module.StartDate.ToShortDateString() <br />
-        End: @Module.EndDate.ToShortDateString()
-    </small>
+<div class="card mb-4 shadow module-card" @onclick="NavigateToModule">
+    <div class="card-body">
+        <h4 class="card-title">@Module.Name</h4>
+        <p class="card-text text-muted">@Module.Description</p>
 
-    <div class="activities">
-        @foreach (var activity in Activities)
-        {
-            <ActivityComponent Activity="activity" />
-        }
+        <small class="text-secondary">
+            <i class="bi bi-calendar"></i>
+            @Module.StartDate.ToShortDateString()
+            -
+            @Module.EndDate.ToShortDateString()
+        </small>
+
+        <hr />
+
+        <div class="activities mt-3">
+            @foreach (var activity in Activities)
+            {
+                <ActivityComponent Activity="activity" />
+            }
+        </div>
     </div>
 </div>
 

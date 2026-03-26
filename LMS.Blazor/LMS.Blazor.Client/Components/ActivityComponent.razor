@@ -1,13 +1,18 @@
 ﻿@using LMS.Shared.DTOs
 @inject NavigationManager NavigationManager
 
-<div class="activity" @onclick="NavigateToActivity" style="cursor:pointer;">
-    <h5>@Activity.Name</h5>
-    <p>@Activity.Description</p>
-    <small>
-        Start: @Activity.StartDate.ToShortDateString() <br />
-        End: @Activity.EndDate.ToShortDateString()
-    </small>
+<div class="card mb-3 shadow-sm activity-card" @onclick="NavigateToActivity">
+    <div class="card-body">
+        <h5 class="card-title">@Activity.Name</h5>
+        <p class="card-text text-muted">@Activity.Description</p>
+
+        <small class="text-secondary">
+            <i class="bi bi-calendar-event"></i>
+            @Activity.StartDate.ToShortDateString()
+            -
+            @Activity.EndDate.ToShortDateString()
+        </small>
+    </div>
 </div>
 
 @code {
