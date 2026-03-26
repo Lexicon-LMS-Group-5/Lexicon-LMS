@@ -1,6 +1,6 @@
 using System;
 using LMS.Blazor.Client.Services;
-using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.CourseDtos;
 using Microsoft.AspNetCore.Components;
 
 namespace LMS.Blazor.Client.Pages;
