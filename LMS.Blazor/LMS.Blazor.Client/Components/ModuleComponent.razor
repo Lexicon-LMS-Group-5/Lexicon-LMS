@@ -19,10 +19,10 @@
 
 @code {
     [Parameter, EditorRequired]
-    public ModuleReadDto Module { get; set; } = default!;
+    public CourseModuleListItemDto Module { get; set; } = default!;
 
     [Parameter]
-    public List<ActivityReadDto> Activities { get; set; } = new();
+    public IEnumerable<ActivityReadDto> Activities { get; set; }
 
     private void NavigateToModule()
     {

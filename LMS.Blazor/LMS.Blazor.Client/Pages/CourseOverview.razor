@@ -1,22 +1,26 @@
 ﻿@page "/my-course"
 
 @using Microsoft.AspNetCore.Authorization
+@using LMS.Shared.DTOs
+@using LMS.Blazor.Client.Components
 
 @attribute [Authorize]
 
 <PageTitle>@(CourseDetails?.Name ?? "Loading course details...")</PageTitle>
 
-
 @if (IsLoading)
 {
     <div class="placeholder-glow">Loading...</div>
-} else
+}
+else
 {
     if (CourseDetails != null)
     {
         <h1>@CourseDetails.Name</h1>
+
         <p>
-            Led by: @foreach(var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
+            Led by: 
+            @foreach(var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
             {
                 <span>@participant.FullName </span>
             }
@@ -46,12 +50,14 @@
 
         <div>
             <h2>Course Modules</h2>
-            <ul>
+            <div class="modules">
                 @foreach(var module in CourseDetails.Modules)
                 {
-                    <li>@module.Name</li>
+                    <ModuleComponent 
+                        Module="module" 
+                        Activities="module.Activities" />
                 }
-            </ul>
+            </div>
         </div>
     }
 

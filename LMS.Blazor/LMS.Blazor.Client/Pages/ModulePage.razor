@@ -4,29 +4,38 @@
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
 
-<h2>Module Details</h2>
-
-<div>
-    <h3>@Module.Name</h3>
-    <p>@Module.Description</p>
-    <small>
-        Start: @Module.StartDate.ToShortDateString() <br />
-        End: @Module.EndDate.ToShortDateString()
-    </small>
-</div>
-
-<h4>Activities</h4>
-@if (Activities != null && Activities.Any())
+@if (Module == null)
 {
-    @foreach (var activity in Activities)
-    {
-        <ActivityComponent Activity="activity" ModuleId="Module.Id" CourseId="CourseId" />
-    }
+    <p>Loading module...</p>
 }
 else
 {
-    <p>No activities found for this module.</p>
+    <h2>Module Details</h2>
+
+    <div>
+        <h3>@Module.Name</h3>
+        <p>@Module.Description</p>
+        <small>
+            Start: @Module.StartDate.ToShortDateString() <br />
+            End: @Module.EndDate.ToShortDateString()
+        </small>
+    </div>
+
+    <h4>Activities</h4>
+    @if (Activities != null && Activities.Any())
+    {
+        @foreach (var activity in Activities)
+        {
+            <ActivityComponent Activity="activity" ModuleId="@Module.Id" CourseId="@CourseId" />
+        }
+    }
+    else
+    {
+        <p>No activities found for this module.</p>
+    }
+
 }
+
 
 
 @code {
