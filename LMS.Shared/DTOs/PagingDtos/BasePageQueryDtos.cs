@@ -1,15 +1,25 @@
-﻿namespace LMS.Shared.DTOs.PagingDtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LMS.Shared.DTOs.PagingDtos;
 
 public class BasePageQueryDto
 {
+    [Range(1, int.MaxValue)]
+    public int Page { get; set; } = 1;
+
+    [Range(2, 25)]
+    public int Size { get; set; } = 2;
+
+    public SortOrder? Order { get; set; } = SortOrder.Descending;
 }
 
 public class BasePagedResultDto<TItem>
 {
     public IReadOnlyList<TItem> Items { get; }
+    public PagedResultMetaDataDto MetaData { get; set; }
 }
 
-public class PagedResultMetadataDto
+public class PagedResultMetaDataDto
 {
     public int Page { get; set; }
     public int Size { get; set; }
