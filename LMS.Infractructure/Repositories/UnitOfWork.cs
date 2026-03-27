@@ -7,6 +7,9 @@ public class UnitOfWork : IUnitOfWork
     private readonly Lazy<ICourseRepository> courseRepository;
     public ICourseRepository CourseRepository => courseRepository.Value;
 
+    private readonly Lazy<IModuleRepository> moduleRepository;
+    public IModuleRepository ModuleRepository => moduleRepository.Value;
+
     private readonly Lazy<IActivityRepository> activities;
     public IActivityRepository Activities => activities.Value;
     
@@ -19,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
 
     {
         this.courseRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
+        this.moduleRepository = moduleRepository ?? throw new ArgumentNullException(nameof(moduleRepository));
         this.activities = activities ?? throw new ArgumentNullException(nameof(activities));
         this.context = context ?? throw new ArgumentNullException(nameof(context));
     }
