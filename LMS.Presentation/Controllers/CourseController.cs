@@ -9,16 +9,30 @@ namespace LMS.Presentation.Controllers;
 [Authorize]
 [Route("api/courses")]
 [ApiController]
-public class CourseController(IServiceManager serviceManager) : ControllerBase
+[Produces("application/json")]
+public class CourseController : ControllerBase
 {
-    private readonly ICourseService courseService = serviceManager.CourseService;
+    private readonly IServiceManager serviceManager;
+
+    public CourseController(IServiceManager serviceManager)
+    {
+        this.serviceManager = serviceManager;
+    }
+
+    [HttpGet()]
+    [ProducesResponseType<CoursesQueryResultDto>(StatusCodes.Status200OK)]
+    public async Task <IActionResult> GetAllCourses([FromQuery] CoursesQueryDto query)
+    {
+        var result = await serviceManager.CourseService.GetCoursesAsync(query);
+
+        return Ok(result);
+    }
 
     [HttpGet("{id:int}")]
-    [Produces("application/json")]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
-        var result = await courseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
+        var result = await serviceManager.CourseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
 
         return Ok(result);
     }

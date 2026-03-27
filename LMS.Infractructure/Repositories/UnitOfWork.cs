@@ -5,7 +5,7 @@ namespace LMS.Infractructure.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly Lazy<ICourseRepository> courseRepository;
-    public ICourseRepository CourseRepository => courseRepository.Value;
+    public ICourseRepository Courses => courseRepository.Value;
 
     private readonly Lazy<IModuleRepository> moduleRepository;
     public IModuleRepository ModuleRepository => moduleRepository.Value;
