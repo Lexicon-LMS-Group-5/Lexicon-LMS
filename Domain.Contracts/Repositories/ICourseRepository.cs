@@ -1,5 +1,5 @@
 ﻿using Domain.Models.Entities;
-using LMS.Shared.DTOs.CourseDtos;
+using LMS.Shared.DTOs;
 
 namespace Domain.Contracts.Repositories
 {

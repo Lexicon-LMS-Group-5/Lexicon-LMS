@@ -1,4 +1,6 @@
-﻿namespace LMS.Shared.DTOs
+﻿using LMS.Shared.DTOs.PagingDtos;
+
+namespace LMS.Shared.DTOs
 {
     public class CourseUpsertDto
     {
@@ -42,4 +44,20 @@
 		public DateTime EndDate { get; set; }
 		public IEnumerable<ActivityReadDto> Activities { get; set; } = [];
 	}
+
+    public class CoursesQueryDto : BasePageQueryDto
+    {
+
+    }
+
+    public class CoursesQueryResultDto : BasePagedResultDto<CourseListItemDto>
+    {
+
+    }
+
+    public class CourseListItemDto : CourseReadDto
+    {
+
+    }
+
 }

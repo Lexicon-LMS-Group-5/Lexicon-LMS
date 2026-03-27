@@ -1,7 +1,7 @@
 ﻿using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using LMS.Infractructure.Data;
-using LMS.Shared.DTOs.CourseDtos;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.PagingDtos;
 using Microsoft.EntityFrameworkCore;
 
