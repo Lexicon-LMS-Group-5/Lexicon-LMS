@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
     public UnitOfWork(
         ApplicationDbContext context,
         Lazy<ICourseRepository> courseRepository,
+        Lazy<IModuleRepository> moduleRepository,
         Lazy<IActivityRepository> activities)
 
     {

@@ -6,6 +6,7 @@ using Service.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using AutoMapper;
 
 namespace LMS.Services
 {
@@ -13,23 +14,32 @@ namespace LMS.Services
     {
         // Injected with AddScoped().
         private readonly IUnitOfWork unitOfWork;
+        private readonly IMapper mapper;
+
+        public ModuleService(IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
+        }
         public async Task<ModuleReadDto> GetModuleDetailsByIdAsync(
             int moduleId,
             bool trackChanges = false,
             CancellationToken ct = default)
         {
-            Module? module = await unitOfWork.ModuleRepository.GetModuleDetailsByIdAsync(moduleId, trackChanges, ct);
+            Module? module = await unitOfWork
+                .ModuleRepository
+                .GetModuleDetailsByIdAsync(moduleId, trackChanges, ct);
             if (module == null)
             {
                 throw new NotFoundException($"Module not found for moduleId={moduleId}.");
             }
-            return module.Dto;
+            return mapper.Map<ModuleReadDto>(module);
         }
-        static IEnumerable<ModuleReadDto> MapModulesToModuleReadDtos(List<Module> modules)
+        private IEnumerable<ModuleReadDto> MapModulesToModuleReadDtos(List<Module> modules)
         {
             foreach (Module module in modules)
             {
-                yield return module.Dto;
+                yield return mapper.Map<ModuleReadDto>(module);
             }
         }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
