@@ -64,5 +64,32 @@ namespace LMS.Services
             courseDetailsDto.Participants = courceParticipantsWithRoleInfo;
             return courseDetailsDto;
         }
+
+        public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
+        {
+            if (command.CreatorId == null || command.CreatorId.IsWhiteSpace()) 
+                throw new BadRequestException("A user Id must be provided to create this resource");
+            var user = await userManager.FindByIdAsync(command.CreatorId) 
+                ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
+            
+            // Initialize the course to be created
+            var course = mapper.Map<Course>(command);
+
+            // ToDo: add all validation rules
+            // A Course can be created if...
+
+            // 1) It has a valid Name
+            course.Name = command.Name.Trim();
+
+            // Check if the Course creator should be added to the course
+            if (command.AddCreator)
+                course.Participants.Add(user);
+
+            unitOfWork.Courses.Create(course);
+
+            await unitOfWork.CompleteAsync();
+
+            return new(course.Id);
+        }
     }
 }
