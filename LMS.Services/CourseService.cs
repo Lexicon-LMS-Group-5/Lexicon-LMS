@@ -16,7 +16,7 @@ namespace LMS.Services
         private readonly IMapper mapper;
 
         public CourseService(
-             IUnitOfWork unitOfWork,
+            IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
