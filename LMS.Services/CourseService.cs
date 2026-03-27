@@ -27,7 +27,7 @@ namespace LMS.Services
 
         public async Task<CoursesQueryResultDto> GetCoursesAsync(CoursesQueryDto query, CancellationToken ct = default)
         {
-            var courses = await unitOfWork.CourseRepository.FindAllByConditionAsync(query, false, ct);
+            var courses = await unitOfWork.Courses.FindAllByConditionAsync(query, false, ct);
 
             // Construct query result Items and MetaData
             var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
@@ -45,7 +45,7 @@ namespace LMS.Services
 
         public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await unitOfWork.CourseRepository.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
                 ?? throw new CourseNotFoundException();
 
             List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];
