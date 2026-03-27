@@ -2,15 +2,11 @@
 using Domain.Contracts.Repositories;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 
 namespace LMS.Services;
 
-internal class UserService : IUserService
+public class UserService : IUserService
 {
     private readonly IMapper mapper;
     private readonly IUnitOfWork unitOfWork;
