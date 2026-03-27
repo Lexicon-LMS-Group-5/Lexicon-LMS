@@ -3,6 +3,7 @@ using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.PagingDtos;
 using Microsoft.AspNetCore.Identity;
 using Service.Contracts;
 
@@ -15,7 +16,7 @@ namespace LMS.Services
         private readonly IMapper mapper;
 
         public CourseService(
-             IUnitOfWork unitOfWork,
+            IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
@@ -24,9 +25,27 @@ namespace LMS.Services
             this.mapper = mapper;
         }
 
+        public async Task<CoursesQueryResultDto> GetCoursesAsync(CoursesQueryDto query, CancellationToken ct = default)
+        {
+            var courses = await unitOfWork.Courses.FindAllByConditionAsync(query, false, ct);
+
+            // Construct query result Items and MetaData
+            var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
+            var totalItems = courses.Count();
+            var metaData = mapper.Map<PagedResultMetaDataDto>(query);
+            metaData.TotalCount = totalItems;
+            metaData.TotalPages = (int)Math.Ceiling((double)totalItems / query.Size);
+
+            return new CoursesQueryResultDto
+            {
+                Items = items,
+                MetaData = metaData
+            };
+        }
+
         public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await unitOfWork.CourseRepository.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
                 ?? throw new CourseNotFoundException();
 
             List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];
