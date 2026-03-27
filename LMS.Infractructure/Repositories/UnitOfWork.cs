@@ -8,7 +8,7 @@ public class UnitOfWork : IUnitOfWork
     public ICourseRepository Courses => courseRepository.Value;
 
     private readonly Lazy<IModuleRepository> moduleRepository;
-    public IModuleRepository ModuleRepository => moduleRepository.Value;
+    public IModuleRepository Modules => moduleRepository.Value;
 
     private readonly Lazy<IActivityRepository> activities;
     public IActivityRepository Activities => activities.Value;

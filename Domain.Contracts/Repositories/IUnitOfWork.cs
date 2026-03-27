@@ -4,6 +4,6 @@ public interface IUnitOfWork
 {
     IActivityRepository Activities { get; }
     ICourseRepository Courses { get; }
-    IModuleRepository ModuleRepository { get; }
+    IModuleRepository Modules { get; }
     Task CompleteAsync();
 }

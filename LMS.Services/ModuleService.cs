@@ -27,7 +27,7 @@ namespace LMS.Services
             CancellationToken ct = default)
         {
             Module? module = await unitOfWork
-                .ModuleRepository
+                .Modules
                 .GetModuleDetailsByIdAsync(moduleId, trackChanges, ct);
             if (module == null)
             {
@@ -48,7 +48,7 @@ namespace LMS.Services
             CancellationToken ct = default)
         {
             return MapModulesToModuleReadDtos(
-                await unitOfWork.ModuleRepository.GetModulesByCourseIdAsync(
+                await unitOfWork.Modules.GetModulesByCourseIdAsync(
                     courseId, 
                     trackChanges,
                     ct)).ToList();
