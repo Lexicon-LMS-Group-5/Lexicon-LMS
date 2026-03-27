@@ -68,18 +68,48 @@ namespace LMS.Services
         public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
         {
             if (command.CreatorId == null || command.CreatorId.IsWhiteSpace()) 
-                throw new BadRequestException("A user Id must be provided to create this resource");
+                throw new CourseCreationException("A user Id must be provided to create this resource");
+
             var user = await userManager.FindByIdAsync(command.CreatorId) 
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
+
+            if (!await userManager.IsInRoleAsync(user, "Teacher"))
+                throw new TokenValidationException("User is not authorized to create a Course");
             
             // Initialize the course to be created
             var course = mapper.Map<Course>(command);
 
-            // ToDo: add all validation rules
+            // Check Course creation rules:
             // A Course can be created if...
 
-            // 1) It has a valid Name
-            course.Name = command.Name.Trim();
+            // 1) it has a valid Name
+            var validatedName = command.Name.Trim();
+            if (validatedName.Length < 0 || validatedName.Length > 35)
+                throw new CourseCreationException($"Could not create Course with invalid {nameof(course.Name)}");
+
+            // 2) it has a valid Description
+            var validatedDescription = command.Description.Trim();
+            if (validatedDescription.Length > 160)
+                throw new CourseCreationException($"Could not create Course with invalid {nameof(course.Description)}");
+
+            // 3) it has a valid StartDate
+            var validatedStartDate = command.StartDate 
+                ?? throw new CourseCreationException($"Could not create Course with invalid {nameof(course.StartDate)}");
+
+            // 4) it has a valid EndDate
+            var validatedEndDate = command.EndDate
+                ?? throw new CourseCreationException($"Could not create Course with invalid {nameof(course.EndDate)}");
+
+            // 5) EndDate is after StartDate
+            if (validatedEndDate <= validatedStartDate)
+                throw new CourseCreationException($"Could not create Course. {nameof(course.EndDate)} must be after {nameof(course.StartDate)}");
+
+            // Set validated properties
+            course.Name = validatedName;
+            course.Description = validatedDescription;
+            course.StartDate = validatedStartDate;
+            course.StartDate = validatedStartDate;
+            course.EndDate = validatedEndDate;
 
             // Check if the Course creator should be added to the course
             if (command.AddCreator)
