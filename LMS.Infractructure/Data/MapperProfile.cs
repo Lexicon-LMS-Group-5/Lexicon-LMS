@@ -13,5 +13,6 @@ public class MapperProfile : Profile
         CreateMap<Course, CourseDetailsDto>();
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
         CreateMap<Module, CourseModuleListItemDto>();
-    }
+		CreateMap<Activity, ActivityReadDto>();
+	}
 }
