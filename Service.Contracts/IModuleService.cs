@@ -8,7 +8,13 @@ namespace Service.Contracts
 {
     public interface IModuleService
     {
-        public Task<ModuleReadDto> GetModuleDetailsByIdAsync(int moduleId, bool trackChanges = false, CancellationToken ct = default);
-        public Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(int courseId, bool trackChanges = false, CancellationToken ct = default);
+        public Task<ModuleReadDto> GetModuleDetailsByIdAsync(
+            int moduleId, 
+            bool trackChanges = false, 
+            CancellationToken ct = default);
+        public Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
+            int courseId, 
+            bool trackChanges = false, 
+            CancellationToken ct = default);
     }
 }
