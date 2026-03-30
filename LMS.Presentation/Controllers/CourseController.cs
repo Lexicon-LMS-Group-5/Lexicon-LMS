@@ -40,7 +40,7 @@ public class CourseController : ControllerBase
     [Authorize(Roles = "Teacher")]
     [HttpPost()]
     [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateCourse([FromBody] CreateCourseCommandDto command)
+    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
     {
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
