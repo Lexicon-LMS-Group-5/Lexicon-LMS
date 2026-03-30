@@ -62,7 +62,7 @@ namespace LMS.Shared.DTOs
 
         [Required]
         [StringLength(35, MinimumLength = 1)]
-        public override string Name { get; set; }
+        public override string Name { get; set; } = string.Empty;
 
         [StringLength(160)]
         public override string Description { get; set; } = string.Empty;
@@ -92,9 +92,9 @@ namespace LMS.Shared.DTOs
         }
     }
 
-    public class CreateCourseResultDto(int id)
+    public class CreateCourseResultDto
     {
-        public int CourseId { get; set; } = id;
+        public CourseListItemDto CreatedCourse { get; set; } = default!;
     }
 
     public class CourseListItemDto : CourseReadDto
