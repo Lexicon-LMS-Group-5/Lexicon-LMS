@@ -28,7 +28,7 @@ public class CourseController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetCourseDetails")]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
@@ -44,6 +44,6 @@ public class CourseController : ControllerBase
     {
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
-        return Ok(result);
+        return CreatedAtRoute("GetCourseDetails", new { id = result.CreatedCourse.Id }, result);
     }
 }
