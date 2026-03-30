@@ -2,7 +2,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Dashboard</h1>
 
 Welcome to your new app.
 
@@ -11,14 +11,28 @@ Welcome to your new app.
     @if(PageState.IsLoading) {
         <div>Loading courses...</div>
     } else if(PageState.Data != null){
-        <ul>
-            @foreach(var course in PageState.Data.Items)
+        <div class="accordion" id="course-list">
+            @foreach(var item in PageState.Data.Items.Select((course, index) => (course, index)))
             {
-                <li>
-                    <div>@course.Name</div>
-                    <div>@course.Description</div>
-                </li>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <button 
+                            class="accordion-button @(item.index == 0 ? "" : "collapsed")" 
+                            type="button" 
+                            data-bs-toggle="collapse"
+                            data-bs-target="#course-list-item-@item.course.Id"
+                            aria-expanded="@(item.index == 0 ? "true" : "false")"
+                            aria-controls="course-list-item-@item.course.Id">
+                            <h3 class="lead">@item.course.Name</h3>
+                        </button>
+                    </div>
+                    <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
+                        <div class="accordion-body bg-body-tertiary">
+                            @item.course.Description
+                        </div>
+                    </div>
+                </div>
             }
-        </ul>
+        </div>
     }
 </div>
