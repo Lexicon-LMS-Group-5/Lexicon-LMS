@@ -35,23 +35,16 @@ namespace LMS.Services
             }
             return mapper.Map<ModuleReadDto>(module);
         }
-        private IEnumerable<ModuleReadDto> MapModulesToModuleReadDtos(List<Module> modules)
-        {
-            foreach (Module module in modules)
-            {
-                yield return mapper.Map<ModuleReadDto>(module);
-            }
-        }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
             int courseId, 
             bool trackChanges = false,
             CancellationToken ct = default)
         {
-            return MapModulesToModuleReadDtos(
+            return mapper.Map<List<ModuleReadDto>>(
                 await unitOfWork.Modules.GetModulesByCourseIdAsync(
                     courseId, 
                     trackChanges,
-                    ct)).ToList();
+                    ct));
         }
     }
 }

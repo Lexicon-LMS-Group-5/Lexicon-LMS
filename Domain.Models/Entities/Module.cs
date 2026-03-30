@@ -1,5 +1,4 @@
-﻿using LMS.Shared.DTOs;
-namespace Domain.Models.Entities;
+﻿namespace Domain.Models.Entities;
 
 public class Module
 {
