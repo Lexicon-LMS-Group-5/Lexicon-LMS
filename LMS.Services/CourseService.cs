@@ -67,17 +67,20 @@ namespace LMS.Services
 
         public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
         {
-            var user = await userManager.FindByIdAsync(command.CreatorId) 
+            ApplicationUser user = await userManager.FindByIdAsync(command.CreatorId) 
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
-            
+
             var course = mapper.Map<Course>(command);
 
-            // ToDo: maybe Trim should be applied before the data attribute validation in the DTO?
+            // ToDo: I think this application of Trim happens after the data attribute validation.
+            // So if there is a Name entered with lots of whitespace, the user could get a character limit exception before the trim is applied.
+            // Maybe that's not an issue? Or maybe Trim should be applied before the data attribute validation using a model binder?
+            // See example: https://stackoverflow.com/a/1734025
             course.Name = command.Name.Trim();
             course.Description = command.Description.Trim();
 
             // Check if the Course creator should be added to the course
-            if (command.AddCreator)
+            if (command.AddCreator && (course.Participants.FirstOrDefault(p => p.Id == user.Id) == null))
                 course.Participants.Add(user);
 
             unitOfWork.Courses.Create(course);
