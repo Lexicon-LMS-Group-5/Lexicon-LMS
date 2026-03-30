@@ -38,7 +38,7 @@ public class CourseController : ControllerBase
     }
 
     [Authorize(Roles = "Teacher")]
-    [HttpPost("create")]
+    [HttpPost()]
     [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateCourse([FromBody] CreateCourseCommandDto command)
     {
