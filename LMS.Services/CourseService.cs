@@ -80,7 +80,7 @@ namespace LMS.Services
             course.Description = command.Description.Trim();
 
             // Check if the Course creator should be added to the course
-            if (command.AddCreator && (course.Participants.FirstOrDefault(p => p.Id == user.Id) == null))
+            if (command.AddCreator && !course.Participants.Contains(user))
                 course.Participants.Add(user);
 
             unitOfWork.Courses.Create(course);
