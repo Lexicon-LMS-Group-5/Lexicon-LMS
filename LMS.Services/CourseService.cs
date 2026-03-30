@@ -119,7 +119,9 @@ namespace LMS.Services
 
             await unitOfWork.CompleteAsync();
 
-            return new(course.Id);
+            return new CreateCourseResultDto {
+                CreatedCourse = mapper.Map<CourseListItemDto>(course)
+            };
         }
     }
 }

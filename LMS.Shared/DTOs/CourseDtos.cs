@@ -92,9 +92,9 @@ namespace LMS.Shared.DTOs
         }
     }
 
-    public class CreateCourseResultDto(int id)
+    public class CreateCourseResultDto
     {
-        public int CourseId { get; set; } = id;
+        public CourseListItemDto CreatedCourse { get; set; } = default!;
     }
 
     public class CourseListItemDto : CourseReadDto
