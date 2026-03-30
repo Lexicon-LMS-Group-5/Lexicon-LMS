@@ -44,6 +44,6 @@ public class CourseController : ControllerBase
     {
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
-        return CreatedAtRoute("GetCourseDetails", new { id = result.CreatedCourse.Id }, result);
+        return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }
 }

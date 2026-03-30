@@ -12,6 +12,7 @@ public class MapperProfile : Profile
     {
         CreateMap<UserRegistrationDto, ApplicationUser>();
         CreateMap<CreateCourseCommandDto, Course>();
+        CreateMap<Course, CreateCourseResultDto>();
         CreateMap<Course, CourseListItemDto>();
         CreateMap<IEnumerable<Course>, IReadOnlyList<CourseListItemDto>>();
         CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
