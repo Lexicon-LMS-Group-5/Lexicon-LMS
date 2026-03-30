@@ -28,5 +28,5 @@ public class UnitOfWork : IUnitOfWork
         this.context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public async Task CompleteAsync() => await context.SaveChangesAsync();
+    public async Task CompleteAsync(CancellationToken ct = default) => await context.SaveChangesAsync(ct);
 }
