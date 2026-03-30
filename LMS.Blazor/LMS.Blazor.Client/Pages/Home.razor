@@ -7,7 +7,14 @@
 Welcome to your new app.
 
 <div>
-    <h2>Courses</h2>
+    <header class="d-flex justify-content-between py-2">
+        <div>
+            <h2>Courses</h2>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">Add a new Course</button>
+        </div>
+    </header>
     @if(PageState.IsLoading) {
         <div>Loading courses...</div>
     } else if(PageState.Data != null){
@@ -35,4 +42,24 @@ Welcome to your new app.
             }
         </div>
     }
+</div>
+
+<div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="createCourseFormModalLabel">
+                    Create a new Course
+                </h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body modal-dialog-scrollable">
+                <CreateCourseForm />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
 </div>
