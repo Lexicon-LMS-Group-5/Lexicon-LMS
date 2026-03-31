@@ -1,6 +1,7 @@
 ﻿@page "/Account/Login"
 
 @using System.ComponentModel.DataAnnotations
+@using LMS.Blazor.Components.Icons
 @using LMS.Blazor.Services
 @using LMS.Shared.DTOs.AuthDtos
 @using Microsoft.AspNetCore.Authentication
@@ -19,61 +20,101 @@
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-lg-6">
-        <section>
-            <StatusMessage Message="@errorMessage" />
-            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
-                <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="name@example.com" />
-                    <label for="Input.Email" class="form-label">Email</label>
-                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+<div class="container min-vh-100 d-flex align-items-center justify-content-center py-5" style="background-color: #F0F0EC;">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="card border-0 shadow-sm rounded-4 login-card">
+            <div class="card-body p-4 p-md-5">
+
+                <div class="text-center mb-4">
+                    <div class="text-primary d-flex justify-content-center mb-3">
+                        <BookIcon/>
+                    </div>
+                    <h1 class="h2 fw-bold mb-0">Lexicon LMS</h1>
                 </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
-                    <ValidationMessage For="() => Input.Password" class="text-danger" />
-                </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
-                </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <hr />
-                <div class="d-flex flex-column">
-                    <span class="text-secondary mx-auto mt-2">OR</span>
-                    <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" EmailName="Input.Email" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
-                </div>
-                <hr />
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </EditForm>
-        </section>
-    </div>
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
+
+                <StatusMessage Message="@errorMessage" />
+
+                <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger small mb-3" role="alert" />
+
+                    <div class="mb-3">
+                        <label for="Input.Email" class="form-label fw-semibold">Email address</label>
+                        <InputText @bind-Value="Input.Email"
+                                   id="Input.Email"
+                                   class="form-control form-control-lg"
+                                   autocomplete="username webauthn"
+                                   aria-required="true" />
+                        <ValidationMessage For="() => Input.Email" class="text-danger small" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Input.Password" class="form-label fw-semibold">Password</label>
+                        <InputText type="password"
+                                   @bind-Value="Input.Password"
+                                   id="Input.Password"
+                                   class="form-control form-control-lg"
+                                   autocomplete="current-password"
+                                   aria-required="true" />
+                        <ValidationMessage For="() => Input.Password" class="text-danger small" />
+                    </div>
+
+                    @* Add this later when roller are implemented
+                        <div class="mb-4">
+                        <label class="form-label fw-semibold d-block">Choose role</label>
+
+                        <InputRadioGroup @bind-Value="Input.Role" class="d-flex gap-4">
+                            <div class="form-check">
+                                <InputRadio Value="Student" id="role-student" class="form-check-input" />
+                                <label for="role-student" class="form-check-label">Student</label>
+                            </div>
+
+                            <div class="form-check">
+                                <InputRadio Value="Teacher" id="role-teacher" class="form-check-input" />
+                                <label for="role-teacher" class="form-check-label">Teacher</label>
+                            </div>
+                        </InputRadioGroup> 
+                    </div>*@
+
+                    <div class="form-check mb-4">
+                        <InputCheckbox @bind-Value="Input.RememberMe" id="rememberMe" class="form-check-input" />
+                        <label for="rememberMe" class="form-check-label">Remember me</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold">
+                        <span aria-hidden="true">
+                            <LoginIcon/>
+                        </span>
+                        <span>Log in</span>
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <a href="Account/ForgotPassword" class="text-decoration-none">Forgot password?</a>
+                    </div>
+
+                    <div class="text-center mt-3 d-flex flex-column gap-2">
+                        <a class="text-decoration-none"
+                               href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">
+                            Register as a new user
+                        </a>
+
+                        <a href="Account/ResendEmailConfirmation" class="text-decoration-none">
+                            Resend email confirmation
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <div class="text-muted small mb-2">or</div>
+                        <PasskeySubmit Operation="PasskeyOperation.Request"
+                                       Name="Input.Passkey"
+                                       EmailName="Input.Email"
+                                       class="btn btn-link text-decoration-none">
+                            Log in with a passkey
+                        </PasskeySubmit>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -93,12 +134,10 @@
     protected override async Task OnInitializedAsync()
     {
         Input ??= new();
-
         editContext = new EditContext(Input);
 
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
     }
@@ -112,22 +151,21 @@
         }
 
         SignInResult result;
+
         if (!string.IsNullOrEmpty(Input.Passkey?.CredentialJson))
         {
-            // When performing passkey sign-in, don't perform form validation.
             result = await SignInManager.PasskeySignInAsync(Input.Passkey.CredentialJson);
         }
         else
         {
-            // If doing a password sign-in, validate the form.
             if (!editContext.Validate())
-            {
                 return;
-            }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-            result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+            result = await SignInManager.PasswordSignInAsync(
+                Input.Email,
+                Input.Password,
+                Input.RememberMe,
+                lockoutOnFailure: false);
         }
 
         if (result.Succeeded)
@@ -135,7 +173,7 @@
             Logger.LogInformation("User logged in.");
 
             var user = await UserManager.FindByEmailAsync(Input.Email);
-            if(user != null)
+            if (user != null)
             {
                 var tokenSuccess = await GetAndStoreJwtTokenAsync(user.Id, Input.Email, Input.Password);
 
@@ -147,8 +185,13 @@
                 }
             }
 
+            if (Input.Role == "Teacher")
+            {
+                RedirectManager.RedirectTo("/teacher");
+                return;
+            }
 
-            RedirectManager.RedirectTo(ReturnUrl);
+            RedirectManager.RedirectTo(ReturnUrl ?? "/student");
         }
         else if (result.RequiresTwoFactor)
         {
@@ -174,10 +217,10 @@
             var httpClient = HttpClientFactory.CreateClient("LmsApiClient");
 
             var loginRequest = new UserAuthDto
-                {
-                    UserName = email,
-                    Password = password
-                };
+            {
+                UserName = email,
+                Password = password
+            };
 
             var response = await httpClient.PostAsJsonAsync("api/auth/login", loginRequest);
 
@@ -185,7 +228,7 @@
             {
                 var tokens = await response.Content.ReadFromJsonAsync<TokenDto>();
 
-                if(tokens != null)
+                if (tokens != null)
                 {
                     await TokenStorage.StoreTokensAsync(userId, tokens);
                     Logger.LogInformation("JWT tokens stored for user {UserId}", userId);
@@ -193,17 +236,13 @@
                     await AddJwtClaimsAsync(userId, tokens.AccessToken);
                     return true;
                 }
-                else
-                {
-                    Logger.LogWarning("Failed to deserialize tokens from API response");
-                    return false;
-                }
-            }
-            else
-            {
-                Logger.LogWarning("Failed to get JWT tokens from API. Status: {StatusCode}", response.StatusCode);
+
+                Logger.LogWarning("Failed to deserialize tokens from API response");
                 return false;
             }
+
+            Logger.LogWarning("Failed to get JWT tokens from API. Status: {StatusCode}", response.StatusCode);
+            return false;
         }
         catch (Exception ex)
         {
@@ -233,7 +272,7 @@
                 new AuthenticationProperties
                 {
                     IsPersistent = Input.RememberMe,
-                    ExpiresUtc =  DateTimeOffset.UtcNow.AddDays(7) // jwt.ValidTo
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
                 });
 
             Logger.LogInformation("Successfully signed in user with JWT claims: {UserId}", userId);
@@ -244,19 +283,18 @@
         }
     }
 
-
-
     private sealed class InputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address")]
         public string Email { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
-        [Display(Name = "Remember me?")]
+        public string Role { get; set; } = "Student";
+
         public bool RememberMe { get; set; }
 
         public PasskeyInputModel? Passkey { get; set; }

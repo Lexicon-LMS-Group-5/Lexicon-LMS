@@ -14,7 +14,6 @@ public class MapperProfile : Profile
         CreateMap<CreateCourseCommandDto, Course>();
         CreateMap<Course, CreateCourseResultDto>();
         CreateMap<Course, CourseListItemDto>();
-        CreateMap<IEnumerable<Course>, IReadOnlyList<CourseListItemDto>>();
         CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
         CreateMap<Course, CourseDetailsDto>();
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
