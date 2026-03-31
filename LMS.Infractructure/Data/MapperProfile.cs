@@ -20,5 +20,9 @@ public class MapperProfile : Profile
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
         CreateMap<Module, CourseModuleListItemDto>();
 		CreateMap<Activity, ActivityReadDto>();
-	}
+        CreateMap<ModuleUpsertDto, Module>();
+        CreateMap<Module, ModuleReadDto>();
+        CreateMap<List<Module>, List<ModuleReadDto>>();
+
+    }
 }

@@ -21,6 +21,15 @@ namespace LMS.Services
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
         }
+
+        public async Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default)
+        {
+            Module module = mapper.Map<Module>(dto);
+            unitOfWork.Modules.Create(module);
+            await unitOfWork.CompleteAsync();
+            return mapper.Map<ModuleReadDto>(module);
+        }
+
         public async Task<ModuleReadDto> GetModuleDetailsByIdAsync(
             int moduleId,
             bool trackChanges = false,
