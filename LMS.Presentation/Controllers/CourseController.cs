@@ -28,12 +28,22 @@ public class CourseController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetCourseDetails")]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
         var result = await serviceManager.CourseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
 
         return Ok(result);
+    }
+
+    [Authorize(Roles = "Teacher")]
+    [HttpPost()]
+    [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
+    {
+        var result = await serviceManager.CourseService.CreateCourseAsync(command);
+
+        return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }
 }
