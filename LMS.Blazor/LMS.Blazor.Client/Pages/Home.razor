@@ -2,46 +2,69 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Dashboard</h1>
+<div class="d-flex flex-column gap-5 pb-5">
+    <h1>Dashboard</h1>
 
-Welcome to your new app.
+    <div>
+        <h2 class="fs-5">Quick actions</h2>
+        <div class="d-flex gap-2">
+            <div 
+                data-bs-toggle="modal"
+                data-bs-target="#createCourseFormModal">
+                <QuickActionButton>
+                    <ButtonIcon>
+                        <CirclePlusIcon />
+                    </ButtonIcon>
+                    <ButtonText>
+                        Add a new Course
+                    </ButtonText>
+                </QuickActionButton>
+            </div>
+            <QuickActionButton>
+                <ButtonIcon>
+                    <BookIcon />
+                </ButtonIcon>
+                <ButtonText>
+                    Some other action
+                </ButtonText>
+            </QuickActionButton>
+        </div>
+    </div>
 
-<div>
-    <header class="d-flex justify-content-between py-2">
-        <div>
-            <h2>Courses</h2>
-        </div>
-        <div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">Add a new Course</button>
-        </div>
-    </header>
-    @if(PageState.IsLoading) {
-        <div>Loading courses...</div>
-    } else if(PageState.Data != null){
-        <div class="accordion" id="course-list">
-            @foreach(var item in PageState.Data.Items.Select((course, index) => (course, index)))
-            {
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <button 
-                            class="accordion-button @(item.index == 0 ? "" : "collapsed")" 
-                            type="button" 
-                            data-bs-toggle="collapse"
-                            data-bs-target="#course-list-item-@item.course.Id"
-                            aria-expanded="@(item.index == 0 ? "true" : "false")"
-                            aria-controls="course-list-item-@item.course.Id">
-                            <h3 class="lead">@item.course.Name</h3>
-                        </button>
-                    </div>
-                    <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
-                        <div class="accordion-body bg-body-tertiary">
-                            @item.course.Description
+    <div>
+        <header class="d-flex justify-content-between py-2">
+            <div>
+                <h2>Courses</h2>
+            </div>
+        </header>
+        @if(PageState.IsLoading) {
+            <div>Loading courses...</div>
+        } else if(PageState.Data != null){
+            <div class="accordion" id="course-list">
+                @foreach(var item in PageState.Data.Items.Select((course, index) => (course, index)))
+                {
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <button 
+                                class="accordion-button @(item.index == 0 ? "" : "collapsed")" 
+                                type="button" 
+                                data-bs-toggle="collapse"
+                                data-bs-target="#course-list-item-@item.course.Id"
+                                aria-expanded="@(item.index == 0 ? "true" : "false")"
+                                aria-controls="course-list-item-@item.course.Id">
+                                <h3 class="lead">@item.course.Name</h3>
+                            </button>
+                        </div>
+                        <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
+                            <div class="accordion-body bg-body-tertiary">
+                                @item.course.Description
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
+        }
+    </div>
 </div>
 
 <div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
