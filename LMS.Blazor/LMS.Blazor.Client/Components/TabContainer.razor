@@ -1,0 +1,45 @@
+﻿@inject NavigationManager Navigation
+
+<div class="d-flex flex-column">
+    <ul class="nav nav-tabs">
+        @foreach (var item in NavItems)
+        {
+            <li class="nav-item">
+                <NavLink
+                    title="@item.Title"
+                    class="nav-link"
+                    href="@item.Href">
+                    @item.Title
+                </NavLink>
+            </li>
+        }
+    </ul>
+    @ChildContent    
+</div>
+
+@code {
+    [Parameter]
+    public string[] TabTitles { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [SupplyParameterFromQuery(Name = "tab")]
+    private string CurrentTab { get; set; } = string.Empty;
+
+    private List<Link> NavItems { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavItems = TabTitles.Select(title => new Link
+        {
+            Title = title,
+            Href = CreateTagQueryFromTitle(title)
+        }).ToList();
+
+        if (string.IsNullOrWhiteSpace(CurrentTab) || !NavItems.Select(item => item.Href).ToList().Contains(CreateTagQueryFromTitle(CurrentTab)))
+            Navigation.NavigateTo(NavItems.First().Href);
+    }
+
+    private static string CreateTagQueryFromTitle(string input) => $"?tab={input.ToLower().Replace(" ", "-")}";
+}

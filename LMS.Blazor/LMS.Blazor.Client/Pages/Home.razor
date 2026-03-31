@@ -31,40 +31,74 @@
         </div>
     </div>
 
-    <div>
-        <header class="d-flex justify-content-between py-2">
-            <div>
-                <h2>Courses</h2>
+    <TabContainer TabTitles="@(["Overview", "Courses", "Create new Course"])">
+        <Tab Slug="overview">
+            <div class="d-flex flex-column gap-3 p-3 bg-body rounded-bottom">
+                <header>
+                    <h2 class="fs-5">Overview</h2>
+                </header>
             </div>
-        </header>
-        @if(PageState.IsLoading) {
-            <div>Loading courses...</div>
-        } else if(PageState.Data != null){
-            <div class="accordion" id="course-list">
-                @foreach(var item in PageState.Data.Items.Select((course, index) => (course, index)))
-                {
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <button 
-                                class="accordion-button @(item.index == 0 ? "" : "collapsed")" 
-                                type="button" 
-                                data-bs-toggle="collapse"
-                                data-bs-target="#course-list-item-@item.course.Id"
-                                aria-expanded="@(item.index == 0 ? "true" : "false")"
-                                aria-controls="course-list-item-@item.course.Id">
-                                <h3 class="lead">@item.course.Name</h3>
-                            </button>
-                        </div>
-                        <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
-                            <div class="accordion-body bg-body-tertiary">
-                                @item.course.Description
-                            </div>
-                        </div>
+        </Tab>
+        <Tab Slug="courses">
+            <div class="d-flex flex-column gap-3 p-3 bg-body rounded-bottom">
+                <header>
+                    <h2 class="fs-5">All Courses</h2>
+                </header>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Search courses...">
                     </div>
-                }
+                    <div>
+                        <button class="btn btn-primary d-flex align-items-middle gap-2" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">
+                            <div class="d-flex align-items-middle m-auto">
+                                <CirclePlusIcon Size="20" />
+                            </div>
+                            Add a new Course
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    @if (PageState.IsLoading)
+                    {
+                        <div>Loading courses...</div>
+                    }
+                    else if (PageState.Data != null)
+                    {
+                        <div class="accordion accordion-flush" id="course-list">
+                            @foreach (var item in PageState.Data.Items.Select((course, index) => (course, index)))
+                            {
+                                <div class="accordion-item">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button @(item.index == 0 ? "" : "collapsed")"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#course-list-item-@item.course.Id"
+                                                aria-expanded="@(item.index == 0 ? "true" : "false")"
+                                                aria-controls="course-list-item-@item.course.Id">
+                                            <h3 class="lead fs-6">@item.course.Name</h3>
+                                        </button>
+                                    </div>
+                                    <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
+                                        <div class="accordion-body bg-body-tertiary">
+                                            <p>@item.course.Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-        }
-    </div>
+        </Tab>
+        <Tab Slug="create-new-course">
+            <div class="d-flex flex-column gap-3 p-3 bg-body rounded-bottobi-arrow-bar-left-nav-menu shadow-sm">
+                <header>
+                    <h2 class="fs-5">Create a new Courses</h2>
+                </header>
+                <CreateCourseForm />
+            </div>
+        </Tab>
+    </TabContainer>
 </div>
 
 <div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
