@@ -8,41 +8,49 @@ namespace LMS.Presentation.Controllers;
 [Route("api/users")]
 [ApiController]
 [Authorize]
-public class UserController : ControllerBase
+public class UserController(IServiceManager serviceManager) : ControllerBase
 {
-    private readonly IServiceManager serviceManager;
-
-    public UserController(IServiceManager serviceManager)
-    {
-        this.serviceManager = serviceManager;
-    }
+    private readonly IServiceManager _serviceManager = serviceManager;
 
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUser(CancellationToken ct)
+    public async Task<ActionResult<UserReadDto>> GetCurrentUser(CancellationToken ct)
     {
-        var user = await serviceManager.UserService.GetCurrentUserAsync(User, ct);
+        var user = await _serviceManager.UserService.GetCurrentUserAsync(User, ct);
+
+        if (user == null)
+            return NotFound();
+
         return Ok(user);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers(CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<UserReadDto>>> GetAllUsers(CancellationToken ct)
     {
-        var users = await serviceManager.UserService.GetAllUsersAsync(ct);
+        var users = await _serviceManager.UserService.GetAllUsersAsync(ct);
         return Ok(users);
     }
 
-    [HttpPut("{id:string}")]
-    public async Task<IActionResult> UpdateUser(
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserReadDto>> GetUserById(string id, CancellationToken ct)
+    {
+        var user = await _serviceManager.UserService.GetUserbyIdAsync(id, ct);
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
+    [HttpPut("edit/{id}")]
+    public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpsertDto dto,
         CancellationToken ct)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var updated = await _serviceManager.UserService.UpdateUserAsync(User, id, dto, ct);
 
-        //Add checks to see if user is you or you are a teacher
-
-        var updated = await serviceManager.UserService.UpdateUserAsync(id, dto, ct);
+        if (updated == null)
+            return NotFound();
 
         return Ok(updated);
     }

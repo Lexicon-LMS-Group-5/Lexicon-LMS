@@ -18,5 +18,8 @@ public class MapperProfile : Profile
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
         CreateMap<Module, CourseModuleListItemDto>();
 		CreateMap<Activity, ActivityReadDto>();
-	}
+        CreateMap<Course, CourseReadDto>();
+        CreateMap<ApplicationUser, UserReadDto>()
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
+    }
 }

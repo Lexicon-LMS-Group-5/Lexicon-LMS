@@ -26,7 +26,6 @@ public class Program
         builder.Services.ConfigureCors();
         builder.Services.ConfigureSwagger();
 
-
         var app = builder.Build();
 
 

@@ -5,15 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Infractructure.Repositories;
 
-public class UserRepository : RepositoryBase<ApplicationUser>, IUserRepository
+public class UserRepository(ApplicationDbContext context) : RepositoryBase<ApplicationUser>(context), IUserRepository
 {
 
-    private readonly ApplicationDbContext Context;
-
-    public UserRepository(ApplicationDbContext context)
-        : base(context)
-    {
-    }
+    private readonly ApplicationDbContext _context = context;
 
     public async Task<List<ApplicationUser>> GetAllAsync(bool trackChanges, CancellationToken ct)
     {
@@ -39,7 +34,7 @@ public class UserRepository : RepositoryBase<ApplicationUser>, IUserRepository
         return MapUsersWithRoles(data);
     }
 
-    private List<ApplicationUser> MapUsersWithRoles(List<(ApplicationUser User, string RoleName)> data)
+    private static List<ApplicationUser> MapUsersWithRoles(List<(ApplicationUser User, string RoleName)> data)
     {
         return data
             .GroupBy(x => x.User.Id)
@@ -49,17 +44,18 @@ public class UserRepository : RepositoryBase<ApplicationUser>, IUserRepository
                 user.Roles = g.Select(x => x.RoleName).ToList();
                 return user;
             })
+            
             .ToList();
     }
 
     private IQueryable<(ApplicationUser User, string RoleName)> GetUserRolesQuery(bool trackChanges)
     {
-        var users = trackChanges ? Context.Users : Context.Users.AsNoTracking();
+        var users = trackChanges ? _context.Users.Include(u => u.Course) : _context.Users.Include(u => u.Course).AsNoTracking();
 
         return from user in users
-               join userRole in Context.UserRoles
+               join userRole in _context.UserRoles
                    on user.Id equals userRole.UserId
-               join role in Context.Roles
+               join role in _context.Roles
                    on userRole.RoleId equals role.Id
                select new ValueTuple<ApplicationUser, string>(user, role.Name!);
     }
