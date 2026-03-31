@@ -3,7 +3,6 @@ using Domain.Contracts.Repositories;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
 using Service.Contracts;
-using System.Security.Claims;
 
 namespace LMS.Services;
 
@@ -19,11 +18,9 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
         return mapper.Map<List<UserReadDto>>(users);
     }
 
-    public async Task<UserReadDto> GetCurrentUserAsync(ClaimsPrincipal user, CancellationToken ct)
+    public async Task<UserReadDto> GetCurrentUserAsync(string id, CancellationToken ct)
     {
-        if (user.FindFirst(ClaimTypes.NameIdentifier) == null) throw new NotFoundException($"Not logged in!");
-
-        return await GetUserbyIdAsync(user.FindFirst(ClaimTypes.NameIdentifier)!.Value, ct);
+        return await GetUserbyIdAsync(id, ct);
     }
 
     public async Task<UserReadDto> GetUserbyIdAsync(string id, CancellationToken ct)
@@ -34,14 +31,12 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
     }
 
     public async Task<UserReadDto> UpdateUserAsync(
-    ClaimsPrincipal currentUser,
+    UpdateUserRequest request,
     string id,
     UserUpsertDto dto,
     CancellationToken ct)
     {
-        var currentUserId = (currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("User not authenticated");
-
-        if (!currentUser.IsInRole("Teacher") && currentUserId != id)
+        if (!request.IsTeacher && request.CurrentUserId != id)
             throw new UnauthorizedAccessException("You are not allowed to update this user");
 
         var user = await unitOfWork.Users.GetByIdAsync(id, trackChanges: true, ct) ?? throw new NotFoundException($"User {id} not found");

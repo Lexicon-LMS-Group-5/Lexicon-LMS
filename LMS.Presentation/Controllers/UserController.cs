@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using System.Security.Claims;
 
 namespace LMS.Presentation.Controllers;
 
@@ -15,7 +16,14 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<UserReadDto>> GetCurrentUser(CancellationToken ct)
     {
-        var user = await _serviceManager.UserService.GetCurrentUserAsync(User, ct);
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (claim == null)
+            return Unauthorized();
+
+        var currentUserId = claim.Value;
+
+        var user = await _serviceManager.UserService.GetCurrentUserAsync(currentUserId, ct);
 
         if (user == null)
             return NotFound();
@@ -47,11 +55,25 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         [FromBody] UserUpsertDto dto,
         CancellationToken ct)
     {
-        var updated = await _serviceManager.UserService.UpdateUserAsync(User, id, dto, ct);
 
-        if (updated == null)
-            return NotFound();
+        var request = new UpdateUserRequest
+        {
+            CurrentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "",
+            IsTeacher = User.IsInRole("Teacher")
+        };
 
-        return Ok(updated);
+        try
+        {
+            var updated = await _serviceManager.UserService.UpdateUserAsync(request, id, dto, ct);
+
+            if (updated == null)
+                return NotFound();
+
+            return Ok(updated);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
     }
 }

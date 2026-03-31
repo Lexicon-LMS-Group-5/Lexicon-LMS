@@ -20,3 +20,14 @@ public class UserUpsertDto
     public int? CourseId { get; set; }
     public List<string> Roles { get; set; }
 }
+
+public class  UpdateUserRequest
+{
+    public string CurrentUserId { get; set; }
+    public bool IsTeacher { get; set; }
+}
+
+public class UserGetMeRequest
+{
+    public string CurrentUserId { get; set; }
+}

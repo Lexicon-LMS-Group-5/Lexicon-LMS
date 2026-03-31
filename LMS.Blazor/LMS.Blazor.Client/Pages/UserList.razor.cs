@@ -27,7 +27,7 @@ public partial class UserList
         IsLoading = true;
         try
         {
-            Users = await ApiService.GetAsync<List<UserReadDto>>($"api/users");
+            Users = await ApiService.GetAsync<List<UserReadDto>>("api/users");
 
             if (Users != null && Users.Count != 0)
             {
