@@ -150,8 +150,11 @@
     </div>
 </div>
 
-<div class="position-fixed bottom-0 start-0 z-3 d-flex justify-content-center w-100">
+@if(Notification != null)
+{
+<div class="toast-container position-fixed bottom-0 start-0 z-3 d-flex justify-content-center w-100">
     <div class="alert alert-success shadow-sm" role="alert">
-        A simple success alert—check it out!
+        @Notification
     </div>
 </div>
+}

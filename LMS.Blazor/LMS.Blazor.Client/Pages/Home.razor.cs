@@ -56,7 +56,9 @@ public partial class Home
         AllCourses = updateList(AllCourses ?? []);
         ActiveCourses = updateList(ActiveCourses ?? [])
             .Where(c => c.EndDate > DateTime.Now).ToList();
-    }
 
-    private EventCallback<CreateCourseResultDto> OnCourseListUpdated { get; set; }
+        Notification = "Courses successfully updated";
+        await Task.Delay(3000);
+        Notification = null;
+    }
 }
