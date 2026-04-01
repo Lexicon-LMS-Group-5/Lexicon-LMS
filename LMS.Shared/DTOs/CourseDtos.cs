@@ -24,8 +24,8 @@ namespace LMS.Shared.DTOs
 
     public class CourseDetailsDto : CourseReadDto
     {
-        public IEnumerable<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
-        public IEnumerable<CourseModuleListItemDto> Modules { get; set; } = [];
+        public List<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
+        public List<CourseModuleListItemDto> Modules { get; set; } = [];
     }
 
     public class CourseParticipantWithRoleInfoDto
@@ -43,7 +43,7 @@ namespace LMS.Shared.DTOs
         public string Description { get; set; } = string.Empty;
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
-		public IEnumerable<ActivityReadDto> Activities { get; set; } = [];
+		public List<ActivityReadDto> Activities { get; set; } = [];
 	}
 
     public class CoursesQueryDto : BasePageQueryDto
