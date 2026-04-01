@@ -35,4 +35,9 @@ public class ClientApiService : IApiService
 
         return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
+
+    public Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
