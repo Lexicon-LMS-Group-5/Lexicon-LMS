@@ -88,6 +88,9 @@
     [Parameter]
     public RenderFragment? ModalCloseButton { get; set; }
 
+    [Parameter]
+    public EventCallback<Func<IReadOnlyList<CourseListItemDto>, IReadOnlyList<CourseListItemDto>>> OnCourseListsUpdated { get; set; }
+
     private ErrorBoundaryBase? CreateCourseFormErrorBoundary { get; set; }
 
     private PageState<CreateCourseResultDto> LoadingState { get; set; } = default!;
@@ -105,8 +108,22 @@
 
         try
         {
-            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", FormData);
+            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", FormData)
+                ?? throw new Exception("No course returned");
             LoadingState = new(isLoading: false, data: response);
+
+            var newListItem = new CourseListItemDto
+                {
+                    Id = response.Id,
+                    Name = response.Name,
+                    Description = response.Description,
+                    StartDate = response.StartDate,
+                    EndDate = response.EndDate
+                };
+
+            if (OnCourseListsUpdated.HasDelegate) {
+                await OnCourseListsUpdated.InvokeAsync((list) => [newListItem, ..list]);
+            }
         } catch(Exception ex)
         {
             LoadingState = new(isLoading: false, data: null, error: ex.Message);
