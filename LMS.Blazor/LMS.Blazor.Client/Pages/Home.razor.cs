@@ -19,7 +19,6 @@ public partial class Home
     public NavigationManager Navigation { get; set; } = default!;
 
     private PageState<CoursesQueryResultDto> PageState { get; set; } = new(isLoading: true, data: null);
-
     protected override async Task OnInitializedAsync()
     {
         var authenticationState = await authenticationStateTask;
