@@ -49,11 +49,11 @@ namespace LMS.Services
             bool trackChanges = false,
             CancellationToken ct = default)
         {
-            return mapper.Map<List<ModuleReadDto>>(
-                await unitOfWork.Modules.GetModulesByCourseIdAsync(
-                    courseId, 
+            var modules = await unitOfWork.Modules.GetModulesByCourseIdAsync(
+                    courseId,
                     trackChanges,
-                    ct));
+                    ct);
+            return modules.Select(m=> mapper.Map<ModuleReadDto>(m)).ToList();
         }
     }
 }
