@@ -33,7 +33,7 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
     public async Task<UserReadDto> UpdateUserAsync(
     UpdateUserRequest request,
     string id,
-    UserUpsertDto dto,
+    UserUpdateDto dto,
     CancellationToken ct)
     {
         if (!request.IsTeacher )//&& request.CurrentUserId != id) Later maybe a user should be able to change themselves?

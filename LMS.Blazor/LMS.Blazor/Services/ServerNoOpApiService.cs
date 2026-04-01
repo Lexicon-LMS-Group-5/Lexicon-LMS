@@ -17,9 +17,8 @@ public class ServerNoOpApiService(ILogger<ServerNoOpApiService> logger) : IApiSe
     CancellationToken ct = default)
     {
         _logger.LogWarning(
-            "ServerNoOpApiService PUT called for: {Endpoint} with payload: {@Data}",
-            endpoint,
-            data);
+            "ServerNoOpApiService PUT called for: {Endpoint}.",
+            endpoint);
 
         return Task.FromResult<TResponse?>(default);
     }

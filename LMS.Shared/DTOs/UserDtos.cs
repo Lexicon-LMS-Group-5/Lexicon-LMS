@@ -12,7 +12,7 @@ public class UserReadDto
     public List<string> Roles { get; set; }
 }
 
-public class UserUpsertDto
+public class UserCreateDto
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
@@ -21,13 +21,15 @@ public class UserUpsertDto
     public List<string> Roles { get; set; }
 }
 
+public class UserUpdateDto
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+}
+
 public class  UpdateUserRequest
 {
     public string CurrentUserId { get; set; }
     public bool IsTeacher { get; set; }
-}
-
-public class UserGetMeRequest
-{
-    public string CurrentUserId { get; set; }
 }

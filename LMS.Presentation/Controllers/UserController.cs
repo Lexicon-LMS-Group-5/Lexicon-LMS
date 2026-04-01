@@ -53,7 +53,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     [Authorize(Roles = "Teacher")]
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
-        [FromBody] UserUpsertDto dto,
+        [FromBody] UserUpdateDto dto,
         CancellationToken ct)
     {
 
