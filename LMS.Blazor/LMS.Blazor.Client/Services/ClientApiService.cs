@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LMS.Blazor.Client.Services;
@@ -25,19 +26,30 @@ public class ClientApiService : IApiService
     {
         var response = await _httpClient.GetAsync($"api/proxy/{endpoint}", ct);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
-            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
-        }
+        await CheckForceLoginAsync(response);
 
         response.EnsureSuccessStatusCode();
 
         return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
 
-    public Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default)
+    public async Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsJsonAsync($"api/proxy/{endpoint}", body, ct);
+
+        await CheckForceLoginAsync(response);
+
+        response.EnsureSuccessStatusCode();
+
+        return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
+    }
+    
+    private async Task CheckForceLoginAsync(HttpResponseMessage response)
+    {
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
     }
 }
