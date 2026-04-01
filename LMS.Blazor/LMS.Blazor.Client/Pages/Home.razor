@@ -124,7 +124,13 @@
                 <header>
                     <h2 class="fs-5">Create a new Courses</h2>
                 </header>
-                <CreateCourseForm OnCourseListsUpdated="UpdateCourseListsAsync"  />
+                <CreateCourseForm OnCourseListsUpdated="UpdateCourseListsAsync">
+                    <FormSubmitionButton>
+                        <FormSubmitionButton>
+                        <button type="submit" class="btn btn-primary">Save and continue</button>
+                    </FormSubmitionButton>
+                    </FormSubmitionButton>
+                </CreateCourseForm>
             </div>
         </Tab>
     </TabContainer>
@@ -144,6 +150,9 @@
                     <ModalCloseButton>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </ModalCloseButton>
+                    <FormSubmitionButton>
+                        <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save and continue</button>
+                    </FormSubmitionButton>
                 </CreateCourseForm>
             </div>
         </div>

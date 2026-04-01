@@ -58,7 +58,7 @@
             </div>
             <div class="d-flex justify-content-end gap-2 w-100">
                 @ModalCloseButton
-                <button type="submit" class="btn btn-primary">Save and continue</button>
+                @FormSubmitionButton
             </div>
         </EditForm>
     </ChildContent>
@@ -84,6 +84,9 @@
 
     [SupplyParameterFromForm]
     private CreateCourseCommandDto? FormData { get; set; }
+
+    [Parameter]
+    public RenderFragment? FormSubmitionButton { get; set; }
 
     [Parameter]
     public RenderFragment? ModalCloseButton { get; set; }
