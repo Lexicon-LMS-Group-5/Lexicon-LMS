@@ -14,10 +14,7 @@ Welcome to your new app.
         <ul>
             @foreach(var course in PageState.Data.Items)
             {
-                <li>
-                    <div>@course.Name</div>
-                    <div>@course.Description</div>
-                </li>
+                <li>@course.Name</li>
             }
         </ul>
     }
