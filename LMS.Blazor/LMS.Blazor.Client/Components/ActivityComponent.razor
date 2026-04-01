@@ -19,8 +19,12 @@
     [Parameter, EditorRequired]
     public ActivityReadDto Activity { get; set; } = default!;
 
+    [Parameter] public int CourseId { get; set; }
+
+    [Parameter] public int ModuleId { get; set; }
+
     private void NavigateToActivity()
     {
-        NavigationManager.NavigateTo($"/activity/{Activity.Id}");
+        NavigationManager.NavigateTo($"/activity/{CourseId}/{ModuleId}/{Activity.Id}");
     }
 }
