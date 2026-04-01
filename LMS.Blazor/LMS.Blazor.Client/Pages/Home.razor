@@ -33,40 +33,44 @@
 
     <TabContainer TabTitles="@(["Overview", "Courses", "Create new Course"])">
         <Tab Slug="overview">
-            <div class="container">
-                <div class="row">
-                    <div class="p-3 col-6 d-flex flex-column gap-2">
-                        <div class="d-flex justify-content-between">
-                            <h2 class="fs-5">Active Courses</h2>
-                            <a class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="?tab=courses">
-                                Show all
-                                <span style="transform: rotate(90deg);">
-                                    <ChevronUpIcon />
-                                </span>
-                            </a>
-                        </div>
-                        <div class="">
-                            @if(PageState.Data != null)
-                            {
-                                <ul class="list-group">
-                                    @foreach(var course in PageState.Data.Items.Where(c => c.EndDate > DateTime.Now).Select(c => c))
-                                    {
-                                        <li class="list-group-item">
-                                            <div class="p-2">
-                                                <h4 class="fs-6">@course.Name</h4>
-                                                <small class="d-flex text-secondary">
-                                                    @course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()
-                                                </small>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
-                            }
+            <div class="container p-0">
+                <div class="row row-cols-1 row-cols-lg-2">
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Active Courses</h2>
+                                <a class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="?tab=courses">
+                                    Show all
+                                    <span style="transform: rotate(90deg);">
+                                        <ChevronUpIcon />
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="">
+                                @if(PageState.Data != null)
+                                {
+                                    <ul class="list-group">
+                                        @foreach(var course in PageState.Data.Items.Where(c => c.EndDate > DateTime.Now).Select(c => c))
+                                        {
+                                            <li class="list-group-item">
+                                                <div class="p-2">
+                                                    <h4 class="fs-6">@course.Name</h4>
+                                                    <small class="d-flex text-secondary">
+                                                        @course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
                         </div>
                     </div>
-                    <div class="p-3 col-6">
-                        <div class="d-flex justify-content-between">
-                            <h2 class="fs-5">Latest Activity</h2>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Latest Activity</h2>
+                            </div>
                         </div>
                     </div>
                 </div>
