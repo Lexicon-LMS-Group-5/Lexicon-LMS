@@ -43,6 +43,19 @@ public partial class CourseController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("my-course")]
+    public async Task<ActionResult<CourseDetailsDto?>> GetMyCourse()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+            return BadRequest();
+
+        var result = await serviceManager.CourseService.GetCourseDetailsByUserIdAsync(userId);
+
+        return Ok(result);
+    }
+
     [Authorize(Roles = "Teacher")]
     [HttpPost()]
     [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
