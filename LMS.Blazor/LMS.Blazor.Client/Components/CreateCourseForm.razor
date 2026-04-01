@@ -1,0 +1,26 @@
+﻿<form class="d-flex flex-column gap-2">
+    <div class="mb-3">
+        <label for="courseName" class="form-label">Course Name</label>
+        <input type="text" class="form-control" id="courseName" aria-describedby="courseNameHelp">
+        <div id="courseNameHelp" class="form-text">Add a descriptive name for your course.</div>
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Description</label>
+        <textarea class="form-control" id="courseDescription" rows="3" aria-describedby="courseDescriptionHelp"></textarea>
+        <div id="courseDescriptionHelp" class="form-text">Describe your course content.</div>
+    </div>
+    <div class="mb-3 form-check">
+        <label class="form-check-label" for="addCreator">Add me</label>
+        <input type="checkbox" class="form-check-input" id="addCreator" aria-describedby="addCreatorHelp">
+        <div id="addCreatorHelp" class="form-text">Set this as your assigned Course.</div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 w-100">
+        @ModalCloseButton
+        <button type="button" class="btn btn-primary">Save and continue</button>
+    </div>
+</form>
+
+@code{
+    [Parameter]
+    public RenderFragment? ModalCloseButton { get; set; }
+}

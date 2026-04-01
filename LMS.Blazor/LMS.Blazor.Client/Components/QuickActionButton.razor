@@ -1,0 +1,24 @@
+﻿<button class="quick-action-button d-flex gap-2 p-3 rounded border-0 shadow-sm text-primary"
+        title="@ButtonTitle"
+        @onclick="OnClick">
+    <div class="p-2 rounded-circle d-flex justify-content-center align-items-middle bg-primary-subtle">
+        @ButtonIcon
+    </div>
+    <div class="m-auto">
+        @ButtonText
+    </div>
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ButtonIcon { get; set; }
+
+    [Parameter]
+    public RenderFragment? ButtonText { get; set; }
+
+    [Parameter]
+    public string ButtonTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+}
