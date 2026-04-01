@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.Contracts;
+using System.Security.Claims;
 
 namespace LMS.Presentation.Controllers;
 
@@ -13,10 +15,14 @@ namespace LMS.Presentation.Controllers;
 public class CourseController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
+    private readonly ILogger<CourseController> logger;
 
-    public CourseController(IServiceManager serviceManager)
+    public CourseController(
+        IServiceManager serviceManager, 
+        ILogger<CourseController> logger)
     {
         this.serviceManager = serviceManager;
+        this.logger = logger;
     }
 
     [HttpGet()]
@@ -42,6 +48,9 @@ public class CourseController : ControllerBase
     [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
     public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
     {
+        // Get the user ID and add it to the DTO
+        command.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
