@@ -60,4 +60,9 @@ public class ClientApiService : IApiService
             _jsonOptions,
             ct);
     }
+
+    public Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
