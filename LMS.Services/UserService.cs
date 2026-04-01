@@ -36,7 +36,7 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
     UserUpsertDto dto,
     CancellationToken ct)
     {
-        if (!request.IsTeacher && request.CurrentUserId != id)
+        if (!request.IsTeacher )//&& request.CurrentUserId != id) Later maybe a user should be able to change themselves?
             throw new UnauthorizedAccessException("You are not allowed to update this user");
 
         var user = await unitOfWork.Users.GetByIdAsync(id, trackChanges: true, ct) ?? throw new NotFoundException($"User {id} not found");

@@ -50,6 +50,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
+    [Authorize(Roles = "Teacher")]
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpsertDto dto,

@@ -23,5 +23,8 @@ public class MapperProfile : Profile
         CreateMap<Course, CourseReadDto>();
         CreateMap<ApplicationUser, UserReadDto>()
             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
+        CreateMap<UserUpsertDto, ApplicationUser>()
+            .ForMember(dest => dest.Roles, opt => opt.Ignore())
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

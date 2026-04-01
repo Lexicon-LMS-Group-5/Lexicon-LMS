@@ -34,7 +34,7 @@ public class UserRepository(ApplicationDbContext context) : RepositoryBase<Appli
         return MapUsersWithRoles(data);
     }
 
-    private static List<ApplicationUser> MapUsersWithRoles(List<(ApplicationUser User, string RoleName)> data)
+    private static List<ApplicationUser> MapUsersWithRoles(List<UserRoleResult> data)
     {
         return data
             .GroupBy(x => x.User.Id)
@@ -48,7 +48,7 @@ public class UserRepository(ApplicationDbContext context) : RepositoryBase<Appli
             .ToList();
     }
 
-    private IQueryable<(ApplicationUser User, string RoleName)> GetUserRolesQuery(bool trackChanges)
+    private IQueryable<UserRoleResult> GetUserRolesQuery(bool trackChanges)
     {
         var users = trackChanges ? _context.Users.Include(u => u.Course) : _context.Users.Include(u => u.Course).AsNoTracking();
 
@@ -57,6 +57,16 @@ public class UserRepository(ApplicationDbContext context) : RepositoryBase<Appli
                    on user.Id equals userRole.UserId
                join role in _context.Roles
                    on userRole.RoleId equals role.Id
-               select new ValueTuple<ApplicationUser, string>(user, role.Name!);
+               select new UserRoleResult
+               {
+                   User = user,
+                   RoleName = role.Name!
+               };
+    }
+
+    private class UserRoleResult
+    {
+        public ApplicationUser User { get; set; } = default!;
+        public string RoleName { get; set; } = string.Empty;
     }
 }
