@@ -77,3 +77,15 @@ h1:focus {
 .quick-action-button:hover {
 	background-color: var(--bs-primary-bg-subtle);
 }
+
+.tab-nav-link {
+	color: var(--bs-secondary);
+}
+
+.tab-nav-link:hover {
+	color: var(--bs-primary);
+}
+
+li:has(.active-nav-link) {
+	border-bottom: 3px solid var(--bs-primary) !important;
+}

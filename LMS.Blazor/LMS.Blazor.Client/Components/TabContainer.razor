@@ -1,15 +1,18 @@
 ﻿@inject NavigationManager Navigation
 
 <div class="d-flex flex-column">
-    <ul class="nav nav-tabs">
+    <ul class="d-flex gap-2 list-unstyled border-bottom">
         @foreach (var item in NavItems)
         {
-            <li class="nav-item">
-                <NavLink
+            <li>
+                <NavLink 
                     title="@item.Title"
-                    class="nav-link"
+                    class="tab-nav-link text-decoration-none"
+                    ActiveClass="active-nav-link text-primary"
                     href="@item.Href">
-                    @item.Title
+                    <div class="p-3">
+                        @item.Title
+                    </div>
                 </NavLink>
             </li>
         }
@@ -40,6 +43,8 @@
         if (string.IsNullOrWhiteSpace(CurrentTab) || !NavItems.Select(item => item.Href).ToList().Contains(CreateTagQueryFromTitle(CurrentTab)))
             Navigation.NavigateTo(NavItems.First().Href);
     }
+
+    private bool IsCurrentTab(Link item) => CurrentTab != null && CreateTagQueryFromTitle(item.Title) == CreateTagQueryFromTitle(CurrentTab);
 
     private static string CreateTagQueryFromTitle(string input) => $"?tab={input.ToLower().Replace(" ", "-")}";
 }
