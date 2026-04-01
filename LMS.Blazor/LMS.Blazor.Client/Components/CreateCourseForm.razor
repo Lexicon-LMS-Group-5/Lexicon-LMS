@@ -1,42 +1,55 @@
 ﻿<ErrorBoundary @ref="CreateCourseFormErrorBoundary">
     <ChildContent>
-        <form class="d-flex flex-column gap-2" method="post" @onsubmit="SubmitAsync" @formname="create-course-form">
+        <EditForm class="d-flex flex-column gap-2" Model="FormData" OnValidSubmit="SubmitAsync" FormName="create-course-form">
+            <DataAnnotationsValidator />
             <div class="mb-3">
                 <label for="courseName" class="form-label">Course Name</label>
-                <InputText @bind-Value="Model!.Name" type="text" class="form-control" id="courseName" aria-describedby="courseNameHelp" />
+                    <InputText 
+                        @bind-Value="FormData!.Name" 
+                        type="text" 
+                        class="form-control" 
+                        id="courseName" 
+                        aria-describedby="courseNameHelp" />
+ 
+                    <ValidationMessage For="() => FormData!.Name" class="text-danger" />
                 <div id="courseNameHelp" class="form-text">Add a descriptive name for the course.</div>
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Description</label>
                 <InputTextArea 
-                    @bind-Value="Model!.Description"
+                    @bind-Value="FormData!.Description"
                     class="form-control" 
                     id="courseDescription" 
                     rows="3" 
                     aria-describedby="courseDescriptionHelp">
                 </InputTextArea>
+                <ValidationMessage For="() => FormData!.Description" />
                 <div id="courseDescriptionHelp" class="form-text">Describe the course content.</div>
             </div>
-            <div class="mb-3">
-                <label class="form-check-label" for="startDate">Start date</label>
-                <InputDate 
-                    @bind-Value="Model!.StartDate" 
-                    class=""
-                    id="startDate"/>
-                <div id="startDateHelp" class="form-text">Set the start date for the Course.</div>
-            </div>
-            <div class="mb-3">
-                <label class="form-check-label" for="endDate">End date</label>
-                <InputDate 
-                    @bind-Value="Model!.EndDate" 
-                    class=""
-                    id="endDate"/>
-                <div id="endDateHelp" class="form-text">Set the end date for the Course.</div>
+            <div class="mb-3 d-flex gap-3">
+                <div class="d-flex flex-column gap-2">
+                    <label class="form-check-label" for="startDate">Start date</label>
+                    <InputDate 
+                        @bind-Value="FormData!.StartDate" 
+                        class="form-control"
+                        id="startDate"/>
+                    <ValidationMessage For="() => FormData!.StartDate" />
+                    <div id="startDateHelp" class="form-text">Set the start date for the Course.</div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <label class="form-check-label" for="endDate">End date</label>
+                    <InputDate 
+                        @bind-Value="FormData!.EndDate" 
+                        class="form-control"
+                        id="endDate"/>
+                    <ValidationMessage For="() => FormData!.EndDate" />
+                    <div id="endDateHelp" class="form-text">Set the end date for the Course.</div>
+                </div>
             </div>
             <div class="mb-3 form-check">
                 <label class="form-check-label" for="addCreator">Add me</label>
                 <InputCheckbox 
-                    @bind-Value="Model!.AddCreator"
+                    @bind-Value="FormData!.AddCreator"
                     type="checkbox" 
                     class="form-check-input" 
                     id="addCreator" 
@@ -47,43 +60,61 @@
                 @ModalCloseButton
                 <button type="submit" class="btn btn-primary">Save and continue</button>
             </div>
-        </form>
+        </EditForm>
     </ChildContent>
     <ErrorContent>
-        <div>
-            <h3>Something went wrong...</h3>
-            <button class="btn-link btn-primary" @onclick="() => CreateCourseFormErrorBoundary?.Recover()">Try to reload</button>
+        <div class="d-flex w-100 h-100 flex-column justify-content-center align-items-middle">
+            <div class="flex flex-column text-center justify-content-center align-items-middle gap-5">
+                <h3 class="p-5">Something went wrong...</h3>
+
+                @if(LoadingState.Error != null)
+                {
+                    <p>@LoadingState.Error</p>
+                }
+              
+                <button class="btn btn-primary" @onclick="() => CreateCourseFormErrorBoundary?.Recover()">Try to reload</button>
+            </div>
         </div>
     </ErrorContent>
 </ErrorBoundary>
-
 
 @code{
     [Inject]
     private IApiService ApiService { get; set; } = default!;
 
     [SupplyParameterFromForm]
-    private CreateCourseCommandDto? Model { get; set; }
+    private CreateCourseCommandDto? FormData { get; set; }
 
     [Parameter]
     public RenderFragment? ModalCloseButton { get; set; }
 
     private ErrorBoundaryBase? CreateCourseFormErrorBoundary { get; set; }
 
+    private PageState<CreateCourseResultDto> LoadingState { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        Model ??= new();
+        LoadingState = new(isLoading: false, data: null);
+        FormData ??= new();
     }
 
     private async Task SubmitAsync() {
-        if (Model == null) return;
+        if (FormData == null) return;
+
+        LoadingState = new(isLoading: true, data: null);
 
         try
         {
-            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", Model);
+            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", FormData);
+            LoadingState = new(isLoading: false, data: response);
         } catch(Exception ex)
         {
+            LoadingState = new(isLoading: false, data: null, error: ex.Message);
             throw ex;
+        } finally
+        {
+            // Reset the form state
+            FormData = new();
         }
 
     }
