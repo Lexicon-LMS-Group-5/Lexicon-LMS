@@ -56,7 +56,7 @@ namespace LMS.Infractructure.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Activities");
+                    b.ToTable("ModuleActivities");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.ActivityType", b =>
@@ -76,7 +76,7 @@ namespace LMS.Infractructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityTypes");
+                    b.ToTable("ModuleActivityTypes");
                 });
 
             modelBuilder.Entity("Domain.Models.Entities.ApplicationUser", b =>
