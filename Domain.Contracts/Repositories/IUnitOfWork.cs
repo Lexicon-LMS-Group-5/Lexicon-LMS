@@ -5,5 +5,7 @@ public interface IUnitOfWork
     IActivityRepository Activities { get; }
     ICourseRepository Courses { get; }
     IModuleRepository Modules { get; }
-    Task CompleteAsync(CancellationToken ct=default);
+
+    IUserRepository Users { get; }
+    Task CompleteAsync(CancellationToken ct = default);
 }

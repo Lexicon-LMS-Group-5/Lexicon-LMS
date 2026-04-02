@@ -14,15 +14,20 @@ public class MapperProfile : Profile
         CreateMap<CreateCourseCommandDto, Course>();
         CreateMap<Course, CreateCourseResultDto>();
         CreateMap<Course, CourseListItemDto>();
-        CreateMap<IEnumerable<Course>, IReadOnlyList<CourseListItemDto>>();
         CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
         CreateMap<Course, CourseDetailsDto>();
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
         CreateMap<Module, CourseModuleListItemDto>();
 		CreateMap<Activity, ActivityReadDto>();
+        CreateMap<Course, CourseReadDto>();
+        CreateMap<ApplicationUser, UserReadDto>()
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
+        CreateMap<UserUpdateDto, ApplicationUser>()
+            .ForMember(dest => dest.Roles, opt => opt.Ignore())
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<UserCreateDto, ApplicationUser>();
         CreateMap<ModuleUpsertDto, Module>();
         CreateMap<Module, ModuleReadDto>();
-        CreateMap<List<Module>, List<ModuleReadDto>>();
 
     }
 }

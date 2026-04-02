@@ -68,3 +68,43 @@ h1:focus {
 		background-color: #e2ecff;
 		transform: translateY(-2px);
 	}
+
+.module-card,
+.activity-card {
+	cursor: pointer;
+}
+
+
+.module-card,
+.activity-card {
+	cursor: pointer;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+	.module-card:hover,
+	.activity-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+	}
+
+
+.quick-action-button {
+	background-color: var(--bs-body-bg);
+	transition: background-color .2s;
+}
+
+.quick-action-button:hover {
+	background-color: var(--bs-primary-bg-subtle);
+}
+
+.tab-nav-link {
+	color: var(--bs-secondary);
+}
+
+.tab-nav-link:hover {
+	color: var(--bs-primary);
+}
+
+li:has(.active-nav-link) {
+	border-bottom: 3px solid var(--bs-primary) !important;
+}
