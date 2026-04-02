@@ -82,7 +82,7 @@ namespace LMS.Shared.DTOs
         {
             if (EndDate <= StartDate)
             {
-                yield return new ValidationResult("End date must be after the start date.", [nameof(EndDate)]);
+                yield return new ValidationResult("End date must be after the start date.", [nameof(EndDate), nameof(StartDate)]);
             }
 
             if (EndDate <= DateTime.UtcNow)

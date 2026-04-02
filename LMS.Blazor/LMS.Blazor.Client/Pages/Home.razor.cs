@@ -58,6 +58,7 @@ public partial class Home
             .Where(c => c.EndDate > DateTime.Now).ToList();
 
         Notification = "Courses successfully updated";
+
         await Task.Delay(3000);
         Notification = null;
     }
