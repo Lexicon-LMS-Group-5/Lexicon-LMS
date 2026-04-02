@@ -1,6 +1,6 @@
 ﻿<ErrorBoundary @ref="CreateCourseFormErrorBoundary">
     <ChildContent>
-        <EditForm class="d-flex flex-column gap-2" Model="FormData" OnValidSubmit="SubmitAsync" FormName="create-course-form">
+        <EditForm class="d-flex flex-column gap-2" EditContext="editContext" OnValidSubmit="SubmitAsync" OnInvalidSubmit="() => IsSaveEnabled = false" FormName="create-course-form">
             <DataAnnotationsValidator />
             <div class="mb-3">
                 <label for="courseName" class="form-label">Course Name</label>
@@ -58,7 +58,14 @@
             </div>
             <div class="d-flex justify-content-end gap-2 w-100">
                 @ModalCloseButton
-                @FormSubmitionButton
+                <button 
+                    disabled="@(!IsSaveEnabled)" 
+                    type="submit" 
+                    data-bs-dismiss="@(ModalId != null ? "modal" : "")" 
+                    data-bs-target="#@ModalId" 
+                    class="btn btn-primary">
+                    Save and continue
+                </button>
             </div>
         </EditForm>
     </ChildContent>
@@ -86,7 +93,7 @@
     private CreateCourseCommandDto? FormData { get; set; }
 
     [Parameter]
-    public RenderFragment? FormSubmitionButton { get; set; }
+    public string? ModalId { get; set; }
 
     [Parameter]
     public RenderFragment? ModalCloseButton { get; set; }
@@ -94,14 +101,33 @@
     [Parameter]
     public EventCallback<Func<IReadOnlyList<CourseListItemDto>, IReadOnlyList<CourseListItemDto>>> OnCourseListsUpdated { get; set; }
 
+    private EditContext? editContext;
+
     private ErrorBoundaryBase? CreateCourseFormErrorBoundary { get; set; }
 
     private PageState<CreateCourseResultDto> LoadingState { get; set; } = default!;
+
+    private string? Notification { get; set; } = null;
+
+    private bool IsSaveEnabled { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         LoadingState = new(isLoading: false, data: null);
         FormData ??= new();
+        editContext = new(FormData);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        if (editContext != null)
+        {
+            IsSaveEnabled = editContext.Validate();
+            StateHasChanged();
+        }
+
+            
     }
 
     private async Task SubmitAsync() {
@@ -124,6 +150,9 @@
                     EndDate = response.EndDate
                 };
 
+            FormData = new();
+            IsSaveEnabled = false;
+
             if (OnCourseListsUpdated.HasDelegate) {
                 await OnCourseListsUpdated.InvokeAsync((list) => [newListItem, ..list]);
             }
@@ -131,11 +160,6 @@
         {
             LoadingState = new(isLoading: false, data: null, error: ex.Message);
             throw ex;
-        } finally
-        {
-            // Reset the form state
-            FormData = new();
         }
-
     }
 }
