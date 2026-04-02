@@ -45,8 +45,7 @@ namespace LMS.Services
 
         public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
-                ?? throw new CourseNotFoundException();
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct) ?? throw new CourseNotFoundException();
 
             List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];
 

@@ -8,6 +8,7 @@
 
 <PageTitle>@(CourseDetails?.Name ?? "Loading course details...")</PageTitle>
 
+
 @if (IsLoading)
 {
     <div class="placeholder-glow">Loading...</div>
@@ -25,22 +26,22 @@ else
                     <p class="text-muted">
                         <strong>Led by:</strong>
                         @foreach (var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
-                        {
+            {
                             <span class="badge bg-primary me-1">@participant.FullName</span>
-                        }
-                    </p>
+            }
+        </p>
 
-                    <p>@CourseDetails.Description</p>
+        <p>@CourseDetails.Description</p>
 
                     <div class="mt-3">
-                        <AuthorizeView Roles="Teacher">
+            <AuthorizeView Roles="Teacher">
                             <div class="alert alert-info">Teacher content</div>
-                        </AuthorizeView>
-                        <AuthorizeView Roles="Student">
+            </AuthorizeView>
+            <AuthorizeView Roles="Student">
                             <div class="alert alert-success">Student content</div>
-                        </AuthorizeView>
+            </AuthorizeView>
                         <div class="alert alert-secondary">General content</div>
-                    </div>
+        </div>
                 </div>
             </div>
 
@@ -49,29 +50,29 @@ else
                 <div class="card-body">
                     <h3>Participants</h3>
                     <div class="d-flex flex-wrap gap-2 mt-2">
-                        @foreach (var participant in CourseDetails.Participants.Where(p => p.Role != "Teacher"))
-                        {
+                @foreach (var participant in CourseDetails.Participants.Where(p => p.Role != "Teacher"))
+                {
                             <span class="badge bg-light text-dark border">
                                 @participant.FullName
                             </span>
-                        }
-                    </div>
-                </div>
+                }
+            </div>
+        </div>
             </div>
 
             <!-- Modules -->
-            <div>
+        <div>
                 <h2 class="mb-3">Course Modules</h2>
 
                 <div class="row">
                     @foreach (var module in CourseDetails.Modules)
-                    {
+                {
                         <div class="col-md-6 col-lg-4">
                             <ModuleComponent Module="module"
                                              Activities="module.Activities"
                                              CourseId="@CourseDetails.Id" />
                         </div>
-                    }
+                }
                 </div>
             </div>
 
