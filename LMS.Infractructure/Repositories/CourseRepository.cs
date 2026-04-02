@@ -26,6 +26,8 @@ namespace LMS.Infractructure.Repositories
 
         public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false, CancellationToken ct = default)
         {
+            var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
+
             return await FindByCondition(c => c.Id == courseId, trackChanges)
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
