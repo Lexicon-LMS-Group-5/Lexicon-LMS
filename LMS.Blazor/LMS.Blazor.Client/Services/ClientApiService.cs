@@ -60,4 +60,29 @@ public class ClientApiService : IApiService
             _jsonOptions,
             ct);
     }
+
+    public async Task<TResponse?> CreateAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(
+            $"api/proxy/{endpoint}", data, _jsonOptions, ct);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content.Headers.ContentLength == 0)
+            return default;
+
+        return await JsonSerializer.DeserializeAsync<TResponse>(
+            await response.Content.ReadAsStreamAsync(ct),
+            _jsonOptions,
+            ct);
+    }
 }

@@ -8,4 +8,9 @@ public interface IApiService
     string endpoint,
     TRequest data,
     CancellationToken ct = default);
+
+    Task<TResponse?> CreateAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default);
 }
