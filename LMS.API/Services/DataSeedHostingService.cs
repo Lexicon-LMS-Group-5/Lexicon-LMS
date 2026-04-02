@@ -57,9 +57,9 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
-            // Add initial ActivityTypes if none exist
-            if (!await context.ActivityTypes.AnyAsync())
-                await AddInitialActivityTypesToDbAsync(cancellationToken);
+            // Add initial ModuleActivityTypes if none exist
+            if (!await context.ModuleActivityTypes.AnyAsync())
+                await AddInitialModuleActivityTypesToDbAsync(cancellationToken);
             
             // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
@@ -158,12 +158,12 @@ public class DataSeedHostingService : IHostedService
         }
     }
 
-    private async Task AddInitialActivityTypesToDbAsync(CancellationToken cancellationToken)
+    private async Task AddInitialModuleActivityTypesToDbAsync(CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await context.ActivityTypes.AddRangeAsync([
+        await context.ModuleActivityTypes.AddRangeAsync([
             new ActivityType()
             {
                 Name = "Assignment",
@@ -216,15 +216,15 @@ public class DataSeedHostingService : IHostedService
         var students = await userManager.GetUsersInRoleAsync(StudentRole);
         var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
         var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
-        var activityTypes = await context.ActivityTypes.ToListAsync(cancellationToken);
+        var moduleActivityTypes = await context.ModuleActivityTypes.ToListAsync(cancellationToken);
 
         var faker = new Faker();
         var courseStartDate = faker.Date.Soon(30);
         DateTime courseEndDate;
 
         var timeOffset = courseStartDate;
-        var activityIteration = 0;
-        var activityGenerator = new Faker<Activity>()
+        var moduleActivityIteration = 0;
+        var moduleActivityGenerator = new Faker<Activity>()
             .Rules((f, a) =>
             {
                 var startTime = timeOffset;
@@ -234,9 +234,9 @@ public class DataSeedHostingService : IHostedService
                 a.Description = f.Hacker.Phrase().ApplyCase(LetterCasing.Sentence);
                 a.StartDate = startTime;
                 a.EndDate = f.Date.Soon(refDate: startTime);
-                a.Type = f.PickRandom(activityTypes);
+                a.Type = f.PickRandom(moduleActivityTypes);
 
-                timeOffset = endTime.AddDays(activityIteration++);
+                timeOffset = endTime.AddDays(moduleActivityIteration++);
             });
 
         var moduleIteration = 0;
@@ -250,7 +250,7 @@ public class DataSeedHostingService : IHostedService
                 m.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
                 m.StartDate = startDate;
                 m.EndDate = courseEndDate;
-                m.Activities = activityGenerator.UseSeed(Seed).Generate(f.Random.Int(3,8));
+                m.Activities = moduleActivityGenerator.UseSeed(Seed).Generate(f.Random.Int(3,8));
             });
 
         var courseGenerator = new Faker<Course>()
