@@ -21,6 +21,15 @@ namespace LMS.Services
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
         }
+
+        public async Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default)
+        {
+            Module module = mapper.Map<Module>(dto);
+            unitOfWork.Modules.Create(module);
+            await unitOfWork.CompleteAsync();
+            return mapper.Map<ModuleReadDto>(module);
+        }
+
         public async Task<ModuleReadDto> GetModuleDetailsByIdAsync(
             int moduleId,
             bool trackChanges = false,
@@ -40,11 +49,11 @@ namespace LMS.Services
             bool trackChanges = false,
             CancellationToken ct = default)
         {
-            return mapper.Map<List<ModuleReadDto>>(
-                await unitOfWork.Modules.GetModulesByCourseIdAsync(
-                    courseId, 
+            var modules = await unitOfWork.Modules.GetModulesByCourseIdAsync(
+                    courseId,
                     trackChanges,
-                    ct));
+                    ct);
+            return modules.Select(m=> mapper.Map<ModuleReadDto>(m)).ToList();
         }
     }
 }

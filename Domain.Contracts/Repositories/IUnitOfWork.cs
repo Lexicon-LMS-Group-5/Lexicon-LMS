@@ -7,5 +7,5 @@ public interface IUnitOfWork
     IModuleRepository Modules { get; }
 
     IUserRepository Users { get; }
-    Task CompleteAsync();
+    Task CompleteAsync(CancellationToken ct = default);
 }
