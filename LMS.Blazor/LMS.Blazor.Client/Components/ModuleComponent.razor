@@ -18,7 +18,9 @@
         <div class="activities mt-3">
             @foreach (var activity in Activities)
             {
-                <ActivityComponent Activity="activity" />
+                <ActivityComponent Activity="activity"
+                                   CourseId="@CourseId"
+                                   ModuleId="@Module.Id" />
             }
         </div>
     </div>
@@ -31,8 +33,11 @@
     [Parameter]
     public IEnumerable<ActivityReadDto> Activities { get; set; }
 
+    [Parameter]
+    public int CourseId { get; set; }  
+
     private void NavigateToModule()
     {
-        NavigationManager.NavigateTo($"/module/{Module.Id}");
+        NavigationManager.NavigateTo($"/module/{CourseId}/{Module.Id}");
     }
 }

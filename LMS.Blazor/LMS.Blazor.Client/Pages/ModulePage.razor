@@ -1,4 +1,4 @@
-@page "/module/{ModuleId:int}"
+@page "/module/{CourseId:int}/{ModuleId:int}"
 @using LMS.Blazor.Client.Components
 @using LMS.Shared.DTOs
 @inject IApiService ApiService
@@ -6,36 +6,100 @@
 
 @if (Module == null)
 {
-    <p>Loading module...</p>
+    <div class="d-flex justify-content-center mt-5">
+        <div class="spinner-border text-primary"></div>
+    </div>
 }
 else
 {
-    <h2>Module Details</h2>
+    <div class="container py-4">
 
-    <div>
-        <h3>@Module.Name</h3>
-        <p>@Module.Description</p>
-        <small>
-            Start: @Module.StartDate.ToShortDateString() <br />
-            End: @Module.EndDate.ToShortDateString()
-        </small>
-    </div>
+        <!-- HEADER -->
+        <div class="mb-4">
+            <h1 class="fw-bold">@Module.Name</h1>
+            <p class="text-muted mb-0">@Module.CourseName</p>
+        </div>
 
-    <h4>Activities</h4>
-    @if (Activities != null && Activities.Any())
-    {
-        @foreach (var activity in Activities)
+        <!-- INFO CARDS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">Module ID</h6>
+                        <h4>@Module.Id</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">Course ID</h6>
+                        <h4>@Module.CourseId</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">Activities</h6>
+                        <h4>@(Module.Activities?.Count ?? 0)</h4>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Description</h5>
+                <p class="card-text">@Module.Description</p>
+            </div>
+        </div>
+
+        <!-- DATES -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Schedule</h5>
+                <p class="mb-1">
+                    <strong>Start:</strong> @Module.StartDate.ToShortDateString()
+                </p>
+                <p class="mb-0">
+                    <strong>End:</strong> @Module.EndDate.ToShortDateString()
+                </p>
+            </div>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <div class="mb-3">
+            <h3 class="fw-semibold">Activities</h3>
+        </div>
+
+        @if (Module.Activities != null && Module.Activities.Any())
         {
-            <ActivityComponent Activity="activity" ModuleId="@Module.Id" CourseId="@CourseId" />
+            <div class="row">
+                @foreach (var activity in Module.Activities)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <ActivityComponent Activity="activity"
+                                           ModuleId="@Module.Id"
+                                           CourseId="@CourseId" />
+                    </div>
+                }
+            </div>
         }
-    }
-    else
-    {
-        <p>No activities found for this module.</p>
-    }
+        else
+        {
+            <div class="alert alert-secondary">
+                No activities found for this module.
+            </div>
+        }
 
+    </div>
 }
-
 
 
 @code {
@@ -48,12 +112,13 @@ else
     private ModuleReadDto Module { get; set; }
     private List<ActivityReadDto> Activities { get; set; } = new();
 
+
     protected override async Task OnInitializedAsync()
     {
         // Fetch module details
-        Module = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{ModuleId}");
+        Module = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{CourseId}/{ModuleId}");
 
         // Fetch activities for this module
-        Activities = await ApiService.GetAsync<List<ActivityReadDto>>($"api/modules/{ModuleId}/activities");
+        // Activities = await ApiService.GetAsync<List<ActivityReadDto>>($"api/modules/{ModuleId}/activities");
     }
 }
