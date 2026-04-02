@@ -64,10 +64,29 @@ h1:focus {
 	transition: all 0.2s ease;
 }
 
-.activity-card:hover {
-	background-color: #e2ecff;
-	transform: translateY(-2px);
+	.activity-card:hover {
+		background-color: #e2ecff;
+		transform: translateY(-2px);
+	}
+
+.module-card,
+.activity-card {
+	cursor: pointer;
 }
+
+
+.module-card,
+.activity-card {
+	cursor: pointer;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+	.module-card:hover,
+	.activity-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+	}
+
 
 .quick-action-button {
 	background-color: var(--bs-body-bg);
