@@ -84,10 +84,16 @@ public static class ServiceExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<ICourseRepository, CourseRepository>();
-        services.AddScoped(provider => new Lazy<ICourseRepository>(() => provider.GetRequiredService<ICourseRepository>()));
+        services.AddScoped(provider => new Lazy<ICourseRepository>(
+            () => provider.GetRequiredService<ICourseRepository>()));
+
+        services.AddScoped<IModuleRepository, ModuleRepository>();
+        services.AddScoped(provider => new Lazy<IModuleRepository>(
+            () => provider.GetRequiredService<IModuleRepository>()));
 
         services.AddScoped<IActivityRepository, ActivityRepository>();
-        services.AddScoped(provider => new Lazy<IActivityRepository>(() => provider.GetRequiredService<IActivityRepository>()));
+        services.AddScoped(provider => new Lazy<IActivityRepository>(
+            () => provider.GetRequiredService<IActivityRepository>()));
     }
 
     public static void AddServiceLayer(this IServiceCollection services)
@@ -95,12 +101,18 @@ public static class ServiceExtensions
         services.AddScoped<IServiceManager, ServiceManager>();
 
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped(provider => new Lazy<IAuthService>(() => provider.GetRequiredService<IAuthService>()));
+        services.AddScoped(provider => new Lazy<IAuthService>(
+            () => provider.GetRequiredService<IAuthService>()));
 
         services.AddScoped<ICourseService, CourseService>();
-        services.AddScoped(provider => new Lazy<ICourseService>(() => provider.GetRequiredService<ICourseService>()));
+        services.AddScoped(provider => new Lazy<ICourseService>(
+            () => provider.GetRequiredService<ICourseService>()));
+        services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped(provider => new Lazy<IModuleService>(
+            () => provider.GetRequiredService<IModuleService>()));
 
         services.AddScoped<IActivityService, ActivityService>();
-        services.AddScoped(provider => new Lazy<IActivityService>(() => provider.GetRequiredService<IActivityService>()));
+        services.AddScoped(provider => new Lazy<IActivityService>(
+            () => provider.GetRequiredService<IActivityService>()));
     }
 }
