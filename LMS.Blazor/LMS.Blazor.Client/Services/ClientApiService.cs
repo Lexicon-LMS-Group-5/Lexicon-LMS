@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LMS.Blazor.Client.Services;
@@ -34,5 +35,29 @@ public class ClientApiService : IApiService
         response.EnsureSuccessStatusCode();
 
         return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
+    }
+
+    public async Task<TResponse?> PutAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/proxy/{endpoint}", data, _jsonOptions, ct);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content.Headers.ContentLength == 0)
+            return default;
+
+        return await JsonSerializer.DeserializeAsync<TResponse>(
+            await response.Content.ReadAsStreamAsync(ct),
+            _jsonOptions,
+            ct);
     }
 }
