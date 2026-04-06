@@ -24,10 +24,39 @@ namespace LMS.Services
 
         public async Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default)
         {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(dto.CourseId, true, ct);
+            if (course == null) throw new CourseNotFoundException(dto.CourseId);
+            DateRangeHelper drh = new DateRangeHelper(course);
+            if (DateRangeHelper.Absent(dto.StartDate)
+                || DateRangeHelper.Absent(dto.EndDate))
+            {
+                if (dto.TimeCond == null) throw new BadRequestException("time parameters");
+                var timeResp = drh.GetDateRange(dto.TimeCond!);
+                if (timeResp != null)
+                {
+                    dto.StartDate = DateRangeHelper.OneOf(dto.StartDate, timeResp.Start);
+                    dto.EndDate = DateRangeHelper.OneOf(dto.EndDate, timeResp.End);
+                }
+            }
             Module module = mapper.Map<Module>(dto);
+            StartEnd newStartEnd = StartEnd.NewModule(
+                module.StartDate,
+                module.EndDate,
+                module.CourseId);
+            drh.CheckNew(newStartEnd);
             unitOfWork.Modules.Create(module);
-            await unitOfWork.CompleteAsync();
+            await unitOfWork.CompleteAsync(ct);
             return mapper.Map<ModuleReadDto>(module);
+        }
+
+        public Task<DateRangeResponseDto> GetDateRangeAsync(
+            DateRangeRequestDto dto, 
+            bool trackChanges = false, 
+            CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ModuleReadDto> GetModuleDetailsByIdAsync(
@@ -40,7 +69,7 @@ namespace LMS.Services
                 .GetModuleDetailsByIdAsync(moduleId, trackChanges, ct);
             if (module == null)
             {
-                throw new NotFoundException($"Module not found for moduleId={moduleId}.");
+                throw new NotFoundException($"ModuleId={moduleId}.");
             }
             return mapper.Map<ModuleReadDto>(module);
         }

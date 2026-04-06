@@ -6,6 +6,8 @@
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public int ModuleId { get; set; }
+        public DateRangeRequestDto? TimeCond { get; set; }
 
         //public int ActivityTypeId { get; set; }
         //If you can change the type, we need to make sure that this is not possible when switching from a time-exclusive type to a non-time-exclusive type, or vice versa.
