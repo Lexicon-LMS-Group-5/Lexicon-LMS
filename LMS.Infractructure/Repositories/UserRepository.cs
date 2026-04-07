@@ -44,7 +44,6 @@ public class UserRepository(ApplicationDbContext context) : RepositoryBase<Appli
                 user.Roles = g.Select(x => x.RoleName).ToList();
                 return user;
             })
-            
             .ToList();
     }
 
