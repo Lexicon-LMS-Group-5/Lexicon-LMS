@@ -27,7 +27,7 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
     {
         var user = await unitOfWork.Users.GetByIdAsync(id, trackChanges: false, ct);
 
-        return user == null ? throw new NotFoundException($"Activity {id} not found") : mapper.Map<UserReadDto>(user);
+        return user == null ? throw new NotFoundException($"User {id} not found") : mapper.Map<UserReadDto>(user);
     }
 
     public async Task<UserReadDto> UpdateUserAsync(

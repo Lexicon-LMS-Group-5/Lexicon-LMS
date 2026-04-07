@@ -26,6 +26,22 @@ public partial class UserList
 
     private string _searchTerm = "";
 
+    private bool ShowEditModal = false;
+    private string SelectedUserId = "";
+
+    private void OpenModal(string userId)
+    {
+        Console.WriteLine($"Opening modal for user ID: {userId}");
+        SelectedUserId = userId;
+        ShowEditModal = true;
+    }
+
+    private void CloseModal()
+    {
+        ShowEditModal = false;
+    }
+
+
     private string SearchTerm
     {
         get => _searchTerm;
@@ -77,7 +93,8 @@ public partial class UserList
                 u.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                (u.Roles != null && u.Roles.Any(r =>
+                u.Course != null && u.Course.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            (u.Roles != null && u.Roles.Any(r =>
                     r.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))));
         }
 
@@ -112,6 +129,14 @@ public partial class UserList
             _sortAscending = true;
         }
 
+        ApplyFilterAndSort();
+    }
+
+    private async Task HandleUserSaved()
+    {
+        ShowEditModal = false;
+
+        AllUsers = await ApiService.GetAsync<List<UserReadDto>>("api/users");
         ApplyFilterAndSort();
     }
 }
