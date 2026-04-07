@@ -30,7 +30,7 @@
                     <div class="col">
                         <div class="d-flex flex-column gap-3 p-3">
                             <div class="d-flex justify-content-between">
-                                <h2 class="fs-5">Active Courses</h2>
+                                <h2 class="fs-5">Active Courses @(ActiveCourses != null ? $"({ActiveCourses.Count.ToString()})" : "")</h2>
                                 <a class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="?tab=courses">
                                     Show all
                                     <span style="transform: rotate(90deg);">
@@ -39,10 +39,10 @@
                                 </a>
                             </div>
                             <div class="">
-                                @if(PageState.Data != null)
+                                @if(ActiveCourses != null)
                                 {
                                     <ul class="list-group">
-                                        @foreach(var course in PageState.Data.Items.Where(c => c.EndDate > DateTime.Now).Select(c => c))
+                                        @foreach(var course in ActiveCourses)
                                         {
                                             <li class="list-group-item">
                                                 <div class="p-2">
@@ -91,10 +91,10 @@
                     {
                         <div>Loading courses...</div>
                     }
-                    else if (PageState.Data != null)
+                    else if (AllCourses != null)
                     {
                         <div class="accordion accordion-flush" id="course-list">
-                            @foreach (var item in PageState.Data.Items.Select((course, index) => (course, index)))
+                            @foreach (var item in AllCourses.Select((course, index) => (course, index)))
                             {
                                 <div class="accordion-item">
                                     <div class="accordion-header">
@@ -124,23 +124,23 @@
                 <header>
                     <h2 class="fs-5">Create a new Courses</h2>
                 </header>
-                <CreateCourseForm />
+                <CreateCourseForm OnCourseListsUpdated="UpdateCourseListsAsync" />
             </div>
         </Tab>
     </TabContainer>
 </div>
 
 <div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content h-100">
             <div class="modal-header">
                 <h2 class="modal-title fs-5" id="createCourseFormModalLabel">
                     Create a new Course
                 </h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body modal-dialog-scrollable">
-                <CreateCourseForm>
+            <div class="modal-body h-100">
+                <CreateCourseForm ModalId="createCourseFormModal" OnCourseListsUpdated="UpdateCourseListsAsync">
                     <ModalCloseButton>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </ModalCloseButton>
@@ -149,3 +149,12 @@
         </div>
     </div>
 </div>
+
+@if(Notification != null)
+{
+<div class="toast-container position-fixed bottom-0 start-0 z-3 d-flex justify-content-center w-100">
+    <div class="alert alert-success shadow-sm" role="alert">
+        @Notification
+    </div>
+</div>
+}

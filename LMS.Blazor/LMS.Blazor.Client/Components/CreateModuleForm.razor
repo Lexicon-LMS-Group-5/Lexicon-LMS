@@ -89,7 +89,7 @@
 
             var json = JsonSerializer.Serialize(dto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await ApiService.PostAsync<ModuleUpsertDto, ModuleReadDto>(
+            var response = await ApiService.PostAsync<ModuleReadDto, ModuleUpsertDto>(
                 $"api/modules/{CourseId}", dto);
 
             await OnCreated.InvokeAsync();

@@ -9,8 +9,5 @@ public interface IApiService
     TRequest data,
     CancellationToken ct = default);
 
-	Task<TResponse?> PostAsync<TRequest, TResponse>(
-	string endpoint,
-	TRequest data,
-	CancellationToken ct = default);
+    Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default);
 }
