@@ -51,11 +51,7 @@ public class ClientApiService : IApiService
     {
         var response = await _httpClient.PutAsJsonAsync($"api/proxy/{endpoint}", data, _jsonOptions, ct);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
-            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
-        }
+        await CheckForceLoginAsync(response);
 
         response.EnsureSuccessStatusCode();
 
