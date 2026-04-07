@@ -1,0 +1,83 @@
+﻿@page "/users"
+
+@using LMS.Shared.DTOs
+@attribute [Authorize]
+
+<h3 class="mb-4">Users</h3>
+
+@if (IsLoading)
+{
+    <div class="text-center mt-4">
+        <div class="spinner-border" role="status"></div>
+    </div>
+}
+else if (Users == null || !Users.Any())
+{
+    <div class="alert alert-info">
+        No users found.
+    </div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th @onclick='() => SortBy("Name")' style="cursor:pointer">
+                    Name
+                    @(_sortColumn == "Name" ? (_sortAscending? " ▲" : " ▼") : "")
+                </th>
+                <th @onclick='() => SortBy("Email")' style="cursor:pointer">
+                    Email
+                    @(_sortColumn == "Email" ? (_sortAscending? " ▲" : " ▼") : "")
+                </th>
+                <th @onclick='() => SortBy("Course")' style="cursor:pointer">
+                    Course
+                    @(_sortColumn == "Course" ? (_sortAscending ? " ▲" : " ▼") : "")
+                </th>
+                <th @onclick='() => SortBy("Roles")' style="cursor:pointer">
+                    Roles
+                    @(_sortColumn == "Roles" ? (_sortAscending? " ▲" : " ▼") : "")
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Users)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@(user.Course?.Name ?? "No Course")</td>
+                    <td>
+                        @if (user.Roles != null && user.Roles.Any())
+                        {
+                            @foreach (var role in user.Roles)
+                            {
+                                @if (role == "Teacher")
+                                {
+                                    <span class="badge bg-info me-1">@role</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary me-1">@role</span>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">No roles</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-warning"
+                               href="@($"/users/edit/{user.Id}")">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

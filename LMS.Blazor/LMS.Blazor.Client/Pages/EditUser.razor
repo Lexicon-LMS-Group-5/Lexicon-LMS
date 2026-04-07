@@ -1,0 +1,40 @@
+﻿@page "/users/edit/{Id}"
+@using LMS.Shared.DTOs
+@inject LMS.Blazor.Client.Services.IApiService ApiService
+@inject NavigationManager Navigation
+
+<h3>Edit User</h3>
+
+@if (IsLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+else
+{
+    <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <InputText class="form-control" @bind-Value="Model.FirstName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <InputText class="form-control" @bind-Value="Model.LastName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText type="email" class="form-control" @bind-Value="Model.Email" />
+        </div>
+
+        <button type="submit" class="btn btn-primary me-2">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
+    </EditForm>
+}

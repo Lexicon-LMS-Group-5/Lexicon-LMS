@@ -3,6 +3,9 @@
 public interface IUnitOfWork
 {
     IActivityRepository Activities { get; }
-    ICourseRepository CourseRepository { get; }
-    Task CompleteAsync();
+    ICourseRepository Courses { get; }
+    IModuleRepository Modules { get; }
+
+    IUserRepository Users { get; }
+    Task CompleteAsync(CancellationToken ct = default);
 }

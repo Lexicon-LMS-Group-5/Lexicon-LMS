@@ -1,0 +1,16 @@
+﻿
+@if (CurrentTab == Slug && ChildContent != null)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [SupplyParameterFromQuery(Name = "tab")]
+    private string CurrentTab { get; set; } = string.Empty;
+}

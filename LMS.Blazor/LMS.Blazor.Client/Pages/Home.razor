@@ -2,6 +2,150 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="d-flex flex-column gap-5 pb-5">
+    <h1>Dashboard</h1>
 
-Welcome to your new app.
+    <div class="d-flex flex-column gap-3 p-3">
+        <h2 class="fs-5">Quick Actions</h2>
+        <div class="d-flex gap-2">
+            <div 
+                data-bs-toggle="modal"
+                data-bs-target="#createCourseFormModal">
+                <QuickActionButton>
+                    <ButtonIcon>
+                        <CirclePlusIcon />
+                    </ButtonIcon>
+                    <ButtonText>
+                        Add a new Course
+                    </ButtonText>
+                </QuickActionButton>
+            </div>
+        </div>
+    </div>
+
+    <TabContainer TabTitles="@(["Overview", "Courses", "Create new Course"])">
+        <Tab Slug="overview">
+            <div class="container p-0">
+                <div class="row row-cols-1 row-cols-lg-2">
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Active Courses</h2>
+                                <a class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="?tab=courses">
+                                    Show all
+                                    <span style="transform: rotate(90deg);">
+                                        <ChevronUpIcon />
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="">
+                                @if(PageState.Data != null)
+                                {
+                                    <ul class="list-group">
+                                        @foreach(var course in PageState.Data.Items.Where(c => c.EndDate > DateTime.Now).Select(c => c))
+                                        {
+                                            <li class="list-group-item">
+                                                <div class="p-2">
+                                                    <h4 class="fs-6">@course.Name</h4>
+                                                    <small class="d-flex text-secondary">
+                                                        @course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Latest Activity</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Tab>
+        <Tab Slug="courses">
+            <div class="d-flex flex-column gap-3 p-3">
+                <header>
+                    <h2 class="fs-5">All Courses</h2>
+                </header>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Search courses...">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary d-flex align-items-middle gap-2" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">
+                            <div class="d-flex align-items-middle m-auto">
+                                <CirclePlusIcon Size="20" />
+                            </div>
+                            Add a new Course
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    @if (PageState.IsLoading)
+                    {
+                        <div>Loading courses...</div>
+                    }
+                    else if (PageState.Data != null)
+                    {
+                        <div class="accordion accordion-flush" id="course-list">
+                            @foreach (var item in PageState.Data.Items.Select((course, index) => (course, index)))
+                            {
+                                <div class="accordion-item">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button @(item.index == 0 ? "" : "collapsed")"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#course-list-item-@item.course.Id"
+                                                aria-expanded="@(item.index == 0 ? "true" : "false")"
+                                                aria-controls="course-list-item-@item.course.Id">
+                                            <h3 class="lead fs-6">@item.course.Name</h3>
+                                        </button>
+                                    </div>
+                                    <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
+                                        <div class="accordion-body bg-body-tertiary">
+                                            <p>@item.course.Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </Tab>
+        <Tab Slug="create-new-course">
+            <div class="d-flex flex-column gap-3 p-3">
+                <header>
+                    <h2 class="fs-5">Create a new Courses</h2>
+                </header>
+                <CreateCourseForm />
+            </div>
+        </Tab>
+    </TabContainer>
+</div>
+
+<div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="createCourseFormModalLabel">
+                    Create a new Course
+                </h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body modal-dialog-scrollable">
+                <CreateCourseForm>
+                    <ModalCloseButton>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </ModalCloseButton>
+                </CreateCourseForm>
+            </div>
+        </div>
+    </div>
+</div>

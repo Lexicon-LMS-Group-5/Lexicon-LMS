@@ -1,0 +1,48 @@
+﻿@using LMS.Shared.DTOs
+@inject NavigationManager NavigationManager
+
+<div class="card mb-4 shadow module-card" @onclick="NavigateToModule">
+    <div class="card-body">
+        <h4 class="card-title">@Module.Name</h4>
+        <p class="card-text text-muted">@Module.Description</p>
+
+        <small class="text-secondary">
+            <i class="bi bi-calendar"></i>
+            @Module.StartDate.ToShortDateString()
+            -
+            @Module.EndDate.ToShortDateString()
+        </small>
+
+
+
+        <hr />
+
+        <h5 class="card-title">Activities</h5>
+
+
+        <div class="activities mt-3">
+            @foreach (var activity in Activities)
+            {
+                <ActivityComponent Activity="activity"
+                                   CourseId="@CourseId"
+                                   ModuleId="@Module.Id" />
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CourseModuleListItemDto Module { get; set; } = default!;
+
+    [Parameter]
+    public IEnumerable<ActivityReadDto> Activities { get; set; }
+
+    [Parameter]
+    public int CourseId { get; set; }  
+
+    private void NavigateToModule()
+    {
+        NavigationManager.NavigateTo($"/module/{CourseId}/{Module.Id}");
+    }
+}
