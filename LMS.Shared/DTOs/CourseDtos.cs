@@ -98,7 +98,7 @@ namespace LMS.Shared.DTOs
     }
 
     public class CourseListItemDto : CourseReadDto
-    {
+    { 
 
     }
 

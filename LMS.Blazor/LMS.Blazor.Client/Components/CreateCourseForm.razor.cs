@@ -12,7 +12,7 @@ public partial class CreateCourseForm
     private IApiService ApiService { get; set; } = default!;
 
     [SupplyParameterFromForm]
-    private CreateCourseCommandDto? FormData { get; set; }
+    private CreateCourseCommandDto? Model { get; set; }
 
     [Parameter]
     public string? ModalId { get; set; }
@@ -27,17 +27,17 @@ public partial class CreateCourseForm
 
     private ErrorBoundaryBase? CreateCourseFormErrorBoundary { get; set; }
 
-    private PageState<CreateCourseResultDto> LoadingState { get; set; } = default!;
-
-    private string? Notification { get; set; } = null;
-
     private bool IsSaveEnabled { get; set; }
+
+    private bool IsLoading { get; set; }
+
+    private string? ErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        LoadingState = new(isLoading: false, data: null);
-        FormData ??= new();
-        editContext = new(FormData);
+        IsLoading = false;
+        Model ??= new();
+        editContext = new(Model);
         editContext.OnFieldChanged += HandleFieldChanged;
     }
 
@@ -46,23 +46,25 @@ public partial class CreateCourseForm
         if (editContext != null)
         {
             IsSaveEnabled = editContext.Validate();
-            StateHasChanged();
         }
-
-
     }
 
     private async Task SubmitAsync()
     {
-        if (FormData == null) return;
 
-        LoadingState = new(isLoading: true, data: null);
+        if (Model == null) return;
+
+        if (editContext != null && !editContext.Validate())
+        {
+            throw new Exception("Form contains invalid or missing data");
+        }
+
+        IsLoading = true;
 
         try
         {
-            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", FormData)
+            var response = await ApiService.PostAsync<CreateCourseResultDto, CreateCourseCommandDto>("api/courses", Model)
                 ?? throw new Exception("No course returned");
-            LoadingState = new(isLoading: false, data: response);
 
             var newListItem = new CourseListItemDto
             {
@@ -73,18 +75,20 @@ public partial class CreateCourseForm
                 EndDate = response.EndDate
             };
 
-            FormData = new();
-            IsSaveEnabled = false;
-
             if (OnCourseListsUpdated.HasDelegate)
             {
-                await OnCourseListsUpdated.InvokeAsync((list) => [newListItem, .. list]);
+                await OnCourseListsUpdated.InvokeAsync((list) => [newListItem, ..list]);
             }
+
+            Model = new();
+            editContext = new(Model);
+            editContext.OnFieldChanged += HandleFieldChanged;
+            IsSaveEnabled = false;
+            IsLoading = false;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            LoadingState = new(isLoading: false, data: null, error: ex.Message);
-            throw ex;
+            ErrorMessage = ex.Message;
         }
     }
 }

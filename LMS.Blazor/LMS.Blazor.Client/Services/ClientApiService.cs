@@ -33,7 +33,7 @@ public class ClientApiService : IApiService
         return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
 
-    public async Task<T?> PostAsync<T, TData>(string endpoint, TData body, CancellationToken ct = default)
+    public async Task<TResponse?> PostAsync<TResponse, TRequest>(string endpoint, TRequest body, CancellationToken ct = default)
     {
         var response = await _httpClient.PostAsJsonAsync($"api/proxy/{endpoint}", body, ct);
 
@@ -41,7 +41,7 @@ public class ClientApiService : IApiService
 
         response.EnsureSuccessStatusCode();
 
-        return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
+        return await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
     
     private async Task CheckForceLoginAsync(HttpResponseMessage response)
