@@ -22,4 +22,16 @@ public class ServerNoOpApiService(ILogger<ServerNoOpApiService> logger) : IApiSe
 
         return Task.FromResult<TResponse?>(default);
     }
+
+	public Task<TResponse?> PostAsync<TRequest, TResponse>(
+	string endpoint,
+	TRequest data,
+	CancellationToken ct = default)
+	{
+		_logger.LogWarning(
+			"ServerNoOpApiService POST called for: {Endpoint}.",
+			endpoint);
+
+		return Task.FromResult<TResponse?>(default);
+	}
 }
