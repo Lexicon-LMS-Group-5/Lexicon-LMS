@@ -77,13 +77,14 @@ else
     [Parameter]
     public int CourseId { get; set; }
 
-    private ModuleReadDto Module { get; set; }
+    private ModuleReadDto Module { get; set; } = new();
     private List<ActivityReadDto> Activities { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-        Module = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{CourseId}/{ModuleId}");
+        var m = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{CourseId}/{ModuleId}");
+        Module = m ?? new();
     }
 
     private void GoBack()

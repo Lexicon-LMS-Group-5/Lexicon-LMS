@@ -36,7 +36,7 @@
     public CourseModuleListItemDto Module { get; set; } = default!;
 
     [Parameter]
-    public IEnumerable<ActivityReadDto> Activities { get; set; }
+    public IEnumerable<ActivityReadDto> Activities { get; set; } = [];
 
     [Parameter]
     public int CourseId { get; set; }  
