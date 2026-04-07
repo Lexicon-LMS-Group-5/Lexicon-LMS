@@ -52,4 +52,24 @@ public class ClientApiService : IApiService
             _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
         }
     }
+
+    public async Task<TResponse?> PutAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/proxy/{endpoint}", data, _jsonOptions, ct);
+
+        await CheckForceLoginAsync(response);
+
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content.Headers.ContentLength == 0)
+            return default;
+
+        return await JsonSerializer.DeserializeAsync<TResponse>(
+            await response.Content.ReadAsStreamAsync(ct),
+            _jsonOptions,
+            ct);
+    }
 }

@@ -1,7 +1,9 @@
 ﻿@using LMS.Shared.DTOs
 @inject NavigationManager NavigationManager
 
-<div class="card mb-3 shadow-sm activity-card" @onclick="NavigateToActivity">
+<div class="card mb-3 shadow-sm activity-card"
+     @onclick="NavigateToActivity"
+     @onclick:stopPropagation="true">
     <div class="card-body">
         <h5 class="card-title">@Activity.Name</h5>
         <p class="card-text text-muted">@Activity.Description</p>
@@ -19,8 +21,12 @@
     [Parameter, EditorRequired]
     public ActivityReadDto Activity { get; set; } = default!;
 
+    [Parameter] public int CourseId { get; set; }
+
+    [Parameter] public int ModuleId { get; set; }
+
     private void NavigateToActivity()
     {
-        NavigationManager.NavigateTo($"/activity/{Activity.Id}");
+        NavigationManager.NavigateTo($"/activity/{CourseId}/{ModuleId}/{Activity.Id}");
     }
 }

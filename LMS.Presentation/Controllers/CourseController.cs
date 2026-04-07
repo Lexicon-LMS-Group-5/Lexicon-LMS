@@ -12,7 +12,7 @@ namespace LMS.Presentation.Controllers;
 [Route("api/courses")]
 [ApiController]
 [Produces("application/json")]
-public class CourseController : ControllerBase
+public partial class CourseController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
     private readonly ILogger<CourseController> logger;

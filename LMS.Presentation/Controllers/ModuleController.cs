@@ -25,13 +25,13 @@ namespace LMS.Presentation.Controllers
         {
             // TODO: CancellationToken ?!
             List<ModuleReadDto> module_dtos = await serviceManager
-                .ModuleService.GetModulesByCourseIdAsync(cid, false);
+                .ModuleService.GetModulesByCourseIdAsync(cid);
             return Ok(module_dtos);
         }
         [HttpGet("{cid:int}/{mid:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetModuleDetails(
-            [FromRoute] int cid, 
+            [FromRoute] int cid,
             [FromRoute] int mid)
         {
             ModuleReadDto module_dto = await serviceManager
@@ -42,6 +42,24 @@ namespace LMS.Presentation.Controllers
                     $"No module with id={mid} in course with id={cid}.");
             }
             return Ok(module_dto);
+        }
+        [HttpPost("{cid:int}")]
+        [ProducesResponseType<ModuleReadDto>(StatusCodes.Status201Created)]
+        public async Task<IActionResult> CreateModule(
+            [FromRoute] int cid,
+            [FromBody] ModuleUpsertDto dto)
+        {
+            if (dto.CourseId != cid)
+            {
+                return BadRequest(
+                    $"CourseId in body ({dto.CourseId}) does not match course id in route ({cid}).");
+            }
+            ModuleReadDto createdModule = await serviceManager
+                .ModuleService.CreateModuleAsync(dto);
+            return CreatedAtAction(
+                nameof(GetModuleDetails),
+                new { cid = createdModule.CourseId, mid = createdModule.Id },
+                createdModule);
         }
     }
 }
