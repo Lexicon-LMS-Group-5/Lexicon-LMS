@@ -1,5 +1,4 @@
-﻿using LMS.Blazor.Client.Models;
-using LMS.Blazor.Client.Services;
+﻿using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
