@@ -25,6 +25,9 @@ else
 {
     if (CourseDetails != null)
     {
+        var students = CourseDetails.Participants.Where(p => p.Role == "Student");
+        var teachers = CourseDetails.Participants.Where(p => p.Role == "Teacher");
+
         <div class="container py-4">
 
             <div class="card shadow-lg mb-4">
@@ -33,9 +36,9 @@ else
 
                     <p class="text-muted">
                         <strong>Led by:</strong>
-                        @foreach (var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
+                        @foreach (var teacher in teachers)
                         {
-                            <span class="badge bg-primary me-1">@participant.FullName</span>
+                            <span class="badge bg-primary me-1">@teacher.FullName</span>
                         }
                     </p>
 
@@ -64,10 +67,11 @@ else
                 <div class="card-body">
                     <h3>Participants</h3>
                     <div class="d-flex flex-wrap gap-2 mt-2">
-                        @foreach (var participant in CourseDetails.Participants.Where(p => p.Role != "Teacher"))
+
+                        @foreach (var student in students)
                         {
                             <span class="badge bg-light text-dark border">
-                                @participant.FullName
+                                @student.FullName
                             </span>
                         }
                     </div>
@@ -165,11 +169,13 @@ else
 }
 
 <script>
-    window.closeBootstrapModal = (modalId) => {
+       window.closeBootstrapModal = (modalId) => {
         const modalEl = document.querySelector(modalId);
-        if (modalEl) {
+
+        if (modalEl !== null) {
             const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) {
+
+            if (modal !== null) {
                 modal.hide();
             }
         }
