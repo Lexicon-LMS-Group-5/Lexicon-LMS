@@ -69,7 +69,7 @@
 
                     <form action="Account/Logout" method="post" class="mobile-logout-form">
                         <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="" />
+                        <input type="hidden" name="ReturnUrl" value="@BuildReturnUrl()" />
                         <button type="submit" class="mobile-logout-button" @onclick="CloseMenu">
                             <LogoutIcon />
                             <span>Logout</span>
@@ -92,6 +92,6 @@
     private string BuildReturnUrl()
     {
         var relative = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        return string.IsNullOrWhiteSpace(relative) ? "/" : "/" + relative;
+        return string.IsNullOrWhiteSpace(relative) ? "/" : relative;
     }
 }

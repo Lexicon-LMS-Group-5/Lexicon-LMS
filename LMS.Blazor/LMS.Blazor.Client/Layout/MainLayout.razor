@@ -19,7 +19,7 @@
             <aside class="sidebar">
                 <NavMenu />
             </aside>
-        
+
             <main class="main-area">
                 <header class="app-header">
                     <div class="header-profile">
@@ -37,7 +37,7 @@
                     <div class="header-actions">
                         <form action="Account/Logout" method="post" class="logout-form">
                             <AntiforgeryToken />
-                            <input type="hidden" name="ReturnUrl" value="" />
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                             <button type="submit" class="logout-button">
                                 <LogoutIcon />
                                 <span>Logout</span>
@@ -78,7 +78,7 @@
     private string BuildReturnUrl(string absoluteUri)
     {
         var relative = NavigationManager.ToBaseRelativePath(absoluteUri);
-        return string.IsNullOrWhiteSpace(relative) ? "/" : "/" + relative;
+        return string.IsNullOrWhiteSpace(relative) ? "/" : relative;
     }
 
     public void Dispose()
