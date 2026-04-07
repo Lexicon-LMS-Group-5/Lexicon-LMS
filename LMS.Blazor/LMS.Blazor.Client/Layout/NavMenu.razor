@@ -67,10 +67,10 @@
                         </NavLink>
                     </div>
 
-                    <form action="Account/Logout" method="post" class="mobile-logout-form" @onsubmit="CloseMenu">
+                    <form action="Account/Logout" method="post" class="mobile-logout-form">
                         <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@BuildReturnUrl()" />
-                        <button type="submit" class="mobile-logout-button">
+                        <input type="hidden" name="ReturnUrl" value="" />
+                        <button type="submit" class="mobile-logout-button" @onclick="CloseMenu">
                             <LogoutIcon />
                             <span>Logout</span>
                         </button>
