@@ -26,6 +26,8 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Roles, opt => opt.Ignore())
             .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<UserCreateDto, ApplicationUser>();
-		CreateMap<Module, ModuleReadDto>();
-	}
+        CreateMap<ModuleUpsertDto, Module>();
+        CreateMap<Module, ModuleReadDto>();
+
+    }
 }
