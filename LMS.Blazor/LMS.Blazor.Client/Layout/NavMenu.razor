@@ -1,71 +1,97 @@
-﻿@implements IDisposable
+﻿@inject NavigationManager NavigationManager
 
-@inject NavigationManager NavigationManager
+<input type="checkbox" id="nav-toggle" class="nav-toggle" @bind="isNavOpen" />
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">LMS.Blazor</a>
+<div class="sidebar-shell">
+    <div class="sidebar-header">
+        <a class="navbar-brand" href="">
+            <span class="brand-icon">
+                <BookIcon />
+            </span>
+            <span>Lexicon LMS</span>
+        </a>
+
+        <label for="nav-toggle" class="navbar-toggler" aria-label="Toggle navigation">
+            <span></span>
+        </label>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <div class="nav-scrollable">
+        <nav class="nav-menu">
+            <AuthorizeView Roles="Teacher">
+                <Authorized>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            <span class="nav-icon"><HouseIcon /></span>
+                            <span>Dashboard</span>
+                        </NavLink>
+                    </div>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <AuthorizeView Roles="Teacher">
-            <Authorized>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
-                </NavLink>
-            </div>
-            </Authorized>
-        </AuthorizeView>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="submissions" Match="NavLinkMatch.Prefix" @onclick="CloseMenu">
+                            <span class="nav-icon"><FileIcon /></span>
+                            <span>Submissions</span>
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="users" Match="NavLinkMatch.Prefix" @onclick="CloseMenu">
+                            <span class="nav-icon"><UsersIcon /></span>
+                            <span>Users</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+
+            <AuthorizeView>
+                <Authorized>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="my-course" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            <span class="nav-icon"><CourseIcon /></span>
+                            <span>My Course</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        </nav>
 
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link d-flex gap-2" href="my-course" Match="NavLinkMatch.All">
-                        <BookIcon /> My Course
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
+                <div class="mobile-sidebar-footer">
+                    <div class="text-center">
+                        <NavLink href="Account/Manage" class="mobile-profile-link" @onclick="CloseMenu">
+                            <span class="mobile-profile-icon">
+                                <CircleProfile />
+                            </span>
+                            <span class="mobile-profile-name">@context.User.Identity?.Name</span>
+                        </NavLink>
+                    </div>
+
+                    <form action="Account/Logout" method="post" class="mobile-logout-form" @onsubmit="CloseMenu">
                         <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                        <input type="hidden" name="ReturnUrl" value="@BuildReturnUrl()" />
+                        <button type="submit" class="mobile-logout-button">
+                            <LogoutIcon />
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>
             </Authorized>
         </AuthorizeView>
-    </nav>
+    </div>
 </div>
 
 @code {
-    private string? currentUrl;
+    private bool isNavOpen;
 
-    protected override void OnInitialized()
+    private void CloseMenu()
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
+        isNavOpen = false;
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    private string BuildReturnUrl()
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        NavigationManager.LocationChanged -= OnLocationChanged;
+        var relative = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        return string.IsNullOrWhiteSpace(relative) ? "/" : "/" + relative;
     }
 }
-
