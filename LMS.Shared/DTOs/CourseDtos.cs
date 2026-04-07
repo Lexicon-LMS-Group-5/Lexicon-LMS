@@ -69,10 +69,12 @@ namespace LMS.Shared.DTOs
 
         [Required]
         [DataType(DataType.Date)]
+        [Display(Name="Start date")]
         public override DateTime? StartDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
+        [Display(Name = "End date")]
         public override DateTime? EndDate { get; set; }
 
         [Required]
