@@ -26,19 +26,30 @@ public partial class UserList
 
     private string _searchTerm = "";
 
-    private bool ShowEditModal = false;
+    private enum ModalType
+    {
+        None,
+        EditUser,
+        CreateUser
+    }
+
+    private ModalType ActiveModal = ModalType.None;
     private string SelectedUserId = "";
 
-    private void OpenModal(string userId)
+    private void OpenEditModal(string userId)
     {
-        Console.WriteLine($"Opening modal for user ID: {userId}");
         SelectedUserId = userId;
-        ShowEditModal = true;
+        ActiveModal = ModalType.EditUser;
+    }
+
+    private void OpenCreateModal()
+    {
+        ActiveModal = ModalType.CreateUser;
     }
 
     private void CloseModal()
     {
-        ShowEditModal = false;
+        ActiveModal = ModalType.None;
     }
 
 
@@ -134,7 +145,7 @@ public partial class UserList
 
     private async Task HandleUserSaved()
     {
-        ShowEditModal = false;
+        ActiveModal = ModalType.None;
 
         AllUsers = await ApiService.GetAsync<List<UserReadDto>>("api/users");
         ApplyFilterAndSort();
