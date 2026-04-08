@@ -88,5 +88,23 @@ namespace LMS.Services
 
             return mapper.Map<CreateCourseResultDto>(course);
         }
+
+        public async Task<CourseReadDto> UpdateCourseAsync(
+            int id,
+            CourseUpsertDto dto,
+            CancellationToken ct = default)
+        {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(id, true, ct);
+            if (course == null) throw new CourseNotFoundException(id);
+            DateRangeHelper drh = new(course);
+            StartEnd oldInt = new(course);
+            mapper.Map(dto, course);
+            StartEnd newInt = new(course, persistent: false);
+            drh.CheckNewBounds(newInt);
+            await unitOfWork.CompleteAsync(ct);
+            return mapper.Map<CourseReadDto>(course);
+        }
     }
 }

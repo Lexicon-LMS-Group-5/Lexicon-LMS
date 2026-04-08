@@ -41,24 +41,34 @@ namespace LMS.Services
                 }
             }
             Module module = mapper.Map<Module>(dto);
-            StartEnd newStartEnd = StartEnd.NewModule(
-                module.StartDate,
-                module.EndDate,
-                module.CourseId);
+            StartEnd newStartEnd = new(module);
             drh.CheckNew(newStartEnd);
             unitOfWork.Modules.Create(module);
             await unitOfWork.CompleteAsync(ct);
             return mapper.Map<ModuleReadDto>(module);
         }
 
-        public Task<DateRangeResponseDto> GetDateRangeAsync(
-            DateRangeRequestDto dto, 
-            bool trackChanges = false, 
+        public async Task<ModuleReadDto> UpdateModuleAsync(
+            int id,
+            ModuleUpsertDto dto,
             CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            Module? module = await unitOfWork
+                .Modules
+                .GetModuleDetailsByIdAsync(id, trackChanges: true, ct);
+            if (module == null) throw new NotFoundException($"ModuleId={id}");
+            if (module!.CourseId != dto.CourseId) throw new BadRequestException(
+                $"No ModuleId={id} under CourseId={dto.CourseId}");
+            DateRangeHelper courseDRH = new (module!.Course);
+            DateRangeHelper moduleDRH = new(module!);
+            StartEnd oldInt = new(module);
+            mapper.Map(dto, module);
+            StartEnd newInt = new(module, persistent: false);
+            courseDRH.CheckIntervalChange(oldInt, newInt);
+            moduleDRH.CheckNewBounds(newInt);
+            await unitOfWork.CompleteAsync(ct);
+            return mapper.Map<ModuleReadDto>(module);
         }
-
         public async Task<ModuleReadDto> GetModuleDetailsByIdAsync(
             int moduleId,
             bool trackChanges = false,
@@ -84,5 +94,6 @@ namespace LMS.Services
                     ct);
             return modules.Select(m=> mapper.Map<ModuleReadDto>(m)).ToList();
         }
+
     }
 }

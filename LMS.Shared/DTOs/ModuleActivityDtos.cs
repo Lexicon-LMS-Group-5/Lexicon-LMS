@@ -6,7 +6,7 @@
         public string Description { get; set; } = "";
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int ModuleId { get; set; }
+        public int ModuleId { get; set; }  // Required for Activity creation.
         public DateRangeRequestDto? TimeCond { get; set; }
 
         //public int ActivityTypeId { get; set; }
