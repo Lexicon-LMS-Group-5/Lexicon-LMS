@@ -82,4 +82,9 @@ public partial class Dashboard
         await Task.Delay(3000);
         Notification = null;
     }
+
+    private async Task UpdateMyCourseAsync(CourseDetailsDto courseDetails)
+    {
+        MyCourse = courseDetails;
+    }
 }

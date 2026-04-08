@@ -1,0 +1,14 @@
+.switch-course-button {
+    font-size: .75rem;
+	opacity: 50%;
+    background-color: var(--bs-body-bg);
+	transition: background-color .2s;
+}
+
+.switch-course-button:hover {
+	opacity: 100%;
+    background-color: var(--bs-primary-bg-subtle);
+}
+.switch-course-button > div {
+    margin-left: -3px;
+}

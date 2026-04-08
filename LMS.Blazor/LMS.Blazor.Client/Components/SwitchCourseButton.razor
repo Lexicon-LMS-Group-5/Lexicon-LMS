@@ -1,0 +1,40 @@
+﻿<button 
+    class="switch-course-button d-flex gap-1 rounded-pill border-0 text-primary fw-semibold my-auto"
+    @onclick="SwitchCourseAsync">
+    @if(IsLoading)
+    {
+        <div class="d-flex align-items-middle my-auto me-0">
+            <div class="spinner-grow spinner-grow-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    Switch
+</button>
+
+@code {
+    [Inject]
+    private IApiService ApiService { get; set; } = default!;
+
+    [Parameter]
+    public int CourseId { get; set; }
+
+    [Parameter]
+    public EventCallback<CourseDetailsDto> OnCourseAssignmentUpdated { get; set; }
+
+    private bool IsLoading { get; set; }
+
+    private async Task SwitchCourseAsync(){
+        IsLoading = true;
+        try {
+            var result = await ApiService.PutAsync<AddUserToCourseCommandDto, CourseDetailsDto>($"api/courses/{CourseId}/participants", new());
+            if (OnCourseAssignmentUpdated.HasDelegate)
+                await OnCourseAssignmentUpdated.InvokeAsync(result);
+        } catch {
+            // ToDo: add error feedback?
+        } finally{
+            IsLoading = false;
+        }
+        
+    }
+}
