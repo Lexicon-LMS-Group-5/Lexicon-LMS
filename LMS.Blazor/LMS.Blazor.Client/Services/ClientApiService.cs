@@ -43,15 +43,6 @@ public class ClientApiService : IApiService
 
         return await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
-    
-    private async Task CheckForceLoginAsync(HttpResponseMessage response)
-    {
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
-            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
-        }
-    }
 
     public async Task<TResponse?> PutAsync<TRequest, TResponse>(
     string endpoint,
@@ -71,5 +62,14 @@ public class ClientApiService : IApiService
             await response.Content.ReadAsStreamAsync(ct),
             _jsonOptions,
             ct);
+    }
+    
+    private async Task CheckForceLoginAsync(HttpResponseMessage response)
+    {
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
     }
 }

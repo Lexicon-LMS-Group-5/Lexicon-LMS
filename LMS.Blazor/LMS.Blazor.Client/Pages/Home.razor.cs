@@ -20,8 +20,10 @@ public partial class Home
 
     private string? Notification { get; set; } = null;
 
-    private PageState<CoursesQueryResultDto> PageState { get; set; } = new(isLoading: true, data: null);
+    private PageState<CoursesQueryResultDto> PageState { get; set; } = new(isLoading: false, data: null);
 
+    private CourseDetailsDto? MyCourse { get; set; } = null;
+    private PageState<CourseDetailsDto> MyCourseState { get; set; } = new(isLoading: false, data: null);
     private IReadOnlyList<CourseListItemDto>? AllCourses { get; set; } = null;
     private IReadOnlyList<CourseListItemDto>? ActiveCourses { get; set; } = null;
     protected override async Task OnInitializedAsync()
@@ -37,13 +39,31 @@ public partial class Home
 
             try
             {
+                MyCourseState = new(isLoading: true, data: null);
+
+                var result = await ApiService.GetAsync<CourseDetailsDto>("api/courses/my-course");
+                
+                if (result != null)
+                {
+                    MyCourseState = new(isLoading: false, data: result);
+                    MyCourse = result;
+                }
+            } catch
+            {
+                MyCourseState = new(isLoading: false, data: null, error: "Could not load your Course");
+            } finally
+            {
+                MyCourseState = new(isLoading: false, data: null);
+            }
+
+            try
+            {
                 var result = await ApiService.GetAsync<CoursesQueryResultDto>("api/courses")
                     ?? throw new Exception("Could not fetch Courses");
                 PageState = new(isLoading: false, data: result);
 
-
-                AllCourses = result.Items.ToList();
-                ActiveCourses = result.Items.Where(c => c.EndDate > DateTime.Now).ToList();
+                AllCourses = [.. result.Items];
+                ActiveCourses = [.. result.Items.Where(c => c.EndDate > DateTime.Now)];
             }
             catch (Exception ex) {
                 PageState = new(isLoading: false, data: null, error: ex.Message);
