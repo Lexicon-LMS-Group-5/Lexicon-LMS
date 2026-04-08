@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace LMS.Blazor.Client.Pages;
 
-public partial class Home
+public partial class Dashboard
 {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
