@@ -101,7 +101,8 @@ namespace LMS.Shared.DTOs
 
     public class CourseListItemDto : CourseReadDto
     { 
-
+        public int StudentsCount { get; set; }
+        public int ModulesCount { get; set; }
     }
 
     public class AddUserToCourseCommandDto 

@@ -6,10 +6,10 @@
         {
             <li>
                 <NavLink 
-                    title="@item.Title"
-                    class="tab-nav-link text-decoration-none"
-                    ActiveClass="active-nav-link text-primary"
-                    href="@item.Href">
+                title="@item.Title"
+                class="tab-nav-link text-decoration-none"
+                ActiveClass="active-nav-link text-primary"
+                href="@item.Href">
                     <div class="p-3">
                         @item.Title
                     </div>
@@ -21,6 +21,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public string CurrentRoute { get; set; } = "/";
+
     [Parameter]
     public string[] TabTitles { get; set; } = [];
 
@@ -35,10 +38,10 @@
     protected override async Task OnInitializedAsync()
     {
         NavItems = TabTitles.Select(title => new Link
-        {
-            Title = title,
-            Href = CreateTagQueryFromTitle(title)
-        }).ToList();
+            {
+                Title = title,
+                Href = CreateTagQueryFromTitle(title)
+            }).ToList();
 
         if (string.IsNullOrWhiteSpace(CurrentTab) || !NavItems.Select(item => item.Href).ToList().Contains(CreateTagQueryFromTitle(CurrentTab)))
             Navigation.NavigateTo(NavItems.First().Href);
@@ -46,5 +49,29 @@
 
     private bool IsCurrentTab(Link item) => CurrentTab != null && CreateTagQueryFromTitle(item.Title) == CreateTagQueryFromTitle(CurrentTab);
 
-    private static string CreateTagQueryFromTitle(string input) => $"?tab={input.ToLower().Replace(" ", "-")}";
+    private string CreateTagQueryFromTitle(string input) {
+        var url = new Uri(Navigation.Uri);
+        var currentQueryKeyValPairs = url.Query.Replace("?", "").Split("&");
+        Dictionary<string, string> queries = new();
+        foreach(var keyVal in currentQueryKeyValPairs)
+        {
+            var kv = keyVal.Split('=');
+            if (kv.Count() == 2)
+                queries.Add(kv[0], kv[1]);
+        }
+        queries["tab"] = input.ToLower().Replace(" ", "-");
+
+        string tagQuery = "?";
+
+        int i = 1;
+        foreach(var kv in queries)
+        {
+            tagQuery += $"{kv.Key}={kv.Value + (i<queries.Count ? "&" : "")}";
+            i++;
+        }
+
+        return CurrentRoute + tagQuery;
+    }
+
+    public static string CreateSlug(string input) => input.ToLower().Replace(" ", "-");
 }
