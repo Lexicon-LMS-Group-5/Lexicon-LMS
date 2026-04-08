@@ -11,18 +11,15 @@ namespace LMS.Services
 {
     public class CourseService : ICourseService
     {
-        private readonly IServiceManager serviceManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
         public CourseService(
-            IServiceManager serviceManager,
             IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
-            this.serviceManager = serviceManager;
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
             this.mapper = mapper;
