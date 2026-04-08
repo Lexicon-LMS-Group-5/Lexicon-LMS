@@ -1,5 +1,7 @@
 ﻿@page "/courses/{courseId}"
 
+<PageTitle>@(IsLoading ? "Loading course details..." : CourseDetails?.Name ?? "Course Details")</PageTitle>
+
 @if (Referrer == "dashboard")
 {
     <div class="mb-3">
