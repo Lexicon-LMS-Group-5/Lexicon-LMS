@@ -107,7 +107,7 @@ namespace LMS.Services
             return courseParticipantsWithRoleInfo;
         }
 
-        public async Task AddUserToCourseAsync(AddUserToCourseCommand command, CancellationToken ct = default)
+        public async Task<CourseDetailsDto> AddUserToCourseAsync(AddUserToCourseCommandDto command, CancellationToken ct = default)
         {
             var course = unitOfWork.Courses
                 .FindByCondition(c => c.Id == command.CourseId)
@@ -120,7 +120,11 @@ namespace LMS.Services
             if (!course.Participants.Contains(user))
                 course.Participants.Add(user);
 
-            await unitOfWork.CompleteAsync();
+            user.Course = course;
+
+            await unitOfWork.CompleteAsync(ct);
+
+            return mapper.Map<CourseDetailsDto>(course);
         }
     }
 }
