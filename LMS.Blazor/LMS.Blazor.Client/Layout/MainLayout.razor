@@ -78,7 +78,7 @@
     private string BuildReturnUrl(string absoluteUri)
     {
         var relative = NavigationManager.ToBaseRelativePath(absoluteUri);
-        return string.IsNullOrWhiteSpace(relative) ? "/" : "/" + relative;
+        return string.IsNullOrWhiteSpace(relative) ? "/" : relative;
     }
 
     public void Dispose()
