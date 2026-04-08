@@ -11,15 +11,18 @@ namespace LMS.Services
 {
     public class CourseService : ICourseService
     {
+        private readonly IServiceManager serviceManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
         public CourseService(
+            IServiceManager serviceManager,
             IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
+            this.serviceManager = serviceManager;
             this.unitOfWork = unitOfWork;
             this.userManager = userManager;
             this.mapper = mapper;
@@ -29,8 +32,16 @@ namespace LMS.Services
         {
             var courses = await unitOfWork.Courses.FindAllByConditionAsync(query, false, ct);
 
-            // Construct query result Items and MetaData
-            var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
+            List<CourseListItemDto> items = [];
+
+            foreach (var course in courses)
+            {
+                var dto = mapper.Map<CourseListItemDto>(course);
+                var users = await GetCourseParticipantsWithRoleInfoAsync(course);
+                dto.StudentsCount = users.Count(u => u.Role == "Student");
+                items.Add(dto);
+            }
+
             var totalItems = courses.Count();
             var metaData = mapper.Map<PagedResultMetaDataDto>(query);
             metaData.TotalCount = totalItems;
