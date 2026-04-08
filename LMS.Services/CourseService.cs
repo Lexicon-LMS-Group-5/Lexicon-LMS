@@ -9,6 +9,7 @@ using Service.Contracts;
 
 namespace LMS.Services
 {
+
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork unitOfWork;
@@ -17,7 +18,7 @@ namespace LMS.Services
 
         public CourseService(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager, 
+            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
@@ -43,13 +44,11 @@ namespace LMS.Services
             };
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(
-            CourseDetailsQueryDto query, 
-            CancellationToken ct = default)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
         {
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(
-                query.CourseId, trackChanges: false, ct);
-            if (course == null) throw new CourseNotFoundException(query.CourseId);
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
+                ?? throw new CourseNotFoundException(query.CourseId);
+
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
             courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course);
@@ -61,7 +60,7 @@ namespace LMS.Services
             var course = await unitOfWork.Courses.GetCourseDetailsByConditionAsync(
                 c => c.Participants.FirstOrDefault(p => p.Id == userId) != null, false, ct)
                 ?? throw new NotFoundException($"Could not find Course for User with ID {userId}");
-            
+
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
             courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course);
@@ -70,7 +69,7 @@ namespace LMS.Services
 
         public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
         {
-            ApplicationUser user = await userManager.FindByIdAsync(command.CreatorId) 
+            ApplicationUser user = await userManager.FindByIdAsync(command.CreatorId)
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
 
             var course = mapper.Map<Course>(command);
@@ -92,10 +91,26 @@ namespace LMS.Services
 
             return mapper.Map<CreateCourseResultDto>(course);
         }
+
+        private async Task<List<CourseParticipantWithRoleInfoDto>> GetCourseParticipantsWithRoleInfoAsync(Course course)
+        {
+            List<CourseParticipantWithRoleInfoDto> courseParticipantsWithRoleInfo = [];
+
+            foreach (var user in course.Participants)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                var courseParticipantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(user);
+                courseParticipantWithRoleInfo.Role = roles.FirstOrDefault() ?? "";
+
+                courseParticipantsWithRoleInfo.Add(courseParticipantWithRoleInfo);
+            }
+
+            return courseParticipantsWithRoleInfo;
+        }
         public async Task<CourseReadDto> UpdateCourseAsync(
-            int id,
-            CourseUpsertDto dto,
-            CancellationToken ct = default)
+        int id,
+        CourseUpsertDto dto,
+        CancellationToken ct = default)
         {
             Course? course = await unitOfWork
                 .Courses
