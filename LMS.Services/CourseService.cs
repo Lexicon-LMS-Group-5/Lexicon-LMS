@@ -43,11 +43,13 @@ namespace LMS.Services
             };
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(
+            CourseDetailsQueryDto query, 
+            CancellationToken ct = default)
         {
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
-                ?? throw new CourseNotFoundException($"Could not find Course with ID {query.CourseId}");
-
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(
+                query.CourseId, trackChanges: false, ct);
+            if (course == null) throw new CourseNotFoundException(query.CourseId);
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
             courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course);
@@ -58,7 +60,7 @@ namespace LMS.Services
         {
             var course = await unitOfWork.Courses.GetCourseDetailsByConditionAsync(
                 c => c.Participants.FirstOrDefault(p => p.Id == userId) != null, false, ct)
-                ?? throw new CourseNotFoundException($"Could not find Course for User with ID {userId}");
+                ?? throw new NotFoundException($"Could not find Course for User with ID {userId}");
             
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
@@ -89,6 +91,23 @@ namespace LMS.Services
             await unitOfWork.CompleteAsync();
 
             return mapper.Map<CreateCourseResultDto>(course);
+        }
+        public async Task<CourseReadDto> UpdateCourseAsync(
+            int id,
+            CourseUpsertDto dto,
+            CancellationToken ct = default)
+        {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(id, true, ct);
+            if (course == null) throw new CourseNotFoundException(id);
+            DateRangeHelper drh = new(course);
+            StartEnd oldInt = new(course);
+            mapper.Map(dto, course);
+            StartEnd newInt = new(course, persistent: false);
+            drh.CheckNewBounds(newInt);
+            await unitOfWork.CompleteAsync(ct);
+            return mapper.Map<CourseReadDto>(course);
         }
     }
 }
