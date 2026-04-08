@@ -28,12 +28,28 @@ public class DataSeedHostingService : IHostedService
     private const string DemoTeacherEmail = "teacher@test.com";
     private const string DemoStudentEmail = "student@test.com";
     private const string DemoCourseName = "Demo Course";
-
+    private readonly List<ActivityType> ActivityTypes;
     public DataSeedHostingService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DataSeedHostingService> logger)
     {
         this.serviceProvider = serviceProvider;
         this.configuration = configuration;
         this.logger = logger;
+
+        ActivityTypes = [
+            new ActivityType()
+            {
+                Name = "Assignment",
+            },
+            new ActivityType()
+            {
+                Name = "E-learning",
+            },
+            new ActivityType()
+            {
+                Name = "Lecture",
+                TimeExclusive = true,
+            }
+        ];
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -46,8 +62,8 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         // // Uncomment to drop current database and re-seed with mock data
-        // await context.Database.EnsureDeletedAsync(cancellationToken);
-        // await context.Database.MigrateAsync(cancellationToken);
+        await context.Database.EnsureDeletedAsync(cancellationToken);
+        await context.Database.MigrateAsync(cancellationToken);
 
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -163,23 +179,8 @@ public class DataSeedHostingService : IHostedService
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await context.ActivityTypes.AddRangeAsync([
-            new ActivityType()
-            {
-                Name = "Assignment",
-            },
-            new ActivityType()
-            {
-                Name = "E-learning",
-            },
-            new ActivityType()
-            {
-                Name = "Lecture",
-                TimeExclusive = true,
-            }
-        ]);
+        await context.ActivityTypes.AddRangeAsync(ActivityTypes);
 
-        // ToDo: Use unitOfWork?
         await context.SaveChangesAsync(cancellationToken);
     }
 
@@ -204,23 +205,15 @@ public class DataSeedHostingService : IHostedService
 
         await context.Courses.AddRangeAsync(courseGenerator.UseSeed(Seed).Generate(count));
 
-        // ToDo: Use unitOfWork?
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    private static async Task<Faker<Activity>> CreateActivityGeneratorAsync(IServiceScope scope)
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        
-        var students = await userManager.GetUsersInRoleAsync(StudentRole);
-        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
-        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
-        var activityTypes = await context.ActivityTypes.ToListAsync(cancellationToken);
-
+        var activityTypes = context.ActivityTypes.AsNoTracking().ToList();
         var faker = new Faker();
         var courseStartDate = faker.Date.Soon(30);
-        DateTime courseEndDate;
 
         var timeOffset = courseStartDate;
         var activityIteration = 0;
@@ -228,7 +221,7 @@ public class DataSeedHostingService : IHostedService
             .Rules((f, a) =>
             {
                 var startTime = timeOffset;
-                var endTime = startTime.AddHours(f.Random.Int(1,4));
+                var endTime = startTime.AddHours(f.Random.Int(1, 4));
 
                 a.Name = f.Company.Bs().ApplyCase(LetterCasing.Title);
                 a.Description = f.Hacker.Phrase().ApplyCase(LetterCasing.Sentence);
@@ -238,6 +231,22 @@ public class DataSeedHostingService : IHostedService
 
                 timeOffset = endTime.AddDays(activityIteration++);
             });
+        return activityGenerator;
+    }
+
+    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var activityGenerator = await CreateActivityGeneratorAsync(scope);
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        
+        var students = await userManager.GetUsersInRoleAsync(StudentRole);
+        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
+        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
+
+        var faker = new Faker();
+        var courseStartDate = faker.Date.Soon(30);
+        DateTime courseEndDate;
 
         var moduleIteration = 0;
         var moduleGenerator = new Faker<Module>()
