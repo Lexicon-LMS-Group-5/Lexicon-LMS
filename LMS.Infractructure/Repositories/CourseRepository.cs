@@ -22,6 +22,8 @@ namespace LMS.Infractructure.Repositories
                 : baseQuery.OrderByDescending(c => c.StartDate);
 
             return await orderedCourses
+                .Include(c => c.Participants)
+                .Include(c => c.Modules)
                 .Skip(query.Skip)
                 .Take(query.Size)
                 .ToListAsync(ct);
