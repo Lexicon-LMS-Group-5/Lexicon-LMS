@@ -50,6 +50,8 @@
                                                         <div><h4 class="fs-6">@course.Name</h4></div>
                                                         @if (MyCourse?.Id == course.Id) {
                                                             <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                                        } else {
+                                                            <button class="course-assign-button rounded-pill border-primary text-primary opacity-50 opacity-100-hover bg-body fw-semibold my-auto" style="font-size: .75rem;">Switch</button>
                                                         }
                                                     </div>
                                                     <small class="d-flex text-secondary">

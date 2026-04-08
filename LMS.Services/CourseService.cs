@@ -106,5 +106,21 @@ namespace LMS.Services
 
             return courseParticipantsWithRoleInfo;
         }
+
+        public async Task AddUserToCourseAsync(AddUserToCourseCommand command, CancellationToken ct = default)
+        {
+            var course = unitOfWork.Courses
+                .FindByCondition(c => c.Id == command.CourseId)
+                .SingleOrDefault()
+                    ?? throw new CourseNotFoundException($"Could not find Course with ID {command.CourseId}");
+
+            var user = await userManager.FindByIdAsync(command.UserId) 
+                ?? throw new UserNotFoundException($"Could not find User with ID {command.UserId}");
+
+            if (!course.Participants.Contains(user))
+                course.Participants.Add(user);
+
+            await unitOfWork.CompleteAsync();
+        }
     }
 }

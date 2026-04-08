@@ -97,9 +97,14 @@ namespace LMS.Shared.DTOs
 
     }
 
-    public class CourseListItemDto : CourseReadDto
+    public class CourseListItemDto: CourseReadDto
     {
 
     }
 
+    public class AddUserToCourseCommand 
+    {
+        public int CourseId { get; set; }
+        public string UserId { get; set; } = String.Empty;
+    }
 }
