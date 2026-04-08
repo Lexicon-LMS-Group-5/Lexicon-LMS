@@ -1,0 +1,68 @@
+﻿@page "/courses/{courseId}"
+
+@if (Referrer == "dashboard")
+{
+    <NavLink class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="@($"?tab={ReferrerTab ?? "overview"}")">
+        <span style="transform: rotate(-90deg);">
+            <ChevronUpIcon />
+        </span>
+        Back to Dashboard
+    </NavLink>
+}
+@if (IsLoading)
+{
+    <div>Loading...</div>
+}
+else if (CourseDetails != null)
+{
+    <h1>@CourseDetails.Name</h1>
+
+    <p>@CourseDetails.Description</p>
+}
+
+@code {
+    [Inject]
+    private IApiService ApiService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    [Parameter]
+    public string? CourseId { get; set; }
+
+    [SupplyParameterFromQuery(Name="ref")]
+    public string? Referrer { get; set; }
+
+    [SupplyParameterFromQuery(Name = "refTab")]
+    public string? ReferrerTab { get; set; }
+
+    private bool IsLoading { get; set; }
+    private string? Error { get; set; } = null;
+    private CourseDetailsDto? CourseDetails { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        if (!int.TryParse(CourseId, out int Id))
+            Navigation.NotFound();
+
+        try
+        {
+            var result = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{Id}");
+
+            if (result == null && !IsLoading)
+                Navigation.NotFound();
+
+            CourseDetails = result;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
