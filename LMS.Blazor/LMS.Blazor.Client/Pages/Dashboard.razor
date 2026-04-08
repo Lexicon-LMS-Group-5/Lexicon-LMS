@@ -83,7 +83,7 @@
                         <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Search courses...">
                     </div>
                     <div>
-                        <button class="btn btn-primary d-flex align-items-middle gap-2" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">
+                        <button type="button" class="btn btn-primary d-flex align-items-middle gap-2" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">
                             <div class="d-flex align-items-middle m-auto">
                                 <CirclePlusIcon Size="20" />
                             </div>
@@ -98,33 +98,35 @@
                     }
                     else if (AllCourses != null)
                     {
-                        <div class="accordion accordion-flush" id="course-list">
-                            @foreach (var item in AllCourses.Select((course, index) => (course, index)))
-                            {
-                                <div class="accordion-item">
-                                    <div class="accordion-header">
-                                        <button class="accordion-button @(item.index == 0 ? "" : "collapsed")"
-                                                type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#course-list-item-@item.course.Id"
-                                                aria-expanded="@(item.index == 0 ? "true" : "false")"
-                                                aria-controls="course-list-item-@item.course.Id">
-                                            <div class="d-flex justify-content-between w-100 me-3">
-                                                <h3 class="lead fs-6">@item.course.Name</h3>
-                                                @if (MyCourse?.Id == item.course.Id) {
-                                                    <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
-                                                }
-                                            </div>
-                                        </button>
-                                    </div>
-                                    <div id="course-list-item-@item.course.Id" class="accordion-collapse collapse @(item.index == 0 ? "show" : "")" data-bs-parent="#course-list">
-                                        <div class="accordion-body bg-body-tertiary">
-                                            <p>@item.course.Description</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col"><span class="visually-hidden">My assigned course</span></th>
+                                    <th scope="col">Start date</th>
+                                    <th scope="col">End date</th>
+                                    <th scope="col">Students</th>
+                                    <th scope="col">Modules</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var item in AllCourses.Select((course, index) => (course, index)))
+                                {
+                                    <tr @key="item.course.Id">
+                                        <th scope="row">@item.course.Name</th>
+                                        <td>@if (MyCourse?.Id == item.course.Id)
+                                            {
+                                                <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                            }
+                                        </td>
+                                        <td>@item.course.StartDate.ToShortDateString()</td>
+                                        <td>@item.course.EndDate.ToShortDateString()</td>
+                                        <td>@item.course.StudentsCount</td>
+                                        <td>@item.course.ModulesCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     }
                 </div>
             </div>
