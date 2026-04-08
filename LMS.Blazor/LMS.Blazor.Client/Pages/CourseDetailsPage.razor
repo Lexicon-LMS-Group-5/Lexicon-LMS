@@ -2,12 +2,14 @@
 
 @if (Referrer == "dashboard")
 {
+    <div class="mb-3">
     <NavLink class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="@($"?tab={ReferrerTab ?? "overview"}")">
         <span style="transform: rotate(-90deg);">
             <ChevronUpIcon />
         </span>
         Back to Dashboard
     </NavLink>
+    </div>
 }
 @if (IsLoading)
 {
@@ -15,9 +17,13 @@
 }
 else if (CourseDetails != null)
 {
-    <h1>@CourseDetails.Name</h1>
-
-    <p>@CourseDetails.Description</p>
+    <div>
+        <h1>@CourseDetails.Name</h1>
+        <p>@CourseDetails.Description</p>
+        <div class="text-secondary d-flex align-items-middle gap-2">
+            <CalendarIcon Size="20" /> @CourseDetails.StartDate.ToShortDateString() - @CourseDetails.EndDate.ToShortDateString()
+        </div>
+    </div>
 }
 
 @code {
