@@ -1,0 +1,35 @@
+﻿namespace LMS.Shared.DTOs;
+
+public class UserReadDto
+{
+    public string Id { get; set; } = "";
+    public string FirstName { get; set; } = "";
+    public string LastName { get; set; } = "";
+    public string FullName { get; set; } = "";
+    public string Email { get; set; } = "";
+    public int CourseId { get; set; }
+    public CourseReadDto Course { get; set; } = new();
+    public List<string> Roles { get; set; } = [];
+}
+
+public class UserCreateDto
+{
+    public string FirstName { get; set; } = "";
+    public string LastName { get; set; } = "";
+    public string Email { get; set; } = "";
+    public int? CourseId { get; set; }
+    public List<string> Roles { get; set; } = [];
+}
+
+public class UserUpdateDto
+{
+    public string FirstName { get; set; } = "";
+    public string LastName { get; set; } = "";
+    public string Email { get; set; } = "";
+}
+
+public class  UpdateUserRequest
+{
+    public string CurrentUserId { get; set; } = "";
+    public bool IsTeacher { get; set; }
+}

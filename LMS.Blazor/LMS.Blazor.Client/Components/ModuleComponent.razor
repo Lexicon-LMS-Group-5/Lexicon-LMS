@@ -13,12 +13,19 @@
             @Module.EndDate.ToShortDateString()
         </small>
 
+
+
         <hr />
+
+        <h5 class="card-title">Activities</h5>
+
 
         <div class="activities mt-3">
             @foreach (var activity in Activities)
             {
-                <ActivityComponent Activity="activity" />
+                <ActivityComponent Activity="activity"
+                                   CourseId="@CourseId"
+                                   ModuleId="@Module.Id" />
             }
         </div>
     </div>
@@ -29,10 +36,13 @@
     public CourseModuleListItemDto Module { get; set; } = default!;
 
     [Parameter]
-    public IEnumerable<ActivityReadDto> Activities { get; set; }
+    public IEnumerable<ActivityReadDto> Activities { get; set; } = [];
+
+    [Parameter]
+    public int CourseId { get; set; }  
 
     private void NavigateToModule()
     {
-        NavigationManager.NavigateTo($"/module/{Module.Id}");
+        NavigationManager.NavigateTo($"/module/{CourseId}/{Module.Id}");
     }
 }
