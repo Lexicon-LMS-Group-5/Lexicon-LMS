@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/dashboard"
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <TabContainer TabTitles="@(["Overview", "Courses", "Create new Course"])">
+    <TabContainer CurrentRoute="/dashboard" TabTitles="@(["Overview", "Courses", "Create new Course"])">
         <Tab Title="Overview">
             <div class="container p-0">
                 <div class="row row-cols-1 row-cols-lg-2">
@@ -49,7 +49,7 @@
                                                     <div class="d-flex justify-content-between align-items-middle">
                                                         <div class="fs-6">
                                                             <NavLink 
-                                                                href="@($"/courses/{course.Id}?ref=dashboard&refTab=overview")"
+                                                                href="@($"/dashboard/courses/{course.Id}?ref=dashboard&refTab=overview")"
                                                                 class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover">
                                                                 @course.Name
                                                             </NavLink>
@@ -121,7 +121,7 @@
                                     <tr @key="item.course.Id">
                                         <th scope="row">
                                             <NavLink 
-                                                href="@($"/courses/{item.course.Id}?ref=dashboard&refTab=courses")"
+                                                href="@($"/dashboard/courses/{item.course.Id}?ref=dashboard&refTab=courses")"
                                                 class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover">
                                                 @item.course.Name
                                             </NavLink>
