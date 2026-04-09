@@ -68,4 +68,18 @@ public partial class CourseController : ControllerBase
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }
+    // PUT api/courses/5
+    [Authorize(Roles = "Teacher")]
+    [HttpPut("{cid:int}")]
+    [ProducesResponseType<CourseReadDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseReadDto>> Update(
+        [FromRoute] int cid,
+        [FromBody] CourseUpsertDto dto,
+        CancellationToken ct)
+    {
+        CourseReadDto updatedCourse = await serviceManager
+            .CourseService.UpdateCourseAsync(cid, dto, ct);
+        return Ok(updatedCourse);
+    }
+
 }

@@ -2,6 +2,8 @@
 using Domain.Contracts.Repositories;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
+using Domain.Models.Entities;
+
 using Service.Contracts;
 
 namespace LMS.Services;
@@ -37,19 +39,44 @@ public class ActivityService : IActivityService
 
     public async Task<ActivityReadDto> CreateActivityAsync(ActivityUpsertDto activityUpsertDto, CancellationToken ct)
     {
-        //This should probably be in the ModuleService instead.
-        throw new NotImplementedException();
+        Module? module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(
+            activityUpsertDto.ModuleId, true, ct);
+        if (module == null) throw new NotFoundException($"ModuleId={activityUpsertDto.ModuleId}");
+        DateRangeHelper drh = new(module);
+        if (DateRangeHelper.Absent(activityUpsertDto.StartDate)
+            || DateRangeHelper.Absent(activityUpsertDto.EndDate))
+        {
+            if (activityUpsertDto.TimeCond == null) throw new BadRequestException("time parameters");
+        }
+        var timeResp = drh.GetDateRange(activityUpsertDto.TimeCond!);
+        if (timeResp != null)
+        {
+            activityUpsertDto.StartDate = DateRangeHelper.OneOf(activityUpsertDto.StartDate, timeResp.Start);
+            activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
+        }
+        Activity activity = mapper.Map<Activity>(activityUpsertDto);
+        StartEnd newStartEnd = new(activity);
+        drh.CheckNew(newStartEnd);
+        unitOfWork.Activities.Create(activity);
+        await unitOfWork.CompleteAsync(ct);
+        return mapper.Map<ActivityReadDto>(activity);
     }
 
     public async Task<ActivityReadDto> UpdateActivityAsync(int id, ActivityUpsertDto dto, CancellationToken ct)
     {
         var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: true, ct);
-
-        if (activity == null) throw new NotFoundException($"Activity {id} not found");
-
+        if (activity == null) throw new NotFoundException($"ActivityId={id}");
+        if (activity.ModuleId != dto.ModuleId) throw new BadRequestException(
+            $"No ActivityId={id} under ModuleId={dto.ModuleId}");
+        Module? module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(
+            dto.ModuleId, true, ct);
+        if (module == null) throw new NotFoundException($"ModuleId={dto.ModuleId}");
+        StartEnd oldInt = new(activity);
+        DateRangeHelper drh = new(module);
         mapper.Map(dto, activity);
-
-        await unitOfWork.CompleteAsync();
+        StartEnd newInt = new(activity, persistent: false);
+        drh.CheckIntervalChange(oldInt, newInt);
+        await unitOfWork.CompleteAsync(ct);
 
         return mapper.Map<ActivityReadDto>(activity);
     }

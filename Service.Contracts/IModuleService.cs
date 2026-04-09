@@ -17,5 +17,6 @@ namespace Service.Contracts
             bool trackChanges = false,
             CancellationToken ct = default);
         public Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default);
+        public Task<ModuleReadDto> UpdateModuleAsync(int id, ModuleUpsertDto dto, CancellationToken ct = default);
     }
 }
