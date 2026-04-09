@@ -9,7 +9,6 @@ using Service.Contracts;
 
 namespace LMS.Services
 {
-
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork unitOfWork;
@@ -18,11 +17,9 @@ namespace LMS.Services
 
         public CourseService(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager,
             IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
-            this.userManager = userManager;
             this.mapper = mapper;
         }
 
@@ -35,8 +32,8 @@ namespace LMS.Services
             foreach (var course in courses)
             {
                 var dto = mapper.Map<CourseListItemDto>(course);
-                var users = await GetCourseParticipantsWithRoleInfoAsync(course);
-                dto.StudentsCount = users.Count(u => u.Role == "Student");
+                var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
+                dto.StudentsCount = participants.Count(p => p.Roles.Contains("Student"));
                 items.Add(dto);
             }
 
@@ -59,7 +56,7 @@ namespace LMS.Services
 
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
-            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course);
+            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course, ct);
             return courseDetailsDto;
         }
 
@@ -71,13 +68,13 @@ namespace LMS.Services
 
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
-            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course);
+            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course, ct);
             return courseDetailsDto;
         }
 
         public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
         {
-            ApplicationUser user = await userManager.FindByIdAsync(command.CreatorId)
+            ApplicationUser user = await unitOfWork.Users.GetByIdAsync(command.CreatorId, true, ct)
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
 
             var course = mapper.Map<Course>(command);
@@ -95,23 +92,22 @@ namespace LMS.Services
 
             unitOfWork.Courses.Create(course);
 
-            await unitOfWork.CompleteAsync();
+            await unitOfWork.CompleteAsync(ct);
 
             return mapper.Map<CreateCourseResultDto>(course);
         }
 
-        private async Task<List<CourseParticipantWithRoleInfoDto>> GetCourseParticipantsWithRoleInfoAsync(Course course)
+        private async Task<List<CourseParticipantWithRoleInfoDto>> GetCourseParticipantsWithRoleInfoAsync(
+            Course course, CancellationToken ct)
         {
-            List<CourseParticipantWithRoleInfoDto> courseParticipantsWithRoleInfo = [];
-
-            foreach (var user in course.Participants)
-            {
-                var roles = await userManager.GetRolesAsync(user);
-                var courseParticipantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(user);
-                courseParticipantWithRoleInfo.Role = roles.FirstOrDefault() ?? "";
-
-                courseParticipantsWithRoleInfo.Add(courseParticipantWithRoleInfo);
-            }
+            var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
+            var courseParticipantsWithRoleInfo = participants
+                .Select(p =>
+                {
+                    var participantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(p);
+                    participantWithRoleInfo.Role = p.Roles.Single();
+                    return participantWithRoleInfo;
+                }).ToList();
 
             return courseParticipantsWithRoleInfo;
         }
