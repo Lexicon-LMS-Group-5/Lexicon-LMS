@@ -30,11 +30,15 @@ public partial class UserList
     {
         None,
         EditUser,
-        CreateUser
+        CreateUser,
+        CreateStudent,
     }
 
     private ModalType ActiveModal = ModalType.None;
+
     private string SelectedUserId = "";
+
+    private int CourseId = 3;
 
     private void OpenEditModal(string userId)
     {
@@ -45,6 +49,11 @@ public partial class UserList
     private void OpenCreateModal()
     {
         ActiveModal = ModalType.CreateUser;
+    }
+
+    private void OpenTempModal()
+    {
+        ActiveModal = ModalType.CreateStudent;
     }
 
     private void CloseModal()

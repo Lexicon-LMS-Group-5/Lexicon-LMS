@@ -6,7 +6,11 @@
 <h3 class="mb-4">Users</h3>
 <button class="btn btn-sm btn-success"
         @onclick="OpenCreateModal">
-    Create User
+    Add Teacher
+</button>
+<button class="btn btn-sm btn-success"
+        @onclick="OpenTempModal">
+    Add Student (Temp)
 </button>
 <input class="form-control mb-3"
        placeholder="Search users..."
@@ -87,6 +91,7 @@ else
             }
         </tbody>
     </table>
+
     @if (ActiveModal == ModalType.EditUser)
     {
         <div class="modal fade show d-block" tabindex="-1">
@@ -120,6 +125,28 @@ else
                     </div>
                     <div class="modal-body">
                         <CreateUserForm OnSaved="HandleUserSaved"
+                                        OnCancel="CloseModal" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop fade show"></div>
+    }
+
+    @if (ActiveModal == ModalType.CreateStudent)
+    {
+        <div class="modal fade show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5>Create User</h5>
+                        <button class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <CreateStudentForm @key="CourseId"
+                                        CourseId="@CourseId"    
+                                        OnSaved="HandleUserSaved"
                                         OnCancel="CloseModal" />
                     </div>
                 </div>
