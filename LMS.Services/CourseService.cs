@@ -30,8 +30,16 @@ namespace LMS.Services
         {
             var courses = await unitOfWork.Courses.FindAllByConditionAsync(query, false, ct);
 
-            // Construct query result Items and MetaData
-            var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
+            List<CourseListItemDto> items = [];
+
+            foreach (var course in courses)
+            {
+                var dto = mapper.Map<CourseListItemDto>(course);
+                var users = await GetCourseParticipantsWithRoleInfoAsync(course);
+                dto.StudentsCount = users.Count(u => u.Role == "Student");
+                items.Add(dto);
+            }
+
             var totalItems = courses.Count();
             var metaData = mapper.Map<PagedResultMetaDataDto>(query);
             metaData.TotalCount = totalItems;

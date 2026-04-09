@@ -55,7 +55,31 @@ public class ClientApiService : IApiService
 
         response.EnsureSuccessStatusCode();
 
-        if (response.Content.Headers.ContentLength == 0)
+        if (response.Content == null)
+            return default;
+
+        return await JsonSerializer.DeserializeAsync<TResponse>(
+            await response.Content.ReadAsStreamAsync(ct),
+            _jsonOptions,
+            ct);
+    }
+
+    public async Task<TResponse?> PostAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"api/proxy/{endpoint}", data, _jsonOptions, ct);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content == null)
             return default;
 
         return await JsonSerializer.DeserializeAsync<TResponse>(
