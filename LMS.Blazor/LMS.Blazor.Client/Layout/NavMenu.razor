@@ -21,7 +21,7 @@
             <AuthorizeView Roles="Teacher">
                 <Authorized>
                     <div class="nav-item">
-                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                        <NavLink class="nav-link" href="?tab=overview" Match="NavLinkMatch.All" @onclick="CloseMenu">
                             <span class="nav-icon"><HouseIcon /></span>
                             <span>Dashboard</span>
                         </NavLink>
@@ -67,10 +67,10 @@
                         </NavLink>
                     </div>
 
-                    <form action="Account/Logout" method="post" class="mobile-logout-form" @onsubmit="CloseMenu">
+                    <form action="Account/Logout" method="post" class="mobile-logout-form">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@BuildReturnUrl()" />
-                        <button type="submit" class="mobile-logout-button">
+                        <button type="submit" class="mobile-logout-button" @onclick="CloseMenu">
                             <LogoutIcon />
                             <span>Logout</span>
                         </button>
@@ -92,6 +92,6 @@
     private string BuildReturnUrl()
     {
         var relative = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        return string.IsNullOrWhiteSpace(relative) ? "/" : "/" + relative;
+        return string.IsNullOrWhiteSpace(relative) ? "/" : relative;
     }
 }
