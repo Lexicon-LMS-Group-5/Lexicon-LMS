@@ -155,7 +155,7 @@ else
 
         try
         {
-            CourseDetails = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{CourseDetails.Id}");
+            CourseDetails = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{CourseDetails?.Id}");
         }
         catch (Exception ex)
         {
