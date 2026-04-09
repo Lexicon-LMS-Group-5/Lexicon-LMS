@@ -1,4 +1,5 @@
 ﻿using LMS.Shared.DTOs;
+using LMS.Shared.DTOs.AuthDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -71,6 +72,24 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
                 return NotFound();
 
             return Ok(updated);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Teacher")]
+    public async Task<ActionResult<UserReadDto>> CreateUser(
+    [FromBody] UserCreateDto dto,
+    CancellationToken ct)
+    {
+        try
+        {
+            var created = await _serviceManager.UserService.CreateUserAsync(dto, ct);
+
+            return Ok(created);
         }
         catch (UnauthorizedAccessException ex)
         {

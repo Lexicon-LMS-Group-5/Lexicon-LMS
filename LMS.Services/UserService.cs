@@ -1,15 +1,32 @@
 ﻿using AutoMapper;
 using Domain.Contracts.Repositories;
+using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Service.Contracts;
 
 namespace LMS.Services;
 
-public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
+public class UserService : IUserService
 {
-    private readonly IMapper mapper = mapper;
-    private readonly IUnitOfWork unitOfWork = unitOfWork;
+    private readonly IMapper mapper;
+    private readonly IUnitOfWork unitOfWork;
+    private readonly UserManager<ApplicationUser> userManager;
+    private readonly string defaultPassword;
+
+    public UserService(
+        IMapper mapper,
+        IUnitOfWork unitOfWork,
+        UserManager<ApplicationUser> userManager,
+        IConfiguration configuration)
+    {
+        this.mapper = mapper;
+        this.unitOfWork = unitOfWork;
+        this.userManager = userManager;
+        defaultPassword = configuration["password"]!;
+    }
 
     public async Task<IEnumerable<UserReadDto>> GetAllUsersAsync(CancellationToken ct)
     {
@@ -27,7 +44,7 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
     {
         var user = await unitOfWork.Users.GetByIdAsync(id, trackChanges: false, ct);
 
-        return user == null ? throw new NotFoundException($"Activity {id} not found") : mapper.Map<UserReadDto>(user);
+        return user == null ? throw new NotFoundException($"User {id} not found") : mapper.Map<UserReadDto>(user);
     }
 
     public async Task<UserReadDto> UpdateUserAsync(
@@ -43,9 +60,30 @@ public class UserService(IMapper mapper, IUnitOfWork unitOfWork) : IUserService
 
         mapper.Map(dto, user);
 
-        await unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync(ct);
 
         return mapper.Map<UserReadDto>(user);
     }
 
+    public async Task<UserReadDto> CreateUserAsync(UserCreateDto dto, CancellationToken ct)
+    {
+        // Map DTO to ApplicationUser
+        var user = mapper.Map<ApplicationUser>(dto);
+        user.UserName = user.Email;
+        var result = await userManager.CreateAsync(user, defaultPassword);
+        if (!result.Succeeded)
+            throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+        if (dto.Roles != null && dto.Roles.Any())
+        {
+            foreach (var role in dto.Roles)
+            {
+                var roleResult = await userManager.AddToRoleAsync(user, role);
+                if (!roleResult.Succeeded)
+                    throw new Exception(string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            }
+        }
+
+        return mapper.Map<UserReadDto>(user);
+    }
 }

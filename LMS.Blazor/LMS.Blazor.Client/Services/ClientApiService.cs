@@ -33,17 +33,6 @@ public class ClientApiService : IApiService
         return await JsonSerializer.DeserializeAsync<T>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
     }
 
-    public async Task<TResponse?> PostAsync<TResponse, TRequest>(string endpoint, TRequest body, CancellationToken ct = default)
-    {
-        var response = await _httpClient.PostAsJsonAsync($"api/proxy/{endpoint}", body, ct);
-
-        await CheckForceLoginAsync(response);
-
-        response.EnsureSuccessStatusCode();
-
-        return await JsonSerializer.DeserializeAsync<TResponse>(await response.Content.ReadAsStreamAsync(ct), _jsonOptions, ct);
-    }
-
     public async Task<TResponse?> PutAsync<TRequest, TResponse>(
     string endpoint,
     TRequest data,
@@ -55,7 +44,27 @@ public class ClientApiService : IApiService
 
         response.EnsureSuccessStatusCode();
 
-        if (response.Content.Headers.ContentLength == 0)
+        if (response.Content == null)
+            return default;
+
+        return await JsonSerializer.DeserializeAsync<TResponse>(
+            await response.Content.ReadAsStreamAsync(ct),
+            _jsonOptions,
+            ct);
+    }
+
+    public async Task<TResponse?> PostAsync<TRequest, TResponse>(
+    string endpoint,
+    TRequest data,
+    CancellationToken ct = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"api/proxy/{endpoint}", data, _jsonOptions, ct);
+
+        await CheckForceLoginAsync(response);
+
+        response.EnsureSuccessStatusCode();
+
+        if (response.Content == null)
             return default;
 
         return await JsonSerializer.DeserializeAsync<TResponse>(
