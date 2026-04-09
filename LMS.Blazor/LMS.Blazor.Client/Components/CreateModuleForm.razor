@@ -1,0 +1,106 @@
+@using LMS.Shared.DTOs
+@using System.Net.Http.Json
+@using System.Text.Json
+@using System.Text
+@inject IApiService ApiService
+
+
+@inject HttpClient Http
+
+<div class="d-flex flex-column gap-2">
+
+    <!-- Module Name -->
+    <div class="mb-3">
+        <label class="form-label">Module Name</label>
+        <input type="text" class="form-control" @bind="Name" />
+        <div class="form-text">Add a descriptive name for your module.</div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="3" @bind="Description"></textarea>
+        <div class="form-text">Describe what this module covers.</div>
+    </div>
+
+    <!-- Start Date -->
+    <div class="mb-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-control" @bind="StartDate" />
+    </div>
+
+    <!-- End Date -->
+    <div class="mb-3">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-control" @bind="EndDate" />
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex justify-content-end gap-2 w-100">
+        @ModalCloseButton
+        <button class="btn btn-primary" @onclick="SaveModule" disabled="@IsSaving">
+            @if (IsSaving)
+            {
+                <span class="spinner-border spinner-border-sm"></span>
+                <span class="ms-2">Saving...</span>
+            }
+            else
+            {
+                <span>Save and continue</span>
+            }
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="text-danger mt-2">@Error</div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ModalCloseButton { get; set; }
+    [Parameter] public int CourseId { get; set; } // Från parent
+    [Parameter] public EventCallback OnCreated { get; set; }
+
+    private string Name { get; set; } = string.Empty;
+    private string Description { get; set; } = string.Empty;
+
+    private DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+
+    private bool IsSaving { get; set; } = false;
+    private string? Error { get; set; }
+
+    private async Task SaveModule()
+    {
+        IsSaving = true;
+        Error = null;
+
+        try
+        {
+            var dto = new ModuleUpsertDto
+            {
+                Name = Name,
+                Description = Description,
+                StartDate = StartDate.ToDateTime(TimeOnly.MinValue),
+                EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
+                CourseId = CourseId
+            };
+
+            var json = JsonSerializer.Serialize(dto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await ApiService.PostAsync<ModuleUpsertDto, ModuleReadDto>(
+                $"api/modules/{CourseId}", dto);
+
+            await OnCreated.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

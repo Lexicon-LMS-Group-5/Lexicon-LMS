@@ -103,12 +103,6 @@ namespace LMS.Shared.DTOs
     { 
         public int StudentsCount { get; set; }
         public int ModulesCount { get; set; }
-
-        [DataType(DataType.Date)]
-        public override DateTime StartDate { get; set; }
-        
-        [DataType(DataType.Date)]
-        public override DateTime EndDate { get; set; }
     }
 
 }
