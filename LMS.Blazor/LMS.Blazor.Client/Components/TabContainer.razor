@@ -40,17 +40,27 @@
         NavItems = TabTitles.Select(title => new Link
             {
                 Title = title,
-                Href = CreateTagQueryFromTitle(title)
+                Href = CreateTabQueryFromTitle(title)
             }).ToList();
 
-        if (string.IsNullOrWhiteSpace(CurrentTab) || !NavItems.Select(item => item.Href).ToList().Contains(CreateTagQueryFromTitle(CurrentTab)))
-            Navigation.NavigateTo(NavItems.First().Href);
+        if (string.IsNullOrWhiteSpace(CurrentTab) || !NavItems.Select(item => item.Href).ToList().Contains(CreateTabQueryFromTitle(CurrentTab)))
+            Navigation.NavigateTo(NavItems.First().Href, forceLoad: true);
     }
 
-    private bool IsCurrentTab(Link item) => CurrentTab != null && CreateTagQueryFromTitle(item.Title) == CreateTagQueryFromTitle(CurrentTab);
+    private bool IsCurrentTab(Link item) => CurrentTab != null && CreateTabQueryFromTitle(item.Title) == CreateTabQueryFromTitle(CurrentTab);
 
-    private string CreateTagQueryFromTitle(string input) {
+    private string CreateTabQueryFromTitle(string input) {
         var url = new Uri(Navigation.Uri);
+
+        // If the current route does not contain any query parameters,
+        // construct the query parameter for the tab.
+        if (string.IsNullOrEmpty(url.Query))
+        {
+            return CurrentRoute + $"?tab={CreateSlug(input)}";
+        }
+
+        // If the current route contains query parameters,
+        // include them when constructing the tab query.
         var currentQueryKeyValPairs = url.Query.Replace("?", "").Split("&");
         Dictionary<string, string> queries = new();
         foreach(var keyVal in currentQueryKeyValPairs)
@@ -59,18 +69,18 @@
             if (kv.Count() == 2)
                 queries.Add(kv[0], kv[1]);
         }
-        queries["tab"] = input.ToLower().Replace(" ", "-");
 
-        string tagQuery = "?";
+        queries["tab"] = CreateSlug(input);
 
+        string fullQuery = "?";
         int i = 1;
         foreach(var kv in queries)
         {
-            tagQuery += $"{kv.Key}={kv.Value + (i<queries.Count ? "&" : "")}";
+            fullQuery += $"{kv.Key}={kv.Value + (i<queries.Count ? "&" : "")}";
             i++;
         }
 
-        return CurrentRoute + tagQuery;
+        return CurrentRoute + fullQuery;
     }
 
     public static string CreateSlug(string input) => input.ToLower().Replace(" ", "-");

@@ -1,10 +1,17 @@
 ﻿@page "/users"
 
 @using LMS.Shared.DTOs
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Teacher")]
 
 <h3 class="mb-4">Users</h3>
-
+<button class="btn btn-sm btn-success"
+        @onclick="OpenCreateModal">
+    Create User
+</button>
+<input class="form-control mb-3"
+       placeholder="Search users..."
+       @bind="SearchTerm"
+       @bind:event="oninput" />
 @if (IsLoading)
 {
     <div class="text-center mt-4">
@@ -71,13 +78,54 @@ else
                         }
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-warning"
-                               href="@($"/users/edit/{user.Id}")">
+                        <button class="btn btn-sm btn-warning"
+                                @onclick="() => OpenEditModal(user.Id)">
                             Edit
-                        </a>
+                        </button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    @if (ActiveModal == ModalType.EditUser)
+    {
+        <div class="modal fade show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5>Edit User</h5>
+                        <button class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditUserForm @key="SelectedUserId"
+                                      Id="@SelectedUserId"
+                                      OnSaved="HandleUserSaved"
+                                      OnCancel="CloseModal" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop fade show"></div>
+    }
+
+    @if (ActiveModal == ModalType.CreateUser)
+    {
+        <div class="modal fade show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5>Create User</h5>
+                        <button class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <CreateUserForm OnSaved="HandleUserSaved"
+                                        OnCancel="CloseModal" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop fade show"></div>
+    }
 }

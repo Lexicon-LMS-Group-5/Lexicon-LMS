@@ -1,11 +1,13 @@
-﻿@page "/courses/{courseId}"
+﻿@page "/dashboard/courses/{courseId}"
 
 <PageTitle>@(IsLoading ? "Loading course details..." : CourseDetails?.Name ?? "Course Details")</PageTitle>
 
 @if (Referrer == "dashboard")
 {
     <div class="mb-3">
-    <NavLink class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="@($"?tab={ReferrerTab ?? "overview"}")">
+    <NavLink 
+        class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" 
+        href="@($"/dashboard?tab={ReferrerTab ?? "overview"}")">
         <span style="transform: rotate(-90deg);">
             <ChevronUpIcon />
         </span>
@@ -29,7 +31,7 @@ else if (CourseDetails != null)
             </div>
         </div>
 
-        <TabContainer CurrentRoute="@($"/courses/{CourseId}")" TabTitles="@(["Course Overview", "Modules", "Students"])">
+        <TabContainer CurrentRoute="@($"/dashboard/courses/{CourseId}")" TabTitles="@(["Course Overview", "Modules", "Students"])">
             <Tab Title="Course Overview">
                 <div class="container p-0">
                     <div class="row row-cols-1 row-cols-lg-2 g-3">
