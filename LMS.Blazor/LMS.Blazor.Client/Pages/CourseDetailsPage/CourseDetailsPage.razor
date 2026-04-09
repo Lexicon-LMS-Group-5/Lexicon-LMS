@@ -71,24 +71,18 @@ else if (CourseDetails != null)
                             </div>
                         </div>
                         <div class="co">
-                            <div class="d-flex flex-column p-3  bg-body rounded">
+                            <div class="d-flex flex-column p-3  bg-body rounded h-100">
                                 <h2 class="fs-5">Course stats</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </Tab>
-            <Tab Title="Modules">
-                <div class="d-flex flex-column gap-3 p-3">
-                    <header>
-                        <h2 class="fs-5">Modules</h2>
-                    </header>
-                </div>
-            </Tab>
+            <ModulesTab CourseId="CourseDetails.Id" CourseDetails="CourseDetails" />
             <Tab Title="Students">
                 <div class="d-flex flex-column gap-3 p-3">
                     <header>
-                        <h2 class="fs-5">Modules</h2>
+                        <h2 class="fs-5">Students</h2>
                     </header>
                 </div>
             </Tab>

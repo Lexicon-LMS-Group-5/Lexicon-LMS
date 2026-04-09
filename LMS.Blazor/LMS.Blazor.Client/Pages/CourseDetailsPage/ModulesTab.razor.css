@@ -1,0 +1,14 @@
+﻿.modules-list > button {
+    border: none;
+    border-top: 2px solid var(--bs-light-border-subtle);
+    background-color: var(--bs-body-bg);
+}
+
+.modules-list > button:hover {
+    background-color: var(--bs-light);
+}
+
+.modules-list > button:first-child {
+    border-top: 0px;
+}
+
