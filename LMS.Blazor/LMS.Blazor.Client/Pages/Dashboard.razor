@@ -56,6 +56,8 @@
                                                         </div>
                                                         @if (MyCourse?.Id == course.Id) {
                                                             <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                                        } else {
+                                                            <SwitchCourseButton CourseId="course.Id" OnCourseAssignmentUpdated="UpdateMyCourseAsync" />
                                                         }
                                                     </div>
                                                     <small class="d-flex text-secondary">
@@ -104,7 +106,7 @@
                     }
                     else if (AllCourses != null)
                     {
-                        <table class="table">
+                        <table class="table align-middle">
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
@@ -129,6 +131,8 @@
                                         <td>@if (MyCourse?.Id == item.course.Id)
                                             {
                                                 <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                            } else {
+                                                <SwitchCourseButton CourseId="item.course.Id" OnCourseAssignmentUpdated="UpdateMyCourseAsync" />
                                             }
                                         </td>
                                         <td>@item.course.StartDate.ToShortDateString()</td>

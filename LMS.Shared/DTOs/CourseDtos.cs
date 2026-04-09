@@ -105,4 +105,9 @@ namespace LMS.Shared.DTOs
         public int ModulesCount { get; set; }
     }
 
+    public class AddUserToCourseCommandDto 
+    {
+        public int CourseId { get; set; }
+        public string UserId { get; set; } = string.Empty;
+    }
 }

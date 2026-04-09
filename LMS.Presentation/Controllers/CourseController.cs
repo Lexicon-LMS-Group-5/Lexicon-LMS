@@ -12,7 +12,7 @@ namespace LMS.Presentation.Controllers;
 [Route("api/courses")]
 [ApiController]
 [Produces("application/json")]
-public partial class CourseController : ControllerBase
+public class CourseController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
     private readonly ILogger<CourseController> logger;
@@ -67,5 +67,22 @@ public partial class CourseController : ControllerBase
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
+    }
+
+    [Authorize(Roles = "Teacher")]
+    [HttpPut("{courseId:int}/participants")]
+    [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseDetailsDto>> AddCurrentUserToCourse([FromRoute] AddUserToCourseCommandDto command)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+            return BadRequest();
+        
+        command.UserId = userId;
+
+        var result = await serviceManager.CourseService.AddUserToCourseAsync(command);
+
+        return Ok(result);
     }
 }
