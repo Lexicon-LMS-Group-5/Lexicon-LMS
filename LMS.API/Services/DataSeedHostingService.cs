@@ -28,12 +28,28 @@ public class DataSeedHostingService : IHostedService
     private const string DemoTeacherEmail = "teacher@test.com";
     private const string DemoStudentEmail = "student@test.com";
     private const string DemoCourseName = "Demo Course";
-
+    private readonly List<ActivityType> ActivityTypes;
     public DataSeedHostingService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DataSeedHostingService> logger)
     {
         this.serviceProvider = serviceProvider;
         this.configuration = configuration;
         this.logger = logger;
+
+        ActivityTypes = [
+            new ActivityType()
+            {
+                Name = "Assignment",
+            },
+            new ActivityType()
+            {
+                Name = "E-learning",
+            },
+            new ActivityType()
+            {
+                Name = "Lecture",
+                TimeExclusive = true,
+            }
+        ];
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -46,8 +62,8 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         // // Uncomment to drop current database and re-seed with mock data
-        // await context.Database.EnsureDeletedAsync(cancellationToken);
-        // await context.Database.MigrateAsync(cancellationToken);
+        //await context.Database.EnsureDeletedAsync(cancellationToken);
+        //await context.Database.MigrateAsync(cancellationToken);
 
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -59,7 +75,7 @@ public class DataSeedHostingService : IHostedService
         {
             // Add initial ActivityTypes if none exist
             if (!await context.ActivityTypes.AnyAsync())
-                await AddInitialActivityTypesToDbAsync(cancellationToken);
+                await AddInitialActivityTypesToDbAsync(scope, cancellationToken);
             
             // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
@@ -71,7 +87,7 @@ public class DataSeedHostingService : IHostedService
 
             // Add mock Courses if none exist
             if (!await context.Courses.AnyAsync())
-                await AddMockCoursesToDbAsync(3, cancellationToken);
+                await AddMockCoursesToDbAsync(3, scope, cancellationToken);
 
             // Add demo Course if it does not exist
             if (await context.Courses.FirstOrDefaultAsync(c => c.Name == DemoCourseName, cancellationToken) is null)
@@ -158,37 +174,21 @@ public class DataSeedHostingService : IHostedService
         }
     }
 
-    private async Task AddInitialActivityTypesToDbAsync(CancellationToken cancellationToken)
+    private async Task AddInitialActivityTypesToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
-        using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await context.ActivityTypes.AddRangeAsync([
-            new ActivityType()
-            {
-                Name = "Assignment",
-            },
-            new ActivityType()
-            {
-                Name = "E-learning",
-            },
-            new ActivityType()
-            {
-                Name = "Lecture",
-                TimeExclusive = true,
-            }
-        ]);
+        await context.ActivityTypes.AddRangeAsync(ActivityTypes, cancellationToken);
 
-        // ToDo: Use unitOfWork?
         await context.SaveChangesAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private async Task AddMockCoursesToDbAsync(int count, CancellationToken cancellationToken)
+    private async Task AddMockCoursesToDbAsync(int count, IServiceScope scope, CancellationToken cancellationToken)
     {
-        using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var faker = new Faker();
 
         var courseGenerator = new Faker<Course>()
             .Rules((f, c) =>
@@ -202,25 +202,25 @@ public class DataSeedHostingService : IHostedService
                 c.EndDate = endDate;
             });
 
-        await context.Courses.AddRangeAsync(courseGenerator.UseSeed(Seed).Generate(count));
+        var courses = courseGenerator.UseSeed(Seed).Generate(count);
 
-        // ToDo: Use unitOfWork?
+        foreach (var course in courses)
+        {
+            var moduleGenerator = await CreateModuleGeneratorAsync(scope, course);
+            course.Modules = moduleGenerator.Generate(faker.Random.Int(3, 8));
+            course.EndDate = course.Modules.Last().EndDate;
+        }
+
+        await context.Courses.AddRangeAsync(courses, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    private static async Task<Faker<Activity>> CreateActivityGeneratorAsync(IServiceScope scope, Course course)
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        
-        var students = await userManager.GetUsersInRoleAsync(StudentRole);
-        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
-        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
-        var activityTypes = await context.ActivityTypes.ToListAsync(cancellationToken);
-
+        var activityTypes = await context.ActivityTypes.ToListAsync();
         var faker = new Faker();
-        var courseStartDate = faker.Date.Soon(30);
-        DateTime courseEndDate;
+        var courseStartDate = course.StartDate;
 
         var timeOffset = courseStartDate;
         var activityIteration = 0;
@@ -228,7 +228,7 @@ public class DataSeedHostingService : IHostedService
             .Rules((f, a) =>
             {
                 var startTime = timeOffset;
-                var endTime = startTime.AddHours(f.Random.Int(1,4));
+                var endTime = startTime.AddHours(f.Random.Int(1, 4));
 
                 a.Name = f.Company.Bs().ApplyCase(LetterCasing.Title);
                 a.Description = f.Hacker.Phrase().ApplyCase(LetterCasing.Sentence);
@@ -238,6 +238,14 @@ public class DataSeedHostingService : IHostedService
 
                 timeOffset = endTime.AddDays(activityIteration++);
             });
+        return activityGenerator;
+    }
+
+    private static async Task<Faker<Module>> CreateModuleGeneratorAsync(IServiceScope scope, Course course)
+    {
+        var activityGenerator = await CreateActivityGeneratorAsync(scope, course);
+        var courseStartDate = course.StartDate;
+        DateTime courseEndDate;
 
         var moduleIteration = 0;
         var moduleGenerator = new Faker<Module>()
@@ -250,23 +258,51 @@ public class DataSeedHostingService : IHostedService
                 m.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
                 m.StartDate = startDate;
                 m.EndDate = courseEndDate;
-                m.Activities = activityGenerator.UseSeed(Seed).Generate(f.Random.Int(3,8));
+                m.Activities = activityGenerator.UseSeed(Seed).Generate(f.Random.Int(3, 8));
             });
 
+        return moduleGenerator;
+    }
+
+    private async Task<Faker<Course>> CreateCourseGenerator()
+    {
         var courseGenerator = new Faker<Course>()
-            .Rules((f, c) => {
-                var startDate = courseStartDate;
+            .Rules((f, c) =>
+            {
+                var startDate = f.Date.Recent(30);
                 var endDate = startDate.AddMonths(6);
-                var modules = moduleGenerator.UseSeed(Seed).Generate(4);
 
-                c.Name = DemoCourseName;
-                c.Description = "A demo course to help with development of Lexicon LMS";
+                c.Name = $"{f.Hacker.Adjective()} {f.Hacker.IngVerb()}".ApplyCase(LetterCasing.Title);
+                c.Description = f.Company.Bs().ApplyCase(LetterCasing.Sentence);
                 c.StartDate = startDate;
-                c.Modules = modules;
-                c.EndDate = modules.Last().EndDate;
+                c.EndDate = endDate;
             });
+
+        return courseGenerator;
+    }
+    private async Task AddDemoCourseToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        
+        var students = await userManager.GetUsersInRoleAsync(StudentRole);
+        var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
+        var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
+
+        var faker = new Faker();
+        var courseStartDate = faker.Date.Soon(30);
+        var courseGenerator = await CreateCourseGenerator();
+        courseGenerator.Rules((f, c) => {
+            c.Name = DemoCourseName;
+            c.Description = "A demo course to help with development of Lexicon LMS";
+            c.StartDate = courseStartDate;
+        });
 
         var demoCourse = courseGenerator.UseSeed(Seed).Generate(1).First();
+
+        var moduleGenerator = await CreateModuleGeneratorAsync(scope, demoCourse);
+        demoCourse.Modules = moduleGenerator.UseSeed(Seed).Generate(4);
+        demoCourse.EndDate = demoCourse.Modules.Last().EndDate;
         demoCourse.Participants.Add(demoTeacher);
 
         foreach (var student in students)

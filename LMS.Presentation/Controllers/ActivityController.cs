@@ -5,12 +5,12 @@ using Service.Contracts;
 namespace LMS.API.Controllers;
 // TODO: FIX THIS
 [ApiController]
-[Route("api/[controller]")]
-public class ActivitiesController : ControllerBase
+[Route("api/activities")]
+public class ActivityController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
 
-    public ActivitiesController(IServiceManager service)
+    public ActivityController(IServiceManager service)
     {
         serviceManager = service;
     }
