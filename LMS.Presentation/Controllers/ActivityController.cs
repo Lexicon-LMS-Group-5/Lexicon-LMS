@@ -1,5 +1,6 @@
 ﻿using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
@@ -95,7 +96,9 @@ public class ActivityController : ControllerBase
     }
 
     // DELETE: api/activities/5
+    [Authorize(Roles = "Teacher")]
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await serviceManager.ActivityService.DeleteActivityAsync(id, ct);
