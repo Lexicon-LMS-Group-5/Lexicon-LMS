@@ -16,15 +16,23 @@ public partial class UserList
 
     private bool IsLoading { get; set; }
     private string? Error { get; set; } = null;
-    private List<UserReadDto>? Users { get; set; } = null;
 
     private List<UserReadDto>? AllUsers { get; set; }
+
+    private List<UserReadDto>? FilteredUsers { get; set; } = null;
+
+    private List<UserReadDto>? PagedUsers { get; set; } = null;
 
     private string _sortColumn = "Roles";
 
     private bool _sortAscending = true;
 
     private string _searchTerm = "";
+
+    private int CurrentPage { get; set; } = 1;
+
+    private const int PageSize = 15;
+    private int TotalPages => (int)Math.Ceiling((double)(FilteredUsers?.Count ?? 0) / PageSize);
 
     private enum ModalType
     {
@@ -82,9 +90,9 @@ public partial class UserList
         {
             AllUsers = await ApiService.GetAsync<List<UserReadDto>>("api/users");
             ApplyFilterAndSort();
-            if (Users != null && Users.Count != 0)
+            if (FilteredUsers != null && FilteredUsers.Count != 0)
             {
-                Users = Users.OrderBy(u => u.Roles.FirstOrDefault()).ThenBy(u => u.FirstName).ThenBy(u => u.LastName).ToList();
+                FilteredUsers = FilteredUsers.OrderBy(u => u.Roles.FirstOrDefault()).ThenBy(u => u.FirstName).ThenBy(u => u.LastName).ToList();
             }
         }
         catch (Exception ex)
@@ -101,7 +109,8 @@ public partial class UserList
     {
         if (AllUsers == null)
         {
-            Users = null;
+            FilteredUsers = null;
+            PagedUsers = null;
             return;
         }
 
@@ -114,7 +123,7 @@ public partial class UserList
                 u.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Course != null && u.Course.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            (u.Roles != null && u.Roles.Any(r =>
+                (u.Roles != null && u.Roles.Any(r =>
                     r.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))));
         }
 
@@ -135,7 +144,11 @@ public partial class UserList
             _ => query
         };
 
-        Users = query.ToList();
+        FilteredUsers = query.ToList();
+        PagedUsers = FilteredUsers
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
     }
 
     private void SortBy(string column)
@@ -151,6 +164,18 @@ public partial class UserList
 
         ApplyFilterAndSort();
     }
+
+    private void GoToPage(int page)
+    {
+        if (page < 1) page = 1;
+        if (page > TotalPages) page = TotalPages;
+
+        CurrentPage = page;
+        ApplyFilterAndSort();
+    }
+
+    private void NextPage() => GoToPage(CurrentPage + 1);
+    private void PreviousPage() => GoToPage(CurrentPage - 1);
 
     private async Task HandleUserSaved()
     {

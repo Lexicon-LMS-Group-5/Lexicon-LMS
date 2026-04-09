@@ -3,6 +3,17 @@
 @using LMS.Shared.DTOs
 @attribute [Authorize(Roles = "Teacher")]
 
+<div class="d-flex gap-2">
+    <QuickActionButton OnClick="OpenCreateModal">
+        <ButtonIcon>
+            <CirclePlusIcon />
+        </ButtonIcon>
+        <ButtonText>
+            Add a new Teacher
+        </ButtonText>
+    </QuickActionButton>
+</div>
+
 <h3 class="mb-4">Users</h3>
 <button class="btn btn-sm btn-success"
         @onclick="OpenCreateModal">
@@ -22,7 +33,7 @@
         <div class="spinner-border" role="status"></div>
     </div>
 }
-else if (Users == null || !Users.Any())
+else if (AllUsers == null || !AllUsers.Any())
 {
     <div class="alert alert-info">
         No users found.
@@ -31,7 +42,7 @@ else if (Users == null || !Users.Any())
 else
 {
     <table class="table table-striped table-hover">
-        <thead class="table-dark">
+        <thead class="table-light">
             <tr>
                 <th @onclick='() => SortBy("Name")' style="cursor:pointer">
                     Name
@@ -55,7 +66,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in Users)
+            @foreach (var user in PagedUsers)
             {
                 <tr>
                     <td>@user.FullName</td>
@@ -91,6 +102,30 @@ else
             }
         </tbody>
     </table>
+
+    <nav aria-label="User list pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="PreviousPage" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+            </li>
+
+            @for (int i = 1; i <= TotalPages; i++)
+            {
+                var page = i; 
+                <li class="page-item @(CurrentPage == i ? "active" : "")">
+                    <button class="page-link" @onclick="() => GoToPage(page)">@i</button>
+                </li>
+            }
+
+            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="NextPage" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
 
     @if (ActiveModal == ModalType.EditUser)
     {
