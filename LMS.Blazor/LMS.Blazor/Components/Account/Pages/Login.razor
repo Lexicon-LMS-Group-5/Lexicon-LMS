@@ -185,13 +185,7 @@
                 }
             }
 
-            if (Input.Role == "Teacher")
-            {
-                RedirectManager.RedirectTo("/teacher");
-                return;
-            }
-
-            RedirectManager.RedirectTo(ReturnUrl ?? "/student");
+            RedirectManager.RedirectTo(ReturnUrl ?? "/my-course");
         }
         else if (result.RequiresTwoFactor)
         {
