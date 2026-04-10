@@ -29,6 +29,7 @@ public class MapperProfile : Profile
         CreateMap<ModuleUpsertDto, Module>();
         CreateMap<Module, ModuleReadDto>();
 		CreateMap<ActivityUpsertDto, Activity>();
+        CreateMap<ActivityType, ActivityTypeReadDto>();
 
 
 	}
