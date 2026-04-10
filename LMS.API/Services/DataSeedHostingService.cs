@@ -62,8 +62,8 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         // // Uncomment to drop current database and re-seed with mock data
-         await context.Database.EnsureDeletedAsync(cancellationToken);
-        await context.Database.MigrateAsync(cancellationToken);
+        // await context.Database.EnsureDeletedAsync(cancellationToken);
+        // await context.Database.MigrateAsync(cancellationToken);
 
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -305,14 +305,16 @@ public class DataSeedHostingService : IHostedService
         foreach (var module in course.Modules)
         {
             module.StartDate = start;
+            TimeSpan activityTimeOffest = new();
 
             foreach (var activity in module.Activities)
             {
-                activity.StartDate = start;
-                activity.EndDate = start.AddHours(faker.Random.Int(1, 4));
+                activity.StartDate = start.Add(activityTimeOffest);
+                activity.EndDate = activity.StartDate.AddHours(faker.Random.Int(1, 4));
                 start = activity.EndDate.AddDays(faker.Random.Int(0, 14));
                 System.Diagnostics.Debug.Assert(activity.EndDate > activity.StartDate);
             }
+            activityTimeOffest = faker.Date.Timespan();
 
             module.EndDate = module.Activities.LastOrDefault()?.EndDate ?? module.StartDate;
             System.Diagnostics.Debug.Assert(module.EndDate > module.StartDate);
