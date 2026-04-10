@@ -17,7 +17,7 @@
 }
 
 <div class="d-flex flex-column gap-5 pb-5">
-    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" />
+    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="OpenModal" />
 
     <TabContainer 
         CurrentRoute="@($"/dashboard/courses/{CourseId}")" 
@@ -101,3 +101,37 @@
         </Tab>
     </TabContainer>
 </div>
+
+@if (CourseDetails != null && EditContext != null)
+{
+    <div class="modal fade" id="editCourseFormModal" tabindex="-1" aria-labelledby="editCourseFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content overflow-y-auto">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="editCourseFormModalLabel">
+                        Edit Course
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <EditCourseForm 
+                    EditContext="EditContext" 
+                    CourseDetails="CourseDetails" 
+                    Model="EditCourseModel">
+                    <FormContent>
+                        <div class="modal-body h-100">
+                            <EditCourseFormContent 
+                                CourseDetails="CourseDetails" 
+                                Model="EditCourseModel" />
+                        </div>
+                    </FormContent>
+                    <FormActions>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </FormActions>
+                </EditCourseForm>
+            </div>
+        </div>
+    </div>
+}

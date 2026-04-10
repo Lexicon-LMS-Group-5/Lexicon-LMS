@@ -29,7 +29,12 @@
     <div>
         <div class="d-flex justify-content-between w-100">
             <h1>@CourseDetails.Name</h1>
-            <button class="btn btn-primary my-auto d-flex gap-2">
+            <button 
+                class="btn btn-primary my-auto d-flex gap-2"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#editCourseFormModal"
+                @onclick="OnOpenModal">
                 <div class="my-auto d-flex flex-column justify-content-center">
                     <PencilIcon Size="16" />    
                 </div>
@@ -53,4 +58,15 @@
 
     [Parameter]
     public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenModal { get; set; }
+
+    private async Task OpenModal()
+    {
+        if(OnOpenModal.HasDelegate)
+        {
+            await OnOpenModal.InvokeAsync();
+        }
+    }
 }

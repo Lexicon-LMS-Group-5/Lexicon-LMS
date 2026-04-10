@@ -1,6 +1,7 @@
 ﻿using LMS.Blazor.Client.Services;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace LMS.Blazor.Client.Pages.CourseDetailsPage;
 
@@ -25,6 +26,17 @@ public partial class CourseDetailsPage
     private string? Error { get; set; } = null;
     private CourseDetailsDto? CourseDetails { get; set; }
 
+    private EditContext? EditContext { get; set; }
+    private EditCourseCommandDto? EditCourseModel { get; set; }
+
+    private bool IsEditModalOpen { get; set; }
+
+    
+
+    private void OpenModal() => IsEditModalOpen = true; 
+    private void CloseModal() => IsEditModalOpen = false;
+    
+
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
@@ -38,6 +50,8 @@ public partial class CourseDetailsPage
                 ?? throw new Exception("Could not fetch course details");
 
             CourseDetails = result;
+            EditCourseModel ??= new(CourseDetails);
+            EditContext ??= new(EditCourseModel);
         }
         catch (Exception ex)
         {
