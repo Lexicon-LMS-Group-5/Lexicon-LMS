@@ -13,4 +13,6 @@ public interface IApiService
         string endpoint,
         TRequest data,
         CancellationToken ct = default);
+
+    Task<bool> DeleteAsync(string endpoint, CancellationToken ct = default);
 }

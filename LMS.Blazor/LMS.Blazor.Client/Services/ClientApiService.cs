@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -72,7 +73,21 @@ public class ClientApiService : IApiService
             _jsonOptions,
             ct);
     }
-    
+
+    public async Task<bool> DeleteAsync(string endpoint, CancellationToken ct = default)
+    {
+        var response = await _httpClient.DeleteAsync($"api/proxy/{endpoint}", ct);
+
+        await CheckForceLoginAsync(response);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return false;
+
+        response.EnsureSuccessStatusCode();
+
+        return true;
+    }
+
     private async Task CheckForceLoginAsync(HttpResponseMessage response)
     {
         if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
