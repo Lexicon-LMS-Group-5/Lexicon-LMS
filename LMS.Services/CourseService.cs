@@ -2,6 +2,7 @@
 using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
+using LMS.Shared;
 using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.PagingDtos;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +33,7 @@ namespace LMS.Services
             {
                 var dto = mapper.Map<CourseListItemDto>(course);
                 var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
-                dto.StudentsCount = participants.Count(p => p.Roles.Contains("Student"));
+                dto.StudentsCount = participants.Count(p => p.Roles.Contains(Roles.Student));
                 items.Add(dto);
             }
 
