@@ -3,7 +3,7 @@
 @attribute [Authorize(Roles = "Teacher")]
 
 <PageTitle>User List</PageTitle>
-
+<h3 class="mb-4">Users</h3>
 <div class="d-flex gap-2">
     <QuickActionButton OnClick="OpenCreateModal">
         <ButtonIcon>
@@ -14,12 +14,6 @@
         </ButtonText>
     </QuickActionButton>
 </div>
-
-<h3 class="mb-4">Users</h3>
-<button class="btn btn-sm btn-success"
-        @onclick="OpenCreateModal">
-    Add Teacher
-</button>
 <button class="btn btn-sm btn-success"
         @onclick="OpenTempModal">
     Add Student (Temp)

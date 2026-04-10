@@ -48,7 +48,7 @@ public class UserService : IUserService
     }
 
     public async Task<UserReadDto> UpdateUserAsync(
-    UpdateUserRequest request,
+    UpdateUserContext request,
     string id,
     UserUpdateDto dto,
     CancellationToken ct)

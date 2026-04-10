@@ -1,5 +1,4 @@
 ﻿using LMS.Shared.DTOs;
-using LMS.Shared.DTOs.AuthDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -17,14 +16,12 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<UserReadDto>> GetCurrentUser(CancellationToken ct)
     {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (claim == null)
+        if (userId is null)
             return Unauthorized();
 
-        var currentUserId = claim.Value;
-
-        var user = await _serviceManager.UserService.GetCurrentUserAsync(currentUserId, ct);
+        var user = await _serviceManager.UserService.GetCurrentUserAsync(userId, ct);
 
         if (user == null)
             return NotFound();
@@ -51,16 +48,21 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = "Teacher")] //Remove this if you want students to be able to edit their own info
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpdateDto dto,
         CancellationToken ct)
     {
 
-        var request = new UpdateUserRequest
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userId is null)
+            return Unauthorized();
+
+        var request = new UpdateUserContext
         {
-            CurrentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "",
+            CurrentUserId = userId,
             IsTeacher = User.IsInRole("Teacher")
         };
 
@@ -73,9 +75,9 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
 
             return Ok(updated);
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
-            return Forbid(ex.Message);
+            return Forbid("Not allowed to update this user");
         }
     }
 
@@ -89,7 +91,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         {
             var created = await _serviceManager.UserService.CreateUserAsync(dto, ct);
 
-            return Ok(created);
+            return CreatedAtAction(nameof(GetUserById), new { id = created.Id }, created); ;
         }
         catch (UnauthorizedAccessException ex)
         {
