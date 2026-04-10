@@ -78,6 +78,17 @@ namespace LMS.Presentation.Controllers
                 .ModuleService.UpdateModuleAsync(mid, dto, ct);
             return Ok(updatedModule);
         }
-
+        // DELETE: /api/modules/33/17
+        [Authorize(Roles = "Teacher")]
+        [HttpPut("{cid:int}/{mid:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Delete(
+            [FromRoute] int cid,
+            [FromRoute] int mid,
+            CancellationToken ct)
+        {
+            await serviceManager.ModuleService.DeleteModuleAsync(mid, new ModuleCourseIdDto(cid), ct);
+            return NoContent();
+        }
     }
 }
