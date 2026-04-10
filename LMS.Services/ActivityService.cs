@@ -94,7 +94,7 @@ public class ActivityService : IActivityService
 
         unitOfWork.Activities.Delete(activity);
 
-        await unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync(ct);
     }
 
     public async Task<List<ActivityReadDto>> GetActivitiesByModuleIdAsync(int moduleId, CancellationToken ct)
