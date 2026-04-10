@@ -1,0 +1,77 @@
+﻿<div class="p-3">
+    <p>
+        Are you sure you want to delete
+        <strong>@UserName</strong>?
+    </p>
+
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="alert alert-danger">@Error</div>
+    }
+
+    <button class="btn btn-danger me-2"
+            @onclick="ConfirmDelete"
+            disabled="@IsDeleting">
+        @if (IsDeleting)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Delete</span>
+        }
+    </button>
+
+    <button class="btn btn-secondary"
+            @onclick="Cancel"
+            disabled="@IsDeleting">
+        Cancel
+    </button>
+</div>
+
+@code {
+    [Inject] private IApiService ApiService { get; set; } = default!;
+
+    [Parameter] public string UserId { get; set; } = default!;
+    [Parameter] public string UserName { get; set; } = "";
+    [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private bool IsDeleting = false;
+    private string? Error;
+
+    private async Task ConfirmDelete()
+    {
+        if (IsDeleting) return;
+
+        IsDeleting = true;
+        Error = null;
+
+        try
+        {
+            var success = await ApiService.DeleteAsync($"api/users/delete/{UserId}");
+
+            if (!success)
+            {
+                Error = "Delete failed or user not found.";
+                return;
+            }
+
+            await OnDeleted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsDeleting = false;
+        }
+    }
+
+    private async Task Cancel()
+    {
+        Error = null;
+        await OnCancel.InvokeAsync();
+    }
+}

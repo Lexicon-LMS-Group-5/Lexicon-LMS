@@ -30,8 +30,6 @@ public class UserCreateDto
 
     public int? CourseId { get; set; }
 
-    [Required]
-    [MinLength(1)]
     public List<string> Roles { get; set; } = null!;
 }
 

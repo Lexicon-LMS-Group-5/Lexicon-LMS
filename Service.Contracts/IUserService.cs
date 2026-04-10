@@ -11,4 +11,5 @@ public interface IUserService
     Task<IEnumerable<UserReadDto>> GetAllUsersAsync(CancellationToken ct);
     Task<UserReadDto> UpdateUserAsync(UpdateUserContext request, string id, UserUpdateDto dto, CancellationToken ct);
     Task<UserReadDto> CreateUserAsync(UserCreateDto dto, CancellationToken ct);
+    Task<bool> DeleteUserByIdAsync(string id, CancellationToken ct);
 }

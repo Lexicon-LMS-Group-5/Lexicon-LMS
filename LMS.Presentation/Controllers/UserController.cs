@@ -98,4 +98,13 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
             return Forbid(ex.Message);
         }
     }
+    [HttpDelete("delete/{id}")]
+    public async Task<ActionResult> DeleteUserById(string id, CancellationToken ct)
+    {
+        var deleted = await _serviceManager.UserService.DeleteUserByIdAsync(id, ct);
+
+        if (!deleted) return NotFound();
+
+        return NoContent();
+    }
 }
