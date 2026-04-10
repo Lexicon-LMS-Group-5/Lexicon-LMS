@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -63,7 +64,7 @@ public class ActivityController : ControllerBase
     }
 
     // POST: api/activities
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPost]
     public async Task<ActionResult<ActivityReadDto>> Create(
         [FromBody] ActivityUpsertDto dto,
@@ -81,7 +82,7 @@ public class ActivityController : ControllerBase
     }
 
     // PUT: api/activities/5
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ActivityReadDto>> Update(
         int id,
@@ -96,7 +97,7 @@ public class ActivityController : ControllerBase
     }
 
     // DELETE: api/activities/5
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)

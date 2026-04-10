@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Humanizer;
 using LMS.Infractructure.Data;
+using LMS.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,8 +24,6 @@ public class DataSeedHostingService : IHostedService
     private readonly ILogger<DataSeedHostingService> logger;
     private UserManager<ApplicationUser> userManager = null!;
     private RoleManager<IdentityRole> roleManager = null!;
-    private const string TeacherRole = "Teacher";
-    private const string StudentRole = "Student";
     private const string DemoTeacherEmail = "teacher@test.com";
     private const string DemoStudentEmail = "student@test.com";
     private const string DemoCourseName = "Demo Course";
@@ -80,7 +79,7 @@ public class DataSeedHostingService : IHostedService
             // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
             {
-                await AddRolesAsync([TeacherRole, StudentRole]);
+                await AddRolesAsync([Roles.Teacher, Roles.Student]);
                 await AddDemoUsersAsync();
                 await AddUsersAsync(20);
             }
@@ -135,10 +134,10 @@ public class DataSeedHostingService : IHostedService
 
         await AddUserToDb([teacher, student]);
 
-        var teacherRoleResult = await userManager.AddToRoleAsync(teacher, TeacherRole);
+        var teacherRoleResult = await userManager.AddToRoleAsync(teacher, Roles.Teacher);
         if (!teacherRoleResult.Succeeded) throw new Exception(string.Join("\n", teacherRoleResult.Errors));
 
-        var studentRoleResult = await userManager.AddToRoleAsync(student, StudentRole);
+        var studentRoleResult = await userManager.AddToRoleAsync(student, Roles.Student);
         if (!studentRoleResult.Succeeded) throw new Exception(string.Join("\n", studentRoleResult.Errors));
     }
 
@@ -158,7 +157,7 @@ public class DataSeedHostingService : IHostedService
 
         foreach (var user in fakeUsers)
         {
-            await userManager.AddToRoleAsync(user, StudentRole);
+            await userManager.AddToRoleAsync(user, Roles.Student);
         }
     }
 
@@ -266,7 +265,7 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         
-        var students = await userManager.GetUsersInRoleAsync(StudentRole);
+        var students = await userManager.GetUsersInRoleAsync(Roles.Student);
         var demoTeacher = await userManager.FindByEmailAsync(DemoTeacherEmail) ?? throw new Exception("Demo Teacher was not found");
         var demoStudent = await userManager.FindByEmailAsync(DemoStudentEmail) ?? throw new Exception("Demo Student was not found");
 
