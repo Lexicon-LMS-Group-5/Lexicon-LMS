@@ -43,6 +43,7 @@ namespace LMS.Presentation.Controllers
             }
             return Ok(module_dto);
         }
+        [Authorize(Roles = "Teacher")]
         [HttpPost("{cid:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateModule(
@@ -60,6 +61,34 @@ namespace LMS.Presentation.Controllers
                 nameof(GetModuleDetails),
                 new { cid = createdModule.CourseId, mid = createdModule.Id },
                 createdModule);
+        }
+        // PUT: api/modules/33/17
+        [Authorize(Roles = "Teacher")]
+        [HttpPut("{cid:int}/{mid:int}")]
+        [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ModuleReadDto>> Update(
+            [FromRoute] int cid,
+            [FromRoute] int mid,
+            [FromBody] ModuleUpsertDto dto,
+            CancellationToken ct)
+        {
+            if (dto.CourseId != cid) return BadRequest(
+                $"CourseId in body ({dto.CourseId}) does not match course id in route ({cid}).");
+            ModuleReadDto updatedModule = await serviceManager
+                .ModuleService.UpdateModuleAsync(mid, dto, ct);
+            return Ok(updatedModule);
+        }
+        // DELETE: /api/modules/33/17
+        [Authorize(Roles = "Teacher")]
+        [HttpPut("{cid:int}/{mid:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Delete(
+            [FromRoute] int cid,
+            [FromRoute] int mid,
+            CancellationToken ct)
+        {
+            await serviceManager.ModuleService.DeleteModuleAsync(mid, new ModuleCourseIdDto(cid), ct);
+            return NoContent();
         }
     }
 }

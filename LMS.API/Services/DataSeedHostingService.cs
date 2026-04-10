@@ -62,8 +62,8 @@ public class DataSeedHostingService : IHostedService
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         // // Uncomment to drop current database and re-seed with mock data
-        //await context.Database.EnsureDeletedAsync(cancellationToken);
-        //await context.Database.MigrateAsync(cancellationToken);
+        // await context.Database.EnsureDeletedAsync(cancellationToken);
+        // await context.Database.MigrateAsync(cancellationToken);
 
         userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -75,7 +75,7 @@ public class DataSeedHostingService : IHostedService
         {
             // Add initial ActivityTypes if none exist
             if (!await context.ActivityTypes.AnyAsync())
-                await AddInitialActivityTypesToDbAsync(scope, cancellationToken);
+                await AddInitialActivityTypesToDbAsync(cancellationToken);
             
             // Add roles, demo users and mock users if none exist
             if (!await context.Users.AnyAsync(cancellationToken))
@@ -174,12 +174,28 @@ public class DataSeedHostingService : IHostedService
         }
     }
 
-    private async Task AddInitialActivityTypesToDbAsync(IServiceScope scope, CancellationToken cancellationToken)
+    private async Task AddInitialActivityTypesToDbAsync(CancellationToken cancellationToken)
     {
+        using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await context.ActivityTypes.AddRangeAsync(ActivityTypes, cancellationToken);
+        await context.ActivityTypes.AddRangeAsync([
+            new ActivityType()
+            {
+                Name = "Assignment",
+            },
+            new ActivityType()
+            {
+                Name = "E-learning",
+            },
+            new ActivityType()
+            {
+                Name = "Lecture",
+                TimeExclusive = true,
+            }
+        ]);
 
+        // ToDo: Use unitOfWork?
         await context.SaveChangesAsync(cancellationToken);
     }
 
