@@ -20,5 +20,5 @@
     public string ButtonTitle { get; set; } = string.Empty;
 
     [Parameter]
-    public EventCallback OnClick { get; set; }
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
 }
