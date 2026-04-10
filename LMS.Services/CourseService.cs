@@ -127,5 +127,15 @@ namespace LMS.Services
             await unitOfWork.CompleteAsync(ct);
             return mapper.Map<CourseReadDto>(course);
         }
+
+        public async Task DeleteCourseAsync(int id, CancellationToken ct = default)
+        {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(id, true, ct);
+            if (course == null) throw new CourseNotFoundException(id);
+            unitOfWork.Courses.Delete(course);
+            await unitOfWork.CompleteAsync(ct);
+        }
     }
 }

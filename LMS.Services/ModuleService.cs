@@ -95,5 +95,15 @@ namespace LMS.Services
             return modules.Select(m=> mapper.Map<ModuleReadDto>(m)).ToList();
         }
 
+        public async Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto dto, CancellationToken ct = default)
+        {
+            Module? module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(moduleId, true, ct);
+            if (module == null) throw new NotFoundException($"ModuleId={moduleId}");
+            if (module!.CourseId != dto.CourseId) throw new BadRequestException(
+                $"No ModuleId={moduleId} under CourseId0{dto.CourseId}");
+            unitOfWork.Modules.Delete(module);
+            await unitOfWork.CompleteAsync(ct);
+
+        }
     }
 }

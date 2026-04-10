@@ -81,5 +81,17 @@ public partial class CourseController : ControllerBase
             .CourseService.UpdateCourseAsync(cid, dto, ct);
         return Ok(updatedCourse);
     }
+    // DELETE: /api/courses/5
+    [Authorize(Roles = "Teacher")]
+    [HttpPut("{cid:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete(
+        [FromRoute] int cid,
+        CancellationToken ct)
+    {
+        await serviceManager.CourseService.DeleteCourseAsync(cid, ct);
+        return NoContent();
+    }
+
 
 }
