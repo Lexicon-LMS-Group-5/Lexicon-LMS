@@ -1,7 +1,8 @@
 ﻿@page "/users"
 @using LMS.Blazor.Client.Components.UserModals
+@using LMS.Shared
 @using LMS.Shared.DTOs
-@attribute [Authorize(Roles = "Teacher")]
+@attribute [Authorize(Roles = Roles.Teacher)]
 
 <PageTitle>User List</PageTitle>
 <h3 class="mb-4">Users</h3>
@@ -79,7 +80,7 @@ else
                         {
                             @foreach (var role in user.Roles)
                             {
-                                @if (role == "Teacher")
+                                @if (role == Roles.Teacher)
                                 {
                                     <span class="badge bg-info me-1">@role</span>
                                 }
