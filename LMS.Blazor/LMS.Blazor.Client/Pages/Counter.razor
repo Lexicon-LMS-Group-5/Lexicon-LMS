@@ -1,5 +1,6 @@
 ﻿@page "/counter"
 @using System.Security.Claims
+@using LMS.Shared
 
 <PageTitle>Counter</PageTitle>
 
@@ -11,7 +12,7 @@
 
 <br />
 
-<AuthorizeView Roles="Student">
+<AuthorizeView Roles=@Roles.Student>
     <Authorized>
         <div class="alert alert-success">
             <strong>Authentication Success!</strong><br>

@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@using LMS.Shared
 
 <input type="checkbox" id="nav-toggle" class="nav-toggle" @bind="isNavOpen" />
 
@@ -18,7 +19,7 @@
 
     <div class="nav-scrollable">
         <nav class="nav-menu">
-            <AuthorizeView Roles="Teacher">
+            <AuthorizeView Roles=@Roles.Teacher>
                 <Authorized>
                     <div class="nav-item">
                         <NavLink class="nav-link" href="?tab=overview" Match="NavLinkMatch.All" @onclick="CloseMenu">
