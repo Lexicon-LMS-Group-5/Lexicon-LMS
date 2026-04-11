@@ -104,64 +104,42 @@
 
 @if (CourseDetails != null && EditContext != null)
 {
-    <div class="modal fade" id="@EditCourseModalId" tabindex="-1" aria-labelledby="editCourseFormModalLabel">
-        <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content overflow-y-auto">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="@($"{EditCourseModalId}Label")">
-                        Edit Course
-                    </h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <EditCourseForm 
-                    EditContext="EditContext" 
-                    CourseDetails="CourseDetails" 
-                    Model="EditCourseModel"
-                    OnSubmissionRequested="OnEditCourseSubmissionRequested"
-                    OnSubmissionFailed="OnEditCourseSubmissionFailed"
-                    OnSubmissionCanceled="OnEditCourseSubmissionCanceledAsync"
-                    OnSubmissionSucceeded="OnEditCourseSubmissionSucceededAsync">
-                    <FormContent>
-                        <div class="modal-body h-100">
-                            <EditCourseFormContent 
-                                CourseDetails="CourseDetails" 
-                                Model="EditCourseModel"
-                                IsLoading="IsFormLoading" />
-                        </div>
-                    </FormContent>
-                    <FormActions>
-                        <div class="modal-footer">
-                            <button 
-                                class="btn btn-secondary"
-                                type="button" 
-                                @onclick="CloseModalAsync">
-                                Cancel
-                            </button>
-                            <button 
-                                class="btn btn-primary"
-                                type="submit"
-                                disabled="@IsFormLoading">
-                                Save changes
-                            </button>
-                        </div>
-                    </FormActions>
-                </EditCourseForm>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        
-        function openModal() {
-            const modalNode = document.getElementById("editCourseFormModal")
-            const modal = bootstrap.Modal.getOrCreateInstance(modalNode)
-            modal.show()
-        }
-
-        function closeModal() {
-            const modalNode = document.getElementById("editCourseFormModal")
-            const modal = bootstrap.Modal.getInstance(modalNode)
-            modal.hide()
-        }
-    </script>
+    <Modal ModalId="@EditCourseModalId">
+        <ModalHeader 
+            ModalId="@EditCourseModalId" 
+            Title="Edit Course" />
+        <EditCourseForm 
+            EditContext="EditContext" 
+            CourseDetails="CourseDetails" 
+            Model="EditCourseModel"
+            OnSubmissionRequested="OnEditCourseSubmissionRequested"
+            OnSubmissionFailed="OnEditCourseSubmissionFailed"
+            OnSubmissionCanceled="OnEditCourseSubmissionCanceledAsync"
+            OnSubmissionSucceeded="OnEditCourseSubmissionSucceededAsync">
+            <FormContent>
+                <ModalBody>
+                    <EditCourseFormContent 
+                        CourseDetails="CourseDetails" 
+                        Model="EditCourseModel"
+                        IsLoading="IsFormLoading" />
+                </ModalBody>
+            </FormContent>
+            <FormActions>
+                <ModalFooter>
+                    <button 
+                        class="btn btn-secondary"
+                        type="button" 
+                        @onclick="CloseModalAsync">
+                        Cancel
+                    </button>
+                    <button 
+                        class="btn btn-primary"
+                        type="submit"
+                        disabled="@IsFormLoading">
+                        Save changes
+                    </button>
+                </ModalFooter>
+            </FormActions>
+        </EditCourseForm>
+    </Modal>
 }

@@ -1,8 +1,16 @@
 ﻿<ErrorBoundary @ref="ModulesTabErrorBoundary">
     <ChildContent>
         <div class="d-flex flex-column gap-3 p-3">
-            <header>
-                <h2 class="fs-5">Modules</h2>
+            <header class="d-flex justify-content-between align-items-middle">
+                <h2 class="fs-5 my-auto">Modules</h2>
+                <div>
+                    <button type="button" class="btn btn-primary d-flex align-items-middle gap-2" @onclick="async () => await ShowModalAsync()">
+                        <div class="d-flex align-items-middle m-auto">
+                            <CirclePlusIcon Size="20" />
+                        </div>
+                        Add a new Module
+                    </button>
+                </div>
             </header>
             <div class="modules-list rounded-3 overflow-hidden shadow-sm">
                 @foreach (var module in Modules)
@@ -89,9 +97,22 @@
     </ErrorContent>
 </ErrorBoundary>
 
+<Modal ModalId="@CreateModuleModalId">
+    <ModalHeader 
+        ModalId="@CreateModuleModalId" 
+        Title="Add a new Module" />
+    <div class="modal-body">
+    </div>
+    <div class="modal-footer">
+    </div>
+</Modal>
+
 @code {
     [Inject]
     private IApiService ApiService { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; } = default!;
@@ -106,6 +127,8 @@
     private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
     private string? ErrorMessage { get; set; }
     private ErrorBoundaryBase? ModulesTabErrorBoundary { get; set; }
+
+    private const string CreateModuleModalId = "createModuleModal";
 
     private int? selectedModuleId = null;
     private string closedChevronIconStyles = "transform: rotate(90deg);";
@@ -128,5 +151,15 @@
         {
             IsLoading = false;
         }
+    }
+
+    private async Task ShowModalAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("showModal", CreateModuleModalId);
+    }
+
+    private async Task HideModalAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("hideModal", CreateModuleModalId);
     }
 }

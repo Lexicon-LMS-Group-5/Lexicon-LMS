@@ -52,11 +52,11 @@ public partial class CourseDetailsPage
 
     private async Task OpenModalAsync()
     {
-        await JsRuntime.InvokeVoidAsync("openModal");
+        await JsRuntime.InvokeVoidAsync("showModal", EditCourseModalId);
     }
     private async Task CloseModalAsync()
     {
-        await JsRuntime.InvokeVoidAsync("closeModal");
+        await JsRuntime.InvokeVoidAsync("hideModal", EditCourseModalId);
         
         if (CourseDetails != null)
         {

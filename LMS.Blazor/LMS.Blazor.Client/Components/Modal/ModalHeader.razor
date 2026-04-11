@@ -1,0 +1,25 @@
+﻿<div class="modal-header">
+    <h2 class="modal-title fs-5" id="@($"{ModalId}Label")">
+        @Title
+    </h2>
+    <button 
+        type="button" 
+        class="btn-close" 
+        @onclick="HideModalAsync"></button>
+</div>
+
+@code {
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
+    [Parameter]
+    public string ModalId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    private async Task HideModalAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("hideModal", ModalId);
+    }
+}
