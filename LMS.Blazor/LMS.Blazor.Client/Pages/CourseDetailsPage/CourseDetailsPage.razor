@@ -104,7 +104,7 @@
 
 @if (CourseDetails != null && EditContext != null)
 {
-    <div class="modal fade" id="@EditCourseModalId" tabindex="-1" aria-labelledby="editCourseFormModalLabel" aria-hidden="true">
+    <div class="modal fade" id="@EditCourseModalId" tabindex="-1" aria-labelledby="editCourseFormModalLabel">
         <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content overflow-y-auto">
                 <div class="modal-header">
@@ -117,12 +117,16 @@
                     EditContext="EditContext" 
                     CourseDetails="CourseDetails" 
                     Model="EditCourseModel"
-                    OnSubmit="CloseModalAsync">
+                    OnSubmissionRequested="OnEditCourseSubmissionRequested"
+                    OnSubmissionFailed="OnEditCourseSubmissionFailed"
+                    OnSubmissionCanceled="OnEditCourseSubmissionCanceledAsync"
+                    OnSubmissionSucceeded="OnEditCourseSubmissionSucceededAsync">
                     <FormContent>
                         <div class="modal-body h-100">
                             <EditCourseFormContent 
                                 CourseDetails="CourseDetails" 
-                                Model="EditCourseModel" />
+                                Model="EditCourseModel"
+                                IsLoading="IsFormLoading" />
                         </div>
                     </FormContent>
                     <FormActions>
@@ -135,7 +139,8 @@
                             </button>
                             <button 
                                 class="btn btn-primary"
-                                type="submit">
+                                type="submit"
+                                disabled="@IsFormLoading">
                                 Save changes
                             </button>
                         </div>

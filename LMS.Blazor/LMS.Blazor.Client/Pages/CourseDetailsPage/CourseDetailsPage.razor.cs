@@ -35,7 +35,20 @@ public partial class CourseDetailsPage
 
     private const string EditCourseModalId = "editCourseFormModal";
 
-    
+    private bool IsFormLoading { get; set; }
+    private void OnEditCourseSubmissionRequested() => IsFormLoading = true;
+    private void OnEditCourseSubmissionFailed() => IsFormLoading = false;
+    private async Task OnEditCourseSubmissionCanceledAsync()
+    {
+        IsFormLoading = false;
+        await CloseModalAsync();
+    }
+    private async Task OnEditCourseSubmissionSucceededAsync(CourseDetailsDto updatedCourseDetails)
+    {
+        CourseDetails = updatedCourseDetails;
+        IsFormLoading = false;
+        await CloseModalAsync();
+    }
 
     private async Task OpenModalAsync()
     {
