@@ -4,7 +4,7 @@
             <header class="d-flex justify-content-between align-items-middle">
                 <h2 class="fs-5 my-auto">Modules</h2>
                 <div>
-                    <button type="button" class="btn btn-primary d-flex align-items-middle gap-2" @onclick="async () => await ShowModalAsync()">
+                    <button type="button" class="btn btn-primary d-flex align-items-middle gap-2" @onclick="async () => await ShowModalAsync(CreateModuleModalId)">
                         <div class="d-flex align-items-middle m-auto">
                             <CirclePlusIcon Size="20" />
                         </div>
@@ -74,9 +74,26 @@
                                         </div>
                                     </div>
                                 }
+                                <button 
+                                    class="d-flex justify-content-center gap-2 p-2 align-items-middle add-activity-button rounded text-secondary"
+                                    @onclick="() => ShowModalAsync(GetCreateActivityModalId(module.Id))">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <CirclePlusIcon Size="20" /> 
+                                    </div>
+                                        Add a new Activity
+                                </button>
                             </div>
                         </div>
                     </div>
+                    <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+                        <ModalHeader 
+                            ModalId="@CreateActivityModalId" 
+                            Title="@($"Add a new Activity to \"{module.Name}\"")" />
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </Modal>
                 }
             </div>
         </div>
@@ -130,6 +147,10 @@
 
     private const string CreateModuleModalId = "createModuleModal";
 
+    private string CreateActivityModalId { get; set; } = string.Empty;
+
+    private string GetCreateActivityModalId(int moduleId) => $"createActivityModal-{moduleId}";
+
     private int? selectedModuleId = null;
     private string closedChevronIconStyles = "transform: rotate(90deg);";
     private string openedChevronIconStyles = "transform: rotate(180deg);";
@@ -153,13 +174,13 @@
         }
     }
 
-    private async Task ShowModalAsync()
+    private async Task ShowModalAsync(string modalId)
     {
-        await JsRuntime.InvokeVoidAsync("showModal", CreateModuleModalId);
+        await JsRuntime.InvokeVoidAsync("showModal", modalId);
     }
 
-    private async Task HideModalAsync()
+    private async Task HideModalAsync(string modalId)
     {
-        await JsRuntime.InvokeVoidAsync("hideModal", CreateModuleModalId);
+        await JsRuntime.InvokeVoidAsync("hideModal", modalId);
     }
 }
