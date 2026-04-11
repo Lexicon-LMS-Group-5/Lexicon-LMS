@@ -21,6 +21,9 @@ public partial class EditCourseForm
     public RenderFragment? FormActions { get; set; }
 
     [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
     public EditContext EditContext { get; set; } = default!;
 
     [Parameter]
@@ -29,8 +32,12 @@ public partial class EditCourseForm
     private string? ErrorMessage { get; set; }
     private ErrorBoundary? EditCourseFormErrorBoundary { get; set; }
 
-    private async Task OnSubmit()
+    private async Task SubmitAsync()
     {
         Console.WriteLine($"### submit: {Model?.Name}");
+        if (OnSubmit.HasDelegate)
+        {
+            await OnSubmit.InvokeAsync();
+        }
     }
 }

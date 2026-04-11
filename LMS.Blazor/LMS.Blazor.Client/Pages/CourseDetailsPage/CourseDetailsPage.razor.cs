@@ -2,6 +2,7 @@
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 
 namespace LMS.Blazor.Client.Pages.CourseDetailsPage;
 
@@ -13,6 +14,9 @@ public partial class CourseDetailsPage
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
 
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
     [Parameter]
     public string? CourseId { get; set; }
 
@@ -23,19 +27,30 @@ public partial class CourseDetailsPage
     public string? ReferrerTab { get; set; }
 
     private bool IsLoading { get; set; } = true;
-    private string? Error { get; set; } = null;
+    private string? ErrorMessage { get; set; }
     private CourseDetailsDto? CourseDetails { get; set; }
 
     private EditContext? EditContext { get; set; }
     private EditCourseCommandDto? EditCourseModel { get; set; }
 
-    private bool IsEditModalOpen { get; set; }
+    private const string EditCourseModalId = "editCourseFormModal";
 
     
 
-    private void OpenModal() => IsEditModalOpen = true; 
-    private void CloseModal() => IsEditModalOpen = false;
-    
+    private async Task OpenModalAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("openModal");
+    }
+    private async Task CloseModalAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("closeModal");
+        
+        if (CourseDetails != null)
+        {
+            EditCourseModel = new(CourseDetails!);
+            EditContext = new(EditCourseModel);  
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +70,7 @@ public partial class CourseDetailsPage
         }
         catch (Exception ex)
         {
-            Error = ex.Message;
+            ErrorMessage = ex.Message;
         }
         finally
         {

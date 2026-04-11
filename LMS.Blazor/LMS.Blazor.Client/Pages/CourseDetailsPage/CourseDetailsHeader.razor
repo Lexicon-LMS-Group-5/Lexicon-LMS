@@ -32,9 +32,7 @@
             <button 
                 class="btn btn-primary my-auto d-flex gap-2"
                 type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#editCourseFormModal"
-                @onclick="OnOpenModal">
+                @onclick="OpenModalAsync">
                 <div class="my-auto d-flex flex-column justify-content-center">
                     <PencilIcon Size="16" />    
                 </div>
@@ -51,7 +49,6 @@
     </div>
 }
 
-
 @code {
     [Parameter]
     public CourseDetailsDto CourseDetails { get; set; } = default!;
@@ -62,7 +59,7 @@
     [Parameter]
     public EventCallback OnOpenModal { get; set; }
 
-    private async Task OpenModal()
+    private async Task OpenModalAsync()
     {
         if(OnOpenModal.HasDelegate)
         {

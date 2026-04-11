@@ -1,6 +1,6 @@
 ﻿<ErrorBoundary>
     <ChildContent>
-        <EditForm EditContext="EditContext" OnSubmit="OnSubmit">
+        <EditForm EditContext="EditContext" OnValidSubmit="SubmitAsync">
             <DataAnnotationsValidator />
             @if (FormContent != null)
             {

@@ -17,7 +17,7 @@
 }
 
 <div class="d-flex flex-column gap-5 pb-5">
-    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="OpenModal" />
+    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="OpenModalAsync" />
 
     <TabContainer 
         CurrentRoute="@($"/dashboard/courses/{CourseId}")" 
@@ -104,11 +104,11 @@
 
 @if (CourseDetails != null && EditContext != null)
 {
-    <div class="modal fade" id="editCourseFormModal" tabindex="-1" aria-labelledby="editCourseFormModalLabel" aria-hidden="true">
+    <div class="modal fade" id="@EditCourseModalId" tabindex="-1" aria-labelledby="editCourseFormModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content overflow-y-auto">
                 <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="editCourseFormModalLabel">
+                    <h2 class="modal-title fs-5" id="@($"{EditCourseModalId}Label")">
                         Edit Course
                     </h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -116,7 +116,8 @@
                 <EditCourseForm 
                     EditContext="EditContext" 
                     CourseDetails="CourseDetails" 
-                    Model="EditCourseModel">
+                    Model="EditCourseModel"
+                    OnSubmit="CloseModalAsync">
                     <FormContent>
                         <div class="modal-body h-100">
                             <EditCourseFormContent 
@@ -126,12 +127,36 @@
                     </FormContent>
                     <FormActions>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
+                            <button 
+                                class="btn btn-secondary"
+                                type="button" 
+                                @onclick="CloseModalAsync">
+                                Cancel
+                            </button>
+                            <button 
+                                class="btn btn-primary"
+                                type="submit">
+                                Save changes
+                            </button>
                         </div>
                     </FormActions>
                 </EditCourseForm>
             </div>
         </div>
     </div>
+
+    <script>
+        
+        function openModal() {
+            const modalNode = document.getElementById("editCourseFormModal")
+            const modal = bootstrap.Modal.getOrCreateInstance(modalNode)
+            modal.show()
+        }
+
+        function closeModal() {
+            const modalNode = document.getElementById("editCourseFormModal")
+            const modal = bootstrap.Modal.getInstance(modalNode)
+            modal.hide()
+        }
+    </script>
 }
