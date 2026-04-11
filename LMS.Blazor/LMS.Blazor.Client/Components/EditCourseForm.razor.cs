@@ -12,7 +12,7 @@ public partial class EditCourseForm
     private IApiService ApiService { get; set; } = default!;
 
     [Parameter]
-    public EditCourseCommandDto? Model { get; set; }
+    public UpdateCourseCommandDto? Model { get; set; }
 
     [Parameter]
     public RenderFragment? FormContent { get; set; }
