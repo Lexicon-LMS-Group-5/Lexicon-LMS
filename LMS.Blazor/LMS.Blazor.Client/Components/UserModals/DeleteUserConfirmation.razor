@@ -49,13 +49,7 @@
 
         try
         {
-            var success = await ApiService.DeleteAsync($"api/users/delete/{UserId}");
-
-            if (!success)
-            {
-                Error = "Delete failed or user not found.";
-                return;
-            }
+            await ApiService.DeleteAsync($"api/users/delete/{UserId}");
 
             await OnDeleted.InvokeAsync();
         }
