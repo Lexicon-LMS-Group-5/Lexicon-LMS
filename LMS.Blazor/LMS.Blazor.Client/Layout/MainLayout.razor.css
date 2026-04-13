@@ -2,7 +2,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f8fafc;
+    background-color: var(--bs-light)
 }
 
 .sidebar {
@@ -15,7 +15,6 @@
 .main-area {
     flex: 1;
     min-width: 0;
-    background: #f8fafc;
     display: flex;
     flex-direction: column;
 }
