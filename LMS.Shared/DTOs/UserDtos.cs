@@ -48,10 +48,9 @@ public class UserUpdateDto
     public string Email { get; set; } = null!;
 }
 
-public class  UpdateUserContext
+public class UpdateUserContext
 {
     [Required]
-    public string CurrentUserId { get; set; } = null!;
-
-    public bool IsTeacher { get; set; }
+    public string CurrentUserId { get; } = string.Empty;
+    public bool IsTeacher { get; }
 }
