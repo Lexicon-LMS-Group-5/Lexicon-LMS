@@ -138,7 +138,7 @@ else
 
     private async Task LoadModule()
     {
-        var m = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{CourseId}/{ModuleId}");
+        var m = await ApiService.GetAsync<ModuleReadDto>(Url);
         Module = m ?? new();
     }
 

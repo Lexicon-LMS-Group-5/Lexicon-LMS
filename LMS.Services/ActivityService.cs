@@ -55,8 +55,6 @@ public class ActivityService : IActivityService
             activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
         }
         Activity activity = mapper.Map<Activity>(activityUpsertDto);
-
-        activity.ActivityTypeId = activityUpsertDto.ActivityTypeId;
 		activity.Module = module;
 
 		StartEnd newStartEnd = new(activity);

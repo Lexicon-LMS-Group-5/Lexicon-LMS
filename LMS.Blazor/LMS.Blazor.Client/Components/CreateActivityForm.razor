@@ -87,7 +87,7 @@
                 StartDate = StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
                 ModuleId = ModuleId,
-                ActivityTypeId = SelectedActivityTypeId
+                ActivityTypeId = SelectedActivityTypeId,
             };
 
             await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>("api/activities", dto);
@@ -107,7 +107,7 @@
     {
         ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activitytypes");
 
-        if (ActivityTypes.Any())
+        if (ActivityTypes != null && ActivityTypes.Any())
         {
             SelectedActivityTypeId = ActivityTypes.First().Id;
         }
