@@ -17,7 +17,7 @@
 }
 
 <div class="d-flex flex-column gap-5 pb-5">
-    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="OpenModalAsync" />
+    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="ShowModalAsync" />
 
     <TabContainer 
         CurrentRoute="@($"/dashboard/courses/{CourseId}")" 
@@ -93,11 +93,9 @@
             }
         </Tab>
         <Tab Title="Students">
-            <div class="d-flex flex-column gap-3 p-3">
-                <header>
-                    <h2 class="fs-5">Students</h2>
-                </header>
-            </div>
+            @if (CourseDetails != null) {
+                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Role == "Student").ToList())" />
+            }
         </Tab>
     </TabContainer>
 </div>
@@ -129,7 +127,7 @@
                     <button 
                         class="btn btn-secondary"
                         type="button" 
-                        @onclick="CloseModalAsync">
+                        @onclick="HideModalAsync">
                         Cancel
                     </button>
                     <button 

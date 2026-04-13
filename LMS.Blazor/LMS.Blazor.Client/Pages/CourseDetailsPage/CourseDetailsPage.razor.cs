@@ -41,20 +41,20 @@ public partial class CourseDetailsPage
     private async Task OnEditCourseSubmissionCanceledAsync()
     {
         IsFormLoading = false;
-        await CloseModalAsync();
+        await HideModalAsync();
     }
     private async Task OnEditCourseSubmissionSucceededAsync(CourseDetailsDto updatedCourseDetails)
     {
         CourseDetails = updatedCourseDetails;
         IsFormLoading = false;
-        await CloseModalAsync();
+        await HideModalAsync();
     }
 
-    private async Task OpenModalAsync()
+    private async Task ShowModalAsync()
     {
         await JsRuntime.InvokeVoidAsync("showModal", EditCourseModalId);
     }
-    private async Task CloseModalAsync()
+    private async Task HideModalAsync()
     {
         await JsRuntime.InvokeVoidAsync("hideModal", EditCourseModalId);
         
