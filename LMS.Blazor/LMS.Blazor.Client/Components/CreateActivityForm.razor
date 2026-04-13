@@ -23,6 +23,16 @@
         <input type="date" class="form-control" @bind="EndDate" />
     </div>
 
+    <div class="mb-3">
+        <label class="form-label">Activity Type</label>
+        <select class="form-select" @bind="SelectedActivityTypeId">
+            @foreach (var type in ActivityTypes)
+            {
+                <option value="@type.Id">@type.Name</option>
+            }
+        </select>
+    </div>
+
     <div class="d-flex justify-content-end gap-2">
         @ModalCloseButton
 
@@ -51,6 +61,9 @@
     [Parameter] public EventCallback OnCreated { get; set; }
     [Parameter] public RenderFragment? ModalCloseButton { get; set; }
 
+    private List<ActivityTypeReadDto> ActivityTypes { get; set; } = new();
+    private int SelectedActivityTypeId { get; set; }
+
     private string Name { get; set; } = "";
     private string Description { get; set; } = "";
 
@@ -73,7 +86,8 @@
                 Description = Description,
                 StartDate = StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
-                ModuleId = ModuleId
+                ModuleId = ModuleId,
+                ActivityTypeId = SelectedActivityTypeId
             };
 
             await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>("api/activities", dto);
@@ -86,6 +100,16 @@
         finally
         {
             IsSaving = false;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activitytypes");
+
+        if (ActivityTypes.Any())
+        {
+            SelectedActivityTypeId = ActivityTypes.First().Id;
         }
     }
 }

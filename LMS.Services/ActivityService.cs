@@ -56,8 +56,7 @@ public class ActivityService : IActivityService
         }
         Activity activity = mapper.Map<Activity>(activityUpsertDto);
 
-        // TODO: place elsewhere
-        activity.ActivityTypeId = 1;
+        activity.ActivityTypeId = activityUpsertDto.ActivityTypeId;
 		activity.Module = module;
 
 		StartEnd newStartEnd = new(activity);
