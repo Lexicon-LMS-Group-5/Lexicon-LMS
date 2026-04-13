@@ -1,73 +1,90 @@
 ﻿@using LMS.Shared.DTOs
+@using System.ComponentModel.DataAnnotations
 @inject IApiService ApiService
 
-<div class="d-flex flex-column gap-2">
+<EditForm Model="@model" OnValidSubmit="SaveActivity">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-    <div class="mb-3">
-        <label class="form-label">Activity Name</label>
-        <input class="form-control" @bind="Name" />
+    <div class="d-flex flex-column gap-2">
+
+        <div class="mb-3">
+            <label class="form-label">Activity Name</label>
+            <input class="form-control" @bind="model.Name" />
+            <ValidationMessage For="@(() => model.Name)" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" @bind="model.Description"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" @bind="StartDate" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" @bind="EndDate" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Activity Type</label>
+            <select class="form-select" @bind="model.ActivityTypeId">
+                @foreach (var type in ActivityTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => model.ActivityTypeId)" class="text-danger" />
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary" type="button" @onclick="HandleClose">
+                @ModalCloseButton
+            </button>
+
+            <button class="btn btn-primary" type="submit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    <span class="ms-2">Saving...</span>
+                }
+                else
+                {
+                    <span>Create Activity</span>
+                }
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Error))
+        {
+            <div class="text-danger">@Error</div>
+        }
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea class="form-control" rows="3" @bind="Description"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Start Date</label>
-        <input type="date" class="form-control" @bind="StartDate" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">End Date</label>
-        <input type="date" class="form-control" @bind="EndDate" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Activity Type</label>
-        <select class="form-select" @bind="SelectedActivityTypeId">
-            @foreach (var type in ActivityTypes)
-            {
-                <option value="@type.Id">@type.Name</option>
-            }
-        </select>
-    </div>
-
-    <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-secondary" @onclick="HandleClose">
-            @ModalCloseButton
-        </button>
-
-        <button class="btn btn-primary" @onclick="SaveActivity" disabled="@IsSaving">
-            @if (IsSaving)
-            {
-                <span class="spinner-border spinner-border-sm"></span>
-                <span class="ms-2">Saving...</span>
-            }
-            else
-            {
-                <span>Create Activity</span>
-            }
-        </button>
-    </div>
-
-    @if (!string.IsNullOrEmpty(Error))
-    {
-        <div class="text-danger">@Error</div>
-    }
-</div>
+</EditForm>
 
 @code {
+
+    public class ActivityFormModel
+    {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; } = "";
+
+        public string Description { get; set; } = "";
+
+        public int ActivityTypeId { get; set; }
+    }
+
     [Parameter] public int CourseId { get; set; }
     [Parameter] public int ModuleId { get; set; }
     [Parameter] public EventCallback OnCreated { get; set; }
     [Parameter] public RenderFragment? ModalCloseButton { get; set; }
 
     private List<ActivityTypeReadDto> ActivityTypes { get; set; } = new();
-    private int SelectedActivityTypeId { get; set; }
 
-    private string Name { get; set; } = "";
-    private string Description { get; set; } = "";
+    private ActivityFormModel model = new();
 
     private DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     private DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
@@ -84,21 +101,23 @@
         {
             var dto = new ActivityUpsertDto
             {
-                Name = Name,
-                Description = Description,
+                Name = model.Name,
+                Description = model.Description,
                 StartDate = StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
                 ModuleId = ModuleId,
-                ActivityTypeId = SelectedActivityTypeId,
+                ActivityTypeId = model.ActivityTypeId,
             };
 
-            await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>("api/activities", dto);
+            await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>(
+                "api/activities", dto);
+
             ResetForm();
             await OnCreated.InvokeAsync();
         }
-        catch (Exception ex)
+        catch
         {
-            Error = "Unexpected error: " + ex.Message;
+            Error = "Something went wrong. Please try again.";
         }
         finally
         {
@@ -110,22 +129,22 @@
     {
         ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activitytypes");
 
-        if (ActivityTypes != null && ActivityTypes.Any())
+        if (ActivityTypes.Any())
         {
-            SelectedActivityTypeId = ActivityTypes.First().Id;
+            model.ActivityTypeId = ActivityTypes.First().Id;
         }
     }
 
     private void ResetForm()
     {
-        Name = "";
-        Description = "";
+        model = new ActivityFormModel();
+
         StartDate = DateOnly.FromDateTime(DateTime.Today);
         EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
 
         if (ActivityTypes.Any())
         {
-            SelectedActivityTypeId = ActivityTypes.First().Id;
+            model.ActivityTypeId = ActivityTypes.First().Id;
         }
 
         Error = null;
