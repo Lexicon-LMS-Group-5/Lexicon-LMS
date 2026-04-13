@@ -2,6 +2,7 @@
 using LMS.Infractructure.Data;
 
 namespace LMS.Infractructure.Repositories;
+
 public class UnitOfWork : IUnitOfWork
 {
     private readonly Lazy<ICourseRepository> courseRepository;
@@ -19,6 +20,9 @@ public class UnitOfWork : IUnitOfWork
     private readonly Lazy<IUserRepository> users;
     public IUserRepository Users => users.Value;
 
+    private readonly Lazy<IAttachmentRepository> attachments;
+    public IAttachmentRepository Attachments => attachments.Value;
+
     private readonly ApplicationDbContext context;
 
     public UnitOfWork(
@@ -27,16 +31,18 @@ public class UnitOfWork : IUnitOfWork
         Lazy<IModuleRepository> moduleRepository,
         Lazy<IActivityRepository> activities,
         Lazy<IActivityTypeRepository> activityTypes,
-        Lazy<IUserRepository> users)
-
+        Lazy<IUserRepository> users,
+        Lazy<IAttachmentRepository> attachments)
     {
+        this.context = context ?? throw new ArgumentNullException(nameof(context));
         this.courseRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
         this.moduleRepository = moduleRepository ?? throw new ArgumentNullException(nameof(moduleRepository));
         this.activities = activities ?? throw new ArgumentNullException(nameof(activities));
         this.activityTypes = activityTypes ?? throw new ArgumentNullException(nameof(activityTypes));
         this.users = users ?? throw new ArgumentNullException(nameof(users));
-        this.context = context ?? throw new ArgumentNullException(nameof(context));
+        this.attachments = attachments ?? throw new ArgumentNullException(nameof(attachments));
     }
 
-    public async Task CompleteAsync(CancellationToken ct = default) => await context.SaveChangesAsync(ct);
+    public async Task CompleteAsync(CancellationToken ct = default) =>
+        await context.SaveChangesAsync(ct);
 }

@@ -10,6 +10,7 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IActivityService> activityService;
     private readonly Lazy<IActivityTypeService> activityTypeService;
     private readonly Lazy<IUserService> userService;
+    private readonly Lazy<IAttachmentService> attachmentService;
 
     public IAuthService AuthService => authService.Value;
     public ICourseService CourseService => courseService.Value;
@@ -17,6 +18,8 @@ public class ServiceManager : IServiceManager
     public IActivityService ActivityService => activityService.Value;
     public IActivityTypeService ActivityTypeService => activityTypeService.Value;
     public IUserService UserService => userService.Value;
+    public IAttachmentService AttachmentService => attachmentService.Value;
+
 
     public ServiceManager(
         Lazy<IAuthService> authService, 
@@ -24,7 +27,8 @@ public class ServiceManager : IServiceManager
         Lazy<IModuleService> moduleService,
         Lazy<IActivityService> activityService,
         Lazy<IActivityTypeService> activityTypeService,
-        Lazy<IUserService> userService)
+        Lazy<IUserService> userService,
+        Lazy<IAttachmentService> attachmentService)
     {
         this.authService = authService ?? throw new ArgumentNullException(nameof(authService));
         this.courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
@@ -32,5 +36,6 @@ public class ServiceManager : IServiceManager
         this.activityService = activityService ?? throw new ArgumentNullException(nameof(activityService));
         this.activityTypeService = activityTypeService ?? throw new ArgumentNullException(nameof(activityService));
         this.userService = userService ?? throw new ArgumentNullException(nameof(activityService));
+        this.attachmentService = attachmentService ?? throw new ArgumentNullException(nameof(attachmentService));
     }
 }

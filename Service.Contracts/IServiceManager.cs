@@ -7,4 +7,5 @@ public interface IServiceManager
     IActivityService ActivityService { get; }
     IActivityTypeService ActivityTypeService { get; }
     IUserService UserService { get; }
+    IAttachmentService AttachmentService { get; }
 }

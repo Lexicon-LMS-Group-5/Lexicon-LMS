@@ -11,4 +11,5 @@ public class Activity
     public required ActivityType Type { get; set; }
     public int ModuleId { get; set; }
     public required Module Module { get; set; }
+    public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
 }

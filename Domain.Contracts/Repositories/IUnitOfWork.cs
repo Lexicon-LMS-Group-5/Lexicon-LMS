@@ -7,6 +7,7 @@ public interface IUnitOfWork
     IActivityRepository Activities { get; }
     IActivityTypeRepository ActivityTypes { get; }
     IUserRepository Users { get; }
+    IAttachmentRepository Attachments { get; }
 
     Task CompleteAsync(CancellationToken ct = default);
 }
