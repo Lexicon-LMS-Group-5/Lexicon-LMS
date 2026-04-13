@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LMS.Blazor.Client.Services;
 
@@ -94,6 +95,17 @@ public class ClientApiService : IApiService
             response.StatusCode == System.Net.HttpStatusCode.Forbidden)
         {
             _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
+        }
+    }
+
+    public async Task DeleteAsync(string endpoint, CancellationToken ct = default)
+    {
+        var response = await _httpClient.DeleteAsync($"api/proxy/{endpoint}", ct);
+        response.EnsureSuccessStatusCode();
+        if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
+        {
+            // TODO: use logger.
+            Console.WriteLine($"DELETE {endpoint} returned {response.StatusCode} instead of 204.");
         }
     }
 }
