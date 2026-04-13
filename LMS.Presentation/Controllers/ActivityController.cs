@@ -18,7 +18,6 @@ public class ActivityController : ControllerBase
         serviceManager = service;
     }
 
-    //This one will probably never be used.
     // GET: api/activities
     [HttpGet]
     public async Task<ActionResult<List<ActivityReadDto>>> GetAll(CancellationToken ct)
@@ -34,15 +33,6 @@ public class ActivityController : ControllerBase
         var activity = await serviceManager.ActivityService.GetActivityAsync(id, ct);
         return Ok(activity);
     }
-
-    // This should probably be in the ModuleController.
-    //// GET: api/activities/module/3
-    //[HttpGet("module/{moduleId:int}")]
-    //public async Task<ActionResult<List<ActivityReadDto>>> GetByModuleId(int moduleId, CancellationToken ct)
-    //{
-    //    var activities = await _service.GetActivitiesByModuleIdAsync(moduleId, ct);
-    //    return Ok(activities);
-    //}
 
     // GET: api/activities/type/2
     [HttpGet("type/{typeId:int}")]
