@@ -13,11 +13,14 @@
 else
 {
     <div class="container py-4">
-
         <div class="mb-4">
             <button class="btn btn-outline-secondary btn-sm mb-3"
                     @onclick="GoBack">
                 ← Back to course
+            </button>
+            <button class="btn btn-outline-secondary btn-sm mb-3"
+                    @onclick="DeleteThis">
+                Delete this module
             </button>
             <h1 class="fw-bold">@Module.Name</h1>
             <p class="text-muted mb-0">@Module.CourseName</p>
@@ -71,11 +74,12 @@ else
 
 
 @code {
-    [Parameter]
-    public int ModuleId { get; set; }
+        [Parameter]
+        public int ModuleId { get; set; }
 
-    [Parameter]
-    public int CourseId { get; set; }
+        [Parameter]
+        public int CourseId { get; set; }
+    public string Url {get { return $"api/modules/{CourseId}/{ModuleId}"; }}
 
     private ModuleReadDto Module { get; set; } = new();
     private List<ActivityReadDto> Activities { get; set; } = new();
@@ -83,12 +87,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var m = await ApiService.GetAsync<ModuleReadDto>($"api/modules/{CourseId}/{ModuleId}");
+        var m = await ApiService.GetAsync<ModuleReadDto>(Url);
         Module = m ?? new();
     }
 
     private void GoBack()
     {
         NavigationManager.NavigateTo($"/my-course");
+    }
+    private async Task DeleteThis()
+    {
+        await ApiService.DeleteAsync(Url);
     }
 }
