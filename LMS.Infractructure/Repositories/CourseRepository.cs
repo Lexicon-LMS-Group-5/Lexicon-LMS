@@ -35,7 +35,7 @@ namespace LMS.Infractructure.Repositories
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
-                .SingleAsync(ct);
+                .FirstOrDefaultAsync(ct);
         }
 
         public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false, CancellationToken ct = default)
@@ -44,7 +44,7 @@ namespace LMS.Infractructure.Repositories
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
-                .SingleAsync(ct);
+                .FirstOrDefaultAsync(ct);
         }
     }
 }

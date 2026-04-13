@@ -56,6 +56,7 @@ namespace LMS.Presentation.Controllers
                 return BadRequest(
                     $"CourseId in body ({dto.CourseId}) does not match course id in route ({cid}).");
             }
+           
             ModuleReadDto createdModule = await serviceManager
                 .ModuleService.CreateModuleAsync(dto);
             return CreatedAtAction(

@@ -28,7 +28,7 @@
                         </div>
                         <div class="d-flex flex-column gap-1 flex-grow-1">
                             <div>
-                                @module.Name test
+                                @module.Name
                             </div>
                             <div class="text-secondary">
                                 @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
@@ -116,15 +116,40 @@
     </ErrorContent>
 </ErrorBoundary>
 
-<Modal ModalId="@CreateModuleModalId">
-    <ModalHeader 
-        ModalId="@CreateModuleModalId" 
-        Title="Add a new Module" />
-    <div class="modal-body">
-    </div>
-    <div class="modal-footer">
-    </div>
-</Modal>
+@if (CreateModuleEditContext != null)
+{
+    <Modal ModalId="@CreateModuleModalId">
+        <ModalHeader 
+            ModalId="@CreateModuleModalId" 
+            Title="Add a new Module" />
+        <AddModuleForm 
+            Model="CreateModuleModel"
+            EditContext="CreateModuleEditContext"
+            OnSubmissionRequested="OnCreateModuleSubmissionRequestedAsync"
+            OnSubmissionFailed="OnCreateModuleSubmissionFailedAsync"
+            OnSubmissionCanceled="OnCreateModuleSubmissionCanceledAsync"
+            OnSubmissionSucceeded="OnCreateModuleSubmissionSucceededAsync">
+            <FormContent>
+                <ModalBody>
+                    <AddModuleFormContent Model="CreateModuleModel" />
+                </ModalBody>
+            </FormContent>
+            <FormActions>
+                <ModalFooter>
+                    <button class="btn btn-secondary"
+                            type="button"
+                            @onclick="OnCreateModuleSubmissionCanceledAsync">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary"
+                            type="submit">
+                        Save changes
+                    </button>
+                </ModalFooter>
+            </FormActions>
+        </AddModuleForm>
+    </Modal>
+}
 
 @code {
     [Inject]
@@ -156,7 +181,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        selectedModuleId = CourseDetails?.Modules.FirstOrDefault()?.Id ?? null;
+        if (CourseDetails == null)
+            throw new Exception("Could not find a Course for this Module");
+        selectedModuleId = CourseDetails.Modules.FirstOrDefault()?.Id ?? null;
 
         IsLoading = true;
 
@@ -164,6 +191,14 @@
         {
             Modules = await ApiService.GetAsync<IReadOnlyList<ModuleReadDto>>($"api/modules/{CourseId}")
                 ?? throw new Exception("Could not fetch modules");
+
+            var moduleStart = CourseDetails.Modules.LastOrDefault()?.EndDate;
+            CreateModuleModel ??= new();
+            CreateModuleModel.CourseId = CourseDetails.Id;
+            CreateModuleModel.TimeCond ??= new();
+            CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
+            CreateModuleModel.StartDate = moduleStart;
+            CreateModuleEditContext ??= new(CreateModuleModel);
         } catch(Exception ex)
         {
             ErrorMessage = ex.Message;
@@ -171,6 +206,40 @@
         {
             IsLoading = false;
         }
+    }
+
+    private EditContext? CreateModuleEditContext { get; set; }
+    private ModuleUpsertDto? CreateModuleModel { get; set; }
+
+    private bool IsFormLoading { get; set; }
+    private void OnCreateModuleSubmissionRequestedAsync() => IsFormLoading = true;
+    private void OnCreateModuleSubmissionFailedAsync() => IsFormLoading = false;
+    private async Task OnCreateModuleSubmissionCanceledAsync()
+    {
+        ResetFormState();
+        IsFormLoading = false;
+        await HideModalAsync(CreateModuleModalId);
+    }
+    private async Task OnCreateModuleSubmissionSucceededAsync(CourseModuleListItemDto moduleDto)
+    {
+        // Re-initialize form state
+        ResetFormState();
+
+        // Update the Modules list
+        CourseDetails.Modules = [.. CourseDetails.Modules, moduleDto];
+        IsFormLoading = false;
+        await HideModalAsync(CreateModuleModalId);
+    }
+
+    private void ResetFormState()
+    {
+        var moduleStart = CourseDetails.Modules.LastOrDefault()?.EndDate;
+        CreateModuleModel = new();
+        CreateModuleModel.CourseId = CourseDetails.Id;
+        CreateModuleModel.TimeCond ??= new();
+        CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
+        CreateModuleModel.StartDate = moduleStart;
+        CreateModuleEditContext = new(CreateModuleModel);
     }
 
     private async Task ShowModalAsync(string modalId)
