@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.AuthDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +52,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpdateDto dto,
@@ -61,7 +62,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         var request = new UpdateUserRequest
         {
             CurrentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "",
-            IsTeacher = User.IsInRole("Teacher")
+            IsTeacher = User.IsInRole(Roles.Teacher)
         };
 
         try
@@ -80,7 +81,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<UserReadDto>> CreateUser(
     [FromBody] UserCreateDto dto,
     CancellationToken ct)

@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +57,7 @@ public partial class CourseController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPost()]
     [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
     public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
@@ -69,7 +70,7 @@ public partial class CourseController : ControllerBase
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }
     // PUT api/courses/5
-    [Authorize(Roles = "Teacher")]
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPut("{cid:int}")]
     [ProducesResponseType<CourseReadDto>(StatusCodes.Status200OK)]
     public async Task<ActionResult<CourseReadDto>> Update(
@@ -82,8 +83,8 @@ public partial class CourseController : ControllerBase
         return Ok(updatedCourse);
     }
     // DELETE: /api/courses/5
-    [Authorize(Roles = "Teacher")]
-    [HttpPut("{cid:int}")]
+    [Authorize(Roles = Roles.Teacher)]
+    [HttpDelete("{cid:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(
         [FromRoute] int cid,

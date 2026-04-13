@@ -1,4 +1,5 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace LMS.Presentation.Controllers
             }
             return Ok(module_dto);
         }
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = Roles.Teacher)]
         [HttpPost("{cid:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateModule(
@@ -63,7 +64,7 @@ namespace LMS.Presentation.Controllers
                 createdModule);
         }
         // PUT: api/modules/33/17
-        [Authorize(Roles = "Teacher")]
+        [Authorize(Roles = Roles.Teacher)]
         [HttpPut("{cid:int}/{mid:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]
         public async Task<ActionResult<ModuleReadDto>> Update(
@@ -79,8 +80,9 @@ namespace LMS.Presentation.Controllers
             return Ok(updatedModule);
         }
         // DELETE: /api/modules/33/17
-        [Authorize(Roles = "Teacher")]
-        [HttpPut("{cid:int}/{mid:int}")]
+        [Authorize(Roles = Roles.Teacher)]
+
+        [HttpDelete("{cid:int}/{mid:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(
             [FromRoute] int cid,

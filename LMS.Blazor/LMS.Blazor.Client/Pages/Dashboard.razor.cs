@@ -1,6 +1,7 @@
 ﻿
 using LMS.Blazor.Client.Models;
 using LMS.Blazor.Client.Services;
+using LMS.Shared;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -30,7 +31,7 @@ public partial class Dashboard
     {
         var authenticationState = await authenticationStateTask;
 
-        if (!authenticationState.User.IsInRole("Teacher"))
+        if (!authenticationState.User.IsInRole(Roles.Teacher))
         {
             Navigation.NavigateTo("my-course");
         } else
