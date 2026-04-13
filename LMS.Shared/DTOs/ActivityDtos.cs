@@ -1,10 +1,17 @@
-﻿namespace LMS.Shared.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LMS.Shared.DTOs
 {
     public class ActivityUpsertDto
     {
+        [Required]
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
+
+        [Required]
         public DateTime StartDate { get; set; }
+
+        [Required]
         public DateTime EndDate { get; set; }
         public int ModuleId { get; set; }  // Required for Activity creation.
         public DateRangeRequestDto? TimeCond { get; set; }
