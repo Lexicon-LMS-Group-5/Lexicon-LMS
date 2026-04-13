@@ -37,7 +37,10 @@
 
     <!-- Actions -->
     <div class="d-flex justify-content-end gap-2 w-100">
-        @ModalCloseButton
+
+ <button class="btn btn-secondary" @onclick="HandleClose">
+            @ModalCloseButton
+        </button>  
         <button class="btn btn-primary" @onclick="SaveModule" disabled="@IsSaving">
             @if (IsSaving)
             {
@@ -102,5 +105,21 @@
         {
             IsSaving = false;
         }
+    }
+
+    private void ResetForm()
+    {
+        Name = string.Empty;
+        Description = string.Empty;
+
+        StartDate = DateOnly.FromDateTime(DateTime.Today);
+        EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+
+        Error = null;
+    }
+
+    private void HandleClose()
+    {
+        ResetForm();
     }
 }
