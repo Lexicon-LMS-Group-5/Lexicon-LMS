@@ -10,6 +10,7 @@ public class Activity
     public int ActivityTypeId { get; set; }
     public required ActivityType Type { get; set; }
     public int ModuleId { get; set; }
+    public bool EnableUpload { get; set; }
     public required Module Module { get; set; }
     public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
 }

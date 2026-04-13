@@ -33,6 +33,22 @@
         </select>
     </div>
 
+    <div class="mb-3">
+        <div class="form-check">
+            <input id="enableUpload" class="form-check-input" type="checkbox" @bind="EnableUpload" />
+            <label class="form-check-label" for="enableUpload">
+                Enable student upload
+            </label>
+        </div>
+
+        @if (EnableUpload)
+        {
+            <div class="form-text mt-1">
+                Students can upload files until the activity end date.
+            </div>
+        }
+    </div>
+
     <div class="d-flex justify-content-end gap-2">
         <button class="btn btn-secondary" @onclick="HandleClose">
             @ModalCloseButton
@@ -72,6 +88,8 @@
     private DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     private DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
 
+    private bool EnableUpload { get; set; }
+
     private bool IsSaving;
     private string? Error;
 
@@ -90,6 +108,7 @@
                 EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
                 ModuleId = ModuleId,
                 ActivityTypeId = SelectedActivityTypeId,
+                EnableUpload = EnableUpload
             };
 
             await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>("api/activities", dto);
@@ -122,6 +141,7 @@
         Description = "";
         StartDate = DateOnly.FromDateTime(DateTime.Today);
         EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+        EnableUpload = false;
 
         if (ActivityTypes.Any())
         {
