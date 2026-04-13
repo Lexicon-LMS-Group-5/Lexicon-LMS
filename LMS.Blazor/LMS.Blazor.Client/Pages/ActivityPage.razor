@@ -72,5 +72,6 @@ else
     private async Task DeleteThis()
     {
         await ApiService.DeleteAsync($"api/activities/{ActivityId}");
+        GoBack();
     }
 }

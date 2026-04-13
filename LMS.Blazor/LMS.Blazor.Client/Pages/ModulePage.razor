@@ -74,11 +74,11 @@ else
 
 
 @code {
-        [Parameter]
-        public int ModuleId { get; set; }
+    [Parameter]
+    public int ModuleId { get; set; }
 
-        [Parameter]
-        public int CourseId { get; set; }
+    [Parameter]
+    public int CourseId { get; set; }
     public string Url {get { return $"api/modules/{CourseId}/{ModuleId}"; }}
 
     private ModuleReadDto Module { get; set; } = new();
@@ -93,10 +93,11 @@ else
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo($"/my-course");
+        NavigationManager.NavigateTo("/my-course");
     }
     private async Task DeleteThis()
     {
         await ApiService.DeleteAsync(Url);
+        GoBack();
     }
 }

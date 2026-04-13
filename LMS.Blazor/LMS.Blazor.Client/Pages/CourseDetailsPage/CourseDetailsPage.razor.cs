@@ -90,4 +90,9 @@ public partial class CourseDetailsPage
             IsLoading = false;
         }
     }
+    private async Task DeleteThis()
+    {
+        await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        Navigation.NavigateTo("/dashboard");
+    }
 }
