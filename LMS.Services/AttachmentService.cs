@@ -44,13 +44,13 @@ public class AttachmentService : IAttachmentService
         var allowedExtensions = new[] { ".pdf", ".zip" };
 
         if (!allowedExtensions.Contains(extension))
-            throw new BadRequestException("Only PDF and ZIP files are allowed");
+            throw new BadRequestException("Only .pdf and .zip files are allowed");
 
         var uploadsFolder = Path.Combine(env.ContentRootPath, "Uploads", "Attachments");
         Directory.CreateDirectory(uploadsFolder);
 
-        var storedFileName = $"{Guid.NewGuid()}{extension}";
-        var fullPath = Path.Combine(uploadsFolder, storedFileName);
+        var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+        var fullPath = Path.Combine(uploadsFolder, uniqueFileName);
 
         await using (var stream = new FileStream(fullPath, FileMode.Create))
         {
@@ -84,6 +84,15 @@ public class AttachmentService : IAttachmentService
 
         var attachments = await unitOfWork.Attachments.GetByActivityIdAsync(activityId, false, ct);
         return mapper.Map<List<AttachmentReadDto>>(attachments);
+    }
+
+    public async Task<Attachment> GetAttachmentByIdAsync(int attachmentId, CancellationToken ct)
+    {
+        var attachment = await unitOfWork.Attachments.GetByIdAsync(attachmentId, false, ct);
+        if (attachment == null)
+            throw new NotFoundException($"Attachment {attachmentId} not found");
+
+        return attachment;
     }
 
     public async Task DeleteAttachmentAsync(int attachmentId, CancellationToken ct)
