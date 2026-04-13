@@ -51,6 +51,6 @@ public class UserUpdateDto
 public class UpdateUserContext
 {
     [Required]
-    public string CurrentUserId { get; } = string.Empty;
-    public bool IsTeacher { get; }
+    public string CurrentUserId { get; set; } = string.Empty;
+    public bool IsTeacher { get; set; }
 }
