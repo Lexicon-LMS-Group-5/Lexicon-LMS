@@ -5,10 +5,10 @@ namespace LMS.Shared.DTOs
 {
     public class CourseUpsertDto
     {
-        public virtual string Name { get; set; } = string.Empty;
-        public virtual string Description { get; set; } = string.Empty;
-        public virtual DateTime? StartDate { get; set; }
-        public virtual DateTime? EndDate { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 
     public class CourseReadDto
@@ -20,31 +20,19 @@ namespace LMS.Shared.DTOs
         public DateTime EndDate { get; set; }
     }
 
-    public record CourseDetailsQueryDto(int CourseId);
-
     public class CourseDetailsDto : CourseReadDto
     {
-        public List<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
-        public List<CourseModuleListItemDto> Modules { get; set; } = [];
+        public IReadOnlyList<CourseParticipant> Participants { get; set; } = [];
+        public IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
     }
 
-    public class CourseParticipantWithRoleInfoDto
+    public class CourseParticipant
     {
-        public string Id { get; set; } = default!;
+        public string Id { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public IReadOnlyList<string> Roles { get; set; } = [];
     }
-
-    public class CourseModuleListItemDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-		public DateTime StartDate { get; set; }
-		public DateTime EndDate { get; set; }
-		public List<ActivityReadDto> Activities { get; set; } = [];
-	}
 
     public class CoursesQueryDto : BasePageQueryDto
     {
@@ -56,26 +44,26 @@ namespace LMS.Shared.DTOs
         
     }
 
-    public class CreateCourseCommandDto : CourseUpsertDto, IValidatableObject
+    public class CreateCourseCommandDto : IValidatableObject
     {
         public string CreatorId { get; set; } = string.Empty;
 
         [Required]
         [StringLength(35, MinimumLength = 1)]
-        public override string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         [StringLength(160)]
-        public override string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         [DataType(DataType.Date)]
         [Display(Name="Start date")]
-        public override DateTime? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "End date")]
-        public override DateTime? EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Required]
         public bool AddCreator { get; set; }

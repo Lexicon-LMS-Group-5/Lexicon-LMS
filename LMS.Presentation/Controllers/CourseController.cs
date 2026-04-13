@@ -39,7 +39,7 @@ public partial class CourseController : ControllerBase
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
-        var result = await serviceManager.CourseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
+        var result = await serviceManager.CourseService.GetCourseDetailsAsync(id);
 
         return Ok(result);
     }
