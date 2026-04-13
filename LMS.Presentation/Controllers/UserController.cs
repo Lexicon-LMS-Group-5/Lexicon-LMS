@@ -49,7 +49,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
-    [Authorize(Roles = Roles.Teacher)]
+    [Authorize(Roles = Roles.Teacher)]//Remove this if you want students to be able to edit their own info
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpdateDto dto,
@@ -64,7 +64,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         var request = new UpdateUserContext
         {
             CurrentUserId = userId,
-            IsTeacher = User.IsInRole("Teacher")
+            IsTeacher = User.IsInRole(Roles.Teacher)
         };
 
         try
