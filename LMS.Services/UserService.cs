@@ -74,7 +74,7 @@ public class UserService : IUserService
         if (!result.Succeeded)
             throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
 
-        if (dto.Roles != null && dto.Roles.Any())
+        if (dto.Roles != null && dto.Roles.Count == 0)
         {
             foreach (var role in dto.Roles)
             {

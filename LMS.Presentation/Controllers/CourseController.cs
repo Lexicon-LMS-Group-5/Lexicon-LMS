@@ -28,44 +28,46 @@ public partial class CourseController : ControllerBase
 
     [HttpGet()]
     [ProducesResponseType<CoursesQueryResultDto>(StatusCodes.Status200OK)]
-    public async Task <IActionResult> GetAllCourses([FromQuery] CoursesQueryDto query)
+    public async Task <IActionResult> GetAllCourses([FromQuery] CoursesQueryDto query, CancellationToken ct)
     {
-        var result = await serviceManager.CourseService.GetCoursesAsync(query);
+        var result = await serviceManager.CourseService.GetCoursesAsync(query, ct);
 
         return Ok(result);
     }
 
     [HttpGet("{id:int}", Name = "GetCourseDetails")]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
+    public async Task<IActionResult> GetCourseDetails([FromRoute] int id, CancellationToken ct)
     {
-        var result = await serviceManager.CourseService.GetCourseDetailsAsync(id);
+        var result = await serviceManager.CourseService.GetCourseDetailsByIdAsync(id, ct);
 
         return Ok(result);
     }
 
     [HttpGet("my-course")]
-    public async Task<ActionResult<CourseDetailsDto?>> GetMyCourse()
+    public async Task<ActionResult<CourseDetailsDto?>> GetMyCourse(CancellationToken ct)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (userId == null)
             return BadRequest();
 
-        var result = await serviceManager.CourseService.GetCourseDetailsByUserIdAsync(userId);
+        var result = await serviceManager.CourseService.GetCourseDetailsByUserIdAsync(userId, ct);
 
         return Ok(result);
     }
 
     [Authorize(Roles = Roles.Teacher)]
     [HttpPost()]
-    [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
+    [ProducesResponseType<CourseReadDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse(
+        [FromBody] CreateCourseCommandDto command,
+        CancellationToken ct)   
     {
         // Get the user ID and add it to the DTO
         command.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
 
-        var result = await serviceManager.CourseService.CreateCourseAsync(command);
+        var result = await serviceManager.CourseService.CreateCourseAsync(command, ct);
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }

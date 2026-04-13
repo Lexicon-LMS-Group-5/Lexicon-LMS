@@ -22,11 +22,11 @@ namespace LMS.Shared.DTOs
 
     public class CourseDetailsDto : CourseReadDto
     {
-        public IReadOnlyList<CourseParticipant> Participants { get; set; } = [];
+        public IReadOnlyList<CourseParticipantDto> Participants { get; set; } = [];
         public IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
     }
 
-    public class CourseParticipant
+    public class CourseParticipantDto
     {
         public string Id { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
@@ -80,11 +80,6 @@ namespace LMS.Shared.DTOs
                 yield return new ValidationResult("End date must be in the future", [nameof(EndDate)]);
             }
         }
-    }
-
-    public class CreateCourseResultDto: CourseReadDto
-    {
-
     }
 
     public class EditCourseCommandDto : CreateCourseCommandDto

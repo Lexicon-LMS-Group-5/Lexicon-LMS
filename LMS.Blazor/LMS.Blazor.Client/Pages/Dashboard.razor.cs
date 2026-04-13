@@ -11,7 +11,7 @@ namespace LMS.Blazor.Client.Pages;
 public partial class Dashboard
 {
     [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
 
     [Inject]
     private IApiService ApiService { get; set; } = default!;
@@ -29,7 +29,7 @@ public partial class Dashboard
     private IReadOnlyList<CourseListItemDto>? ActiveCourses { get; set; } = null;
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await authenticationStateTask;
+        var authenticationState = await AuthenticationStateTask;
 
         if (!authenticationState.User.IsInRole(Roles.Teacher))
         {

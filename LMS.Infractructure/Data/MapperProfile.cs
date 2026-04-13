@@ -11,23 +11,24 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         CreateMap<UserRegistrationDto, ApplicationUser>();
-        CreateMap<CreateCourseCommandDto, Course>();
-        CreateMap<Course, CreateCourseResultDto>();
-        CreateMap<Course, CourseListItemDto>();
-        CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
-        CreateMap<Course, CourseDetailsDto>();
-        CreateMap<ApplicationUser, CourseParticipant>();
-        CreateMap<Module, ModuleReadDto>();
-		CreateMap<Activity, ActivityReadDto>();
         CreateMap<Course, CourseReadDto>();
+        CreateMap<Course, CourseListItemDto>();
+        CreateMap<Course, CourseDetailsDto>();
+        CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
+        CreateMap<CreateCourseCommandDto, Course>();
+        CreateMap<ApplicationUser, CourseParticipantDto>();
+        CreateMap<Module, ModuleReadDto>()
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name ?? ""));
+        CreateMap<ModuleUpsertDto, Module>();
+        CreateMap<Activity, ActivityReadDto>();
+        CreateMap<ActivityType, ActivityTypeReadDto>();
         CreateMap<ApplicationUser, UserReadDto>()
-            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()))
+            .ForMember(dest => dest.CourseName, 
+                opt => opt.MapFrom(src => src.Course != null ? src.Course.Name : ""));
         CreateMap<UserUpdateDto, ApplicationUser>()
             .ForMember(dest => dest.Roles, opt => opt.Ignore())
             .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<UserCreateDto, ApplicationUser>();
-        CreateMap<ModuleUpsertDto, Module>();
-        CreateMap<Module, ModuleReadDto>();
-        CreateMap<ActivityType, ActivityTypeReadDto>();
     }
 }

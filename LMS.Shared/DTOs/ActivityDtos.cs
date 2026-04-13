@@ -22,8 +22,6 @@
         public string Description { get; set; } = "";
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int ActivityTypeId { get; set; }
-        public string ActivityTypeName { get; set; } = "";
-        public bool ActivityTypeTimeExclusive { get; set; }
+        public ActivityTypeReadDto? Type { get; set; }
     }
 }

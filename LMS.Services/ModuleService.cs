@@ -84,34 +84,24 @@ namespace LMS.Services
             return mapper.Map<ModuleReadDto>(module);
         }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
-            int courseId, 
-            bool trackChanges = false,
-            CancellationToken ct = default)
+        int courseId,
+        bool trackChanges = false,
+        CancellationToken ct = default)
         {
             var modules = await unitOfWork.Modules.GetModulesByCourseIdAsync(
-                    courseId,
-                    trackChanges,
-                    ct);
+                courseId,
+                trackChanges,
+                ct);
 
-            var moduleReadDtos = modules.Select(m => {
-                var moduleDto = mapper.Map<ModuleReadDto>(m);
-                moduleDto.Activities = m.Activities.Select(a => {
-                    var activityDto = mapper.Map<ActivityReadDto>(a);
-                    activityDto.ActivityTypeName = a.Type.Name;
-                    return activityDto;
-                }).ToList();
-                return moduleDto;
-            }).ToList();
-
-            return moduleReadDtos;
+            return mapper.Map<List<ModuleReadDto>>(modules);
         }
 
-        public async Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto dto, CancellationToken ct = default)
+        public async Task DeleteModuleAsync(ModuleCourseIdDto dto, CancellationToken ct = default)
         {
-            Module? module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(moduleId, true, ct);
-            if (module == null) throw new NotFoundException($"ModuleId={moduleId}");
+            Module? module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(dto.ModuleId, true, ct);
+            if (module == null) throw new NotFoundException($"ModuleId={dto.ModuleId}");
             if (module!.CourseId != dto.CourseId) throw new BadRequestException(
-                $"No ModuleId={moduleId} under CourseId0{dto.CourseId}");
+                $"No ModuleId={dto.ModuleId} under CourseId0{dto.CourseId}");
             unitOfWork.Modules.Delete(module);
             await unitOfWork.CompleteAsync(ct);
 
