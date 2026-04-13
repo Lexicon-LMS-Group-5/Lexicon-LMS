@@ -29,7 +29,12 @@ else
         var teachers = CourseDetails.Participants.Where(p => p.Role == "Teacher");
 
         <div class="container py-4">
-
+            <div class="mb-4">
+                <button class="btn btn-outline-secondary btn-sm mb-3"
+                        @onclick="DeleteThis">
+                    Delete this course
+                </button>
+            </div>
             <div class="card shadow-lg mb-4">
                 <div class="card-body">
                     <h1 class="card-title">@CourseDetails.Name</h1>
@@ -165,6 +170,10 @@ else
         {
             IsLoading = false;
         }
+    }
+    private async Task DeleteThis()
+    {
+        await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
     }
 }
 

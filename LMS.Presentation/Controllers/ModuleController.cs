@@ -80,7 +80,7 @@ namespace LMS.Presentation.Controllers
         }
         // DELETE: /api/modules/33/17
         [Authorize(Roles = "Teacher")]
-        [HttpPut("{cid:int}/{mid:int}")]
+        [HttpDelete("{cid:int}/{mid:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(
             [FromRoute] int cid,
