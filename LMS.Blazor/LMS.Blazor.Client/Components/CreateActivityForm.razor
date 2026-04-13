@@ -34,7 +34,9 @@
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        @ModalCloseButton
+        <button class="btn btn-secondary" @onclick="HandleClose">
+            @ModalCloseButton
+        </button>
 
         <button class="btn btn-primary" @onclick="SaveActivity" disabled="@IsSaving">
             @if (IsSaving)
@@ -91,6 +93,7 @@
             };
 
             await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>("api/activities", dto);
+            ResetForm();
             await OnCreated.InvokeAsync();
         }
         catch (Exception ex)
@@ -111,5 +114,25 @@
         {
             SelectedActivityTypeId = ActivityTypes.First().Id;
         }
+    }
+
+    private void ResetForm()
+    {
+        Name = "";
+        Description = "";
+        StartDate = DateOnly.FromDateTime(DateTime.Today);
+        EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+
+        if (ActivityTypes.Any())
+        {
+            SelectedActivityTypeId = ActivityTypes.First().Id;
+        }
+
+        Error = null;
+    }
+
+    private void HandleClose()
+    {
+        ResetForm();
     }
 }
