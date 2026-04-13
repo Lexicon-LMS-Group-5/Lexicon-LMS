@@ -100,7 +100,7 @@
     public int CourseId { get; set; }
 
     [Parameter]
-    public CourseDetailsDto CourseDetails { get; set; }
+    public CourseDetailsDto CourseDetails { get; set; } = default!;
 
     private bool IsLoading { get; set; }
     private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
