@@ -129,7 +129,7 @@
     {
         ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activitytypes");
 
-        if (ActivityTypes.Any())
+        if (ActivityTypes != null && ActivityTypes.Any())
         {
             model.ActivityTypeId = ActivityTypes.First().Id;
         }

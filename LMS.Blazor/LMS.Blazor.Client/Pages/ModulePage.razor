@@ -13,6 +13,14 @@
 }
 else
 {
+    @if (ShowSuccessMessage)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Activity created successfully!
+            <button type="button" class="btn-close" @onclick="() => ShowSuccessMessage = false"></button>
+        </div>
+    }
+
     <div class="container py-4">
         <div class="mb-4">
             <button class="btn btn-outline-secondary btn-sm mb-3"
@@ -114,6 +122,9 @@ else
 
 
 @code {
+
+        private bool ShowSuccessMessage = false;
+
         [Parameter]
         public int ModuleId { get; set; }
 
@@ -127,6 +138,8 @@ else
     private async Task HandleActivityCreated()
     {
         await JS.InvokeVoidAsync("closeBootstrapModal", "#createActivityModal");
+
+        ShowSuccessMessage = true;
 
         await LoadModule();
     }
