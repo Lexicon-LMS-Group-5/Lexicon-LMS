@@ -1,6 +1,8 @@
 ﻿using LMS.Blazor.Client.Services;
+using LMS.Shared;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
@@ -8,6 +10,9 @@ namespace LMS.Blazor.Client.Pages.CourseDetailsPage;
 
 public partial class CourseDetailsPage
 {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+
     [Inject]
     private IApiService ApiService { get; set; } = default!;
 
@@ -54,6 +59,14 @@ public partial class CourseDetailsPage
 
     protected override async Task OnInitializedAsync()
     {
+        var authenticationState = await authenticationStateTask;
+
+        if (!authenticationState.User.IsInRole(Roles.Teacher))
+        {
+            Navigation.NavigateTo("my-course");
+            return;
+        }
+
         IsLoading = true;
 
         if (!int.TryParse(CourseId, out int Id))
