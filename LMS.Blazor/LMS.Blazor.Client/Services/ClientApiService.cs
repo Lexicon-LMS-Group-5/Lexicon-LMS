@@ -75,18 +75,18 @@ public class ClientApiService : IApiService
             ct);
     }
 
-    public async Task<bool> DeleteAsync(string endpoint, CancellationToken ct = default)
+    public async Task DeleteAsync(string endpoint, CancellationToken ct = default)
     {
         var response = await _httpClient.DeleteAsync($"api/proxy/{endpoint}", ct);
 
         await CheckForceLoginAsync(response);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return false;
+            return;
 
         response.EnsureSuccessStatusCode();
 
-        return true;
+        return;
     }
 
     private async Task CheckForceLoginAsync(HttpResponseMessage response)
@@ -95,17 +95,6 @@ public class ClientApiService : IApiService
             response.StatusCode == System.Net.HttpStatusCode.Forbidden)
         {
             _navigationManager.NavigateTo("/Account/Login", forceLoad: true);
-        }
-    }
-
-    public async Task DeleteAsync(string endpoint, CancellationToken ct = default)
-    {
-        var response = await _httpClient.DeleteAsync($"api/proxy/{endpoint}", ct);
-        response.EnsureSuccessStatusCode();
-        if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
-        {
-            // TODO: use logger.
-            Console.WriteLine($"DELETE {endpoint} returned {response.StatusCode} instead of 204.");
         }
     }
 }
