@@ -43,31 +43,35 @@ public partial class CourseDetailsPage
     private bool IsFormLoading { get; set; }
     private void OnEditCourseSubmissionRequested() => IsFormLoading = true;
     private void OnEditCourseSubmissionFailed() => IsFormLoading = false;
+
+    private void ResetEditCourseFormState()
+    {
+        if (CourseDetails != null)
+        {
+            EditCourseModel = new(CourseDetails!);
+            EditContext = new(EditCourseModel);
+        }
+    }
     private async Task OnEditCourseSubmissionCanceledAsync()
     {
         IsFormLoading = false;
-        await CloseModalAsync();
+        await HideModalAsync(EditCourseModalId);
+        ResetEditCourseFormState();
     }
     private async Task OnEditCourseSubmissionSucceededAsync(CourseDetailsDto updatedCourseDetails)
     {
         CourseDetails = updatedCourseDetails;
         IsFormLoading = false;
-        await CloseModalAsync();
+        await HideModalAsync(EditCourseModalId);
     }
 
-    private async Task OpenModalAsync()
+    private async Task ShowModalAsync(string modalId)
     {
-        await JsRuntime.InvokeVoidAsync("openModal");
+        await JsRuntime.InvokeVoidAsync("showModal", modalId);
     }
-    private async Task CloseModalAsync()
+    private async Task HideModalAsync(string modalId)
     {
-        await JsRuntime.InvokeVoidAsync("closeModal");
-        
-        if (CourseDetails != null)
-        {
-            EditCourseModel = new(CourseDetails!);
-            EditContext = new(EditCourseModel);  
-        }
+        await JsRuntime.InvokeVoidAsync("hideModal", modalId);
     }
 
     protected override async Task OnInitializedAsync()
@@ -103,7 +107,9 @@ public partial class CourseDetailsPage
             IsLoading = false;
         }
     }
-    private async Task DeleteThis()
+
+    private const string DeleteConfirmationModalId = "deleteConfirmationModal";
+    private async Task DeleteThisAsync()
     {
         if (CourseDetails != null)
         {
