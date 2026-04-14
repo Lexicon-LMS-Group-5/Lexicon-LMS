@@ -52,6 +52,12 @@ else
 
                     <p>@CourseDetails.Description</p>
 
+                    <p class="text-muted">
+                        <strong>Start:</strong> @CourseDetails.StartDate.ToString("yyyy-MM-dd")
+                        <br />
+                        <strong>End:</strong> @CourseDetails.EndDate.ToString("yyyy-MM-dd")
+                    </p>
+
                     <div class="mt-3">
                         <AuthorizeView Roles=@Roles.Teacher>
                             <div data-bs-toggle="modal"
