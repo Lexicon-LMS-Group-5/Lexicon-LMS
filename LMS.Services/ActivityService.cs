@@ -70,6 +70,7 @@ public class ActivityService : IActivityService
 		StartEnd newStartEnd = new(activity);
         drh.CheckNew(newStartEnd);
         unitOfWork.Activities.Create(activity);
+
         await unitOfWork.CompleteAsync(ct);
         return mapper.Map<ActivityReadDto>(activity);
     }

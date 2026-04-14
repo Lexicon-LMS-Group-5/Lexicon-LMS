@@ -1,8 +1,7 @@
-﻿<ErrorBoundary>
+﻿<ErrorBoundary @ref="AddActivityFormErrorBoundary">
     <ChildContent>
-        <EditForm 
-            EditContext="EditContext" 
-            OnValidSubmit="SubmitAsync">
+        <EditForm EditContext="EditContext"
+                  OnValidSubmit="SubmitAsync">
             <DataAnnotationsValidator />
             @if (FormContent != null)
             {
@@ -24,7 +23,7 @@
                     <p>@ErrorMessage</p>
                 }
               
-                <button class="btn btn-primary" @onclick="() => EditCourseFormErrorBoundary?.Recover()">Try to reload</button>
+                <button class="btn btn-primary" @onclick="() => AddActivityFormErrorBoundary?.Recover()">Try to reload</button>
             </div>
         </div>
     </ErrorContent>

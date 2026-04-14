@@ -1,13 +1,33 @@
-﻿namespace LMS.Shared.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LMS.Shared.DTOs
 {
-    public class ModuleUpsertDto
+    public class ModuleUpsertDto : IValidatableObject
     {
+        [Required]
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
-        public DateRangeRequestDto? TimeCond;
+        public DateRangeRequestDto? TimeCond { get; set; }
+
+        [Required]
         public DateTime? StartDate { get; set; }
+        [Required]
         public DateTime? EndDate { get; set; }
+        [Required]
         public int CourseId { get; set; }  // required for Module creation.
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (EndDate <= StartDate)
+            {
+                yield return new ValidationResult("End date must be after the start date.", [nameof(EndDate), nameof(StartDate)]);
+            }
+
+            if (EndDate <= DateTime.UtcNow)
+            {
+                yield return new ValidationResult("End date must be in the future", [nameof(EndDate)]);
+            }
+        }
     }
 
     public class ModuleReadDto
