@@ -34,7 +34,6 @@ public partial class UserList
         None,
         EditUser,
         CreateUser,
-        CreateStudent,
         DeleteUser,
     }
 
@@ -55,11 +54,6 @@ public partial class UserList
     private void OpenCreateModal()
     {
         _activeModal = ModalType.CreateUser;
-    }
-
-    private void OpenTempModal()
-    {
-        _activeModal = ModalType.CreateStudent;
     }
 
     private void OpenDeleteModal(string userId, string userName)

@@ -19,6 +19,7 @@ namespace LMS.Infractructure.Repositories
             CancellationToken ct = default)
         {
             return await FindByCondition(m => m.Id == moduleId, trackChanges)
+                .Include(m => m.Course)
                 .Include(m => m.Activities)
                 .SingleAsync(ct);
         }
@@ -28,6 +29,7 @@ namespace LMS.Infractructure.Repositories
             CancellationToken ct = default)
         {
             return await FindByCondition(m => m.CourseId == courseId, trackChanges)
+                .Include(m => m.Course)
                 .Include(m => m.Activities)
                     .ThenInclude(a => a.Type)
                 .ToListAsync(ct);

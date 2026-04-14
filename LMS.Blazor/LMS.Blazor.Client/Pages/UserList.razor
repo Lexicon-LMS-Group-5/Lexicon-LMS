@@ -16,10 +16,6 @@
         </ButtonText>
     </QuickActionButton>
 </div>
-<button class="btn btn-sm btn-success"
-        @onclick="OpenTempModal">
-    Add Student (Temp)
-</button>
 <input class="form-control mb-3"
        placeholder="Search users..."
        @bind="SearchTerm"
@@ -170,19 +166,6 @@ else
                         <div class="modal-body">
                             <CreateUserForm OnSaved="HandleUserSaved"
                                             OnCancel="CloseModal" />
-                        </div>
-                    }
-                    else if (_activeModal == ModalType.CreateStudent)
-                    {
-                        <div class="modal-header">
-                            <h5>Add Student</h5>
-                            <button class="btn-close" @onclick="CloseModal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <CreateStudentForm @key="_courseIdTemp"
-                                               CourseId="@_courseIdTemp"
-                                               OnSaved="HandleUserSaved"
-                                               OnCancel="CloseModal" />
                         </div>
                     }
                     else if (_activeModal == ModalType.DeleteUser)

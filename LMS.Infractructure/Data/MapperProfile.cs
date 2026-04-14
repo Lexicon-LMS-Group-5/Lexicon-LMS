@@ -34,14 +34,17 @@ public class MapperProfile : Profile
         CreateMap<UserCreateDto, ApplicationUser>();
         CreateMap<ModuleUpsertDto, Module>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
-        CreateMap<Module, ModuleReadDto>();
 		CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ModuleUpsertDto, Module>();
+        CreateMap<ModuleReadDto, Module>();
         CreateMap<Module, ModuleReadDto>()
             .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
         CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ActivityType, ActivityTypeReadDto>();
         CreateMap<Activity, ActivityReadDto>()
+            .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Module.Course.Id))
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Module.Course.Name))
             .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
             .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Module.Course.Id))
             .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Module.Course.Name));

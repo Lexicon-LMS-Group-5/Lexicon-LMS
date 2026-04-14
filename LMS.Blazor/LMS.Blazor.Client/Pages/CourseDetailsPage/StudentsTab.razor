@@ -112,12 +112,12 @@
     {
         if (user != null)
         {
-            var newStudent = new CourseParticipantWithRoleInfoDto
+            var newStudent = new CourseParticipantDto
             {
                 Id = user.Id,
                 FullName = $"{user.FirstName} {user.LastName}",
                 Email = user.Email,
-                Role = user.Roles.FirstOrDefault() ?? ""
+                Roles = user.Roles
             };
 
             Students = [newStudent, .. Students];
