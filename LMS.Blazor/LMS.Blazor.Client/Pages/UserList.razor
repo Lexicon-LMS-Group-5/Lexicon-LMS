@@ -141,51 +141,67 @@ else
 
     @if (_activeModal != ModalType.None)
     {
-        <div class="modal fade show d-block" tabindex="-1">
-            <div class="modal-dialog">
+        <div class="modal fade @( _isModalVisible ? "show" : "" ) d-block" tabindex="-1"
+             @onclick="CloseModal">
+            <div class="modal-dialog" @onclick:stopPropagation="true">
                 <div class="modal-content">
-                    @if (_activeModal == ModalType.EditUser)
+                    @switch (_activeModal)
                     {
-                        <div class="modal-header">
-                            <h5>Edit User</h5>
-                            <button class="btn-close" @onclick="CloseModal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <EditUserForm @key="_selectedUserId"
-                                          Id="@_selectedUserId"
-                                          OnSaved="HandleUserSaved"
-                                          OnCancel="CloseModal" />
-                        </div>
-                    }
-                    else if (_activeModal == ModalType.CreateUser)
-                    {
-                        <div class="modal-header">
-                            <h5>Add Teacher</h5>
-                            <button class="btn-close" @onclick="CloseModal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <CreateUserForm OnSaved="HandleUserSaved"
-                                            OnCancel="CloseModal" />
-                        </div>
-                    }
-                    else if (_activeModal == ModalType.DeleteUser)
-                    {
-                        <div class="modal-header">
-                            <h5>Confirmation </h5>
-                            <button class="btn-close" @onclick="CloseModal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <DeleteUserConfirmation @key="_selectedUserId"
-                                               UserId="@_selectedUserId"
-                                               UserName="@_selectedUserName"
-                                               OnDeleted="HandleUserSaved"
-                                               OnCancel="CloseModal" />
-                        </div>
+                        case ModalType.EditUser:
+                            <div class="modal-header">
+                                <h5>Edit User</h5>
+                                <button class="btn-close" @onclick="CloseModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <EditUserForm @key="_selectedUserId"
+                                              Id="@_selectedUserId"
+                                              OnSaved="HandleUserSaved"
+                                              OnCancel="CloseModal" />
+                            </div>
+                            break;
+
+                        case ModalType.CreateUser:
+                            <div class="modal-header">
+                                <h5>Add Teacher</h5>
+                                <button class="btn-close" @onclick="CloseModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <CreateUserForm OnSaved="HandleUserSaved"
+                                                OnCancel="CloseModal" />
+                            </div>
+                            break;
+
+                        case ModalType.CreateStudent:
+                            <div class="modal-header">
+                                <h5>Add Student</h5>
+                                <button class="btn-close" @onclick="CloseModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <CreateStudentForm @key="_courseIdTemp"
+                                                   CourseId="@_courseIdTemp"
+                                                   OnSaved="HandleUserSaved"
+                                                   OnCancel="CloseModal" />
+                            </div>
+                            break;
+
+                        case ModalType.DeleteUser:
+                            <div class="modal-header">
+                                <h5>Confirmation</h5>
+                                <button class="btn-close" @onclick="CloseModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <DeleteUserConfirmation @key="_selectedUserId"
+                                                        UserId="@_selectedUserId"
+                                                        UserName="@_selectedUserName"
+                                                        OnDeleted="HandleUserSaved"
+                                                        OnCancel="CloseModal" />
+                            </div>
+                            break;
                     }
                 </div>
             </div>
         </div>
-
-        <div class="modal-backdrop fade show"></div>
+        <div class="modal-backdrop fade @( _isModalVisible ? "show" : "" )">
+        </div>
     }
 }
