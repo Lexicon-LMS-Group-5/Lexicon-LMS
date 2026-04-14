@@ -11,7 +11,7 @@ public partial class CreateCourseForm
     private IApiService ApiService { get; set; } = default!;
 
     [SupplyParameterFromForm]
-    private CreateCourseCommandDto? Model { get; set; }
+    private CreateCourseDto? Model { get; set; }
 
     [Parameter]
     public string? ModalId { get; set; }
@@ -62,7 +62,7 @@ public partial class CreateCourseForm
 
         try
         {
-            var response = await ApiService.PostAsync<CreateCourseCommandDto, CreateCourseResultDto>("api/courses", Model)
+            var response = await ApiService.PostAsync<CreateCourseDto, CreateCourseResultDto>("api/courses", Model)
                 ?? throw new Exception("No course returned");
 
             var newListItem = new CourseListItemDto

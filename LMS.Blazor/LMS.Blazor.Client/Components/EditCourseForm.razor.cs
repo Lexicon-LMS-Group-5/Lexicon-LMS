@@ -12,7 +12,7 @@ public partial class EditCourseForm
     private IApiService ApiService { get; set; } = default!;
 
     [Parameter]
-    public UpdateCourseCommandDto? Model { get; set; }
+    public CourseUpdateDto? Model { get; set; }
 
     [Parameter]
     public RenderFragment? FormContent { get; set; }
@@ -55,7 +55,7 @@ public partial class EditCourseForm
         try
         {
             EditContext.Validate();
-            var result = await ApiService.PutAsync<UpdateCourseCommandDto, CourseDetailsDto>($"api/courses/{Model.Id}", Model)
+            var result = await ApiService.PutAsync<CourseUpdateDto, CourseDetailsDto>($"api/courses/{Model.Id}", Model)
                 ?? throw new Exception("Updated course was not received");
 
             

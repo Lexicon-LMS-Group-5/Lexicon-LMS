@@ -39,7 +39,7 @@ public partial class CourseController : ControllerBase
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
-        var result = await serviceManager.CourseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
+        var result = await serviceManager.CourseService.GetCourseDetailsAsync(id);
 
         return Ok(result);
     }
@@ -60,7 +60,7 @@ public partial class CourseController : ControllerBase
     [Authorize(Roles = Roles.Teacher)]
     [HttpPost()]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<CourseDetailsDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
+    public async Task<ActionResult<CourseDetailsDto>> CreateCourse([FromBody] CreateCourseDto command)
     {
         // Get the user ID and add it to the DTO
         command.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -76,7 +76,7 @@ public partial class CourseController : ControllerBase
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<ActionResult<CourseDetailsDto>> Update(
         [FromRoute] int cid,
-        [FromBody] UpdateCourseCommandDto dto,
+        [FromBody] CourseUpdateDto dto,
         CancellationToken ct)
     {
         dto.Id = cid;

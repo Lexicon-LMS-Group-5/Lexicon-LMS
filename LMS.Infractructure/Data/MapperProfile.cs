@@ -11,15 +11,14 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         CreateMap<UserRegistrationDto, ApplicationUser>();
-        CreateMap<CreateCourseCommandDto, Course>();
+        CreateMap<CreateCourseDto, Course>();
         CreateMap<Course, CreateCourseResultDto>();
         CreateMap<Course, CourseListItemDto>();
         CreateMap<BasePageQueryDto, PagedResultMetaDataDto>();
         CreateMap<Course, CourseDetailsDto>();
-        CreateMap<UpdateCourseCommandDto, Course>();
-        CreateMap<Course, UpdateCourseCommandDto>();
+        CreateMap<CourseUpdateDto, Course>();
+        CreateMap<Course, CourseUpdateDto>();
         CreateMap<ApplicationUser, CourseParticipantDto>();
-        CreateMap<Module, CourseModuleListItemDto>();
 		CreateMap<Activity, ActivityReadDto>();
         CreateMap<ActivityUpsertDto, Activity>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
