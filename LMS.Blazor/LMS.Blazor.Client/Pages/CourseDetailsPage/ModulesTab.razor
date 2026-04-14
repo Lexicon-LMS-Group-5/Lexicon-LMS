@@ -192,13 +192,7 @@
             Modules = await ApiService.GetAsync<IReadOnlyList<ModuleReadDto>>($"api/modules/{CourseId}")
                 ?? throw new Exception("Could not fetch modules");
 
-            var moduleStart = CourseDetails.Modules.LastOrDefault()?.EndDate;
-            CreateModuleModel ??= new();
-            CreateModuleModel.CourseId = CourseDetails.Id;
-            CreateModuleModel.TimeCond ??= new();
-            CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
-            CreateModuleModel.StartDate = moduleStart;
-            CreateModuleEditContext ??= new(CreateModuleModel);
+            InitializeModuleFormState();
         } catch(Exception ex)
         {
             ErrorMessage = ex.Message;
@@ -216,24 +210,36 @@
     private void OnCreateModuleSubmissionFailedAsync() => IsFormLoading = false;
     private async Task OnCreateModuleSubmissionCanceledAsync()
     {
-        ResetFormState();
+        ResetModuleFormState();
         IsFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
     }
-    private async Task OnCreateModuleSubmissionSucceededAsync(CourseModuleListItemDto moduleDto)
+
+    private async Task OnCreateModuleSubmissionSucceededAsync(ModuleReadDto moduleDto)
     {
         // Re-initialize form state
-        ResetFormState();
+        ResetModuleFormState();
 
         // Update the Modules list
-        CourseDetails.Modules = [.. CourseDetails.Modules, moduleDto];
+        Modules = [.. Modules, moduleDto];
         IsFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
     }
 
-    private void ResetFormState()
+    private void InitializeModuleFormState()
     {
-        var moduleStart = CourseDetails.Modules.LastOrDefault()?.EndDate;
+        var moduleStart = Modules.LastOrDefault()?.EndDate ?? CourseDetails.StartDate;
+        CreateModuleModel ??= new();
+        CreateModuleModel.CourseId = CourseDetails.Id;
+        CreateModuleModel.TimeCond ??= new();
+        CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
+        CreateModuleModel.StartDate = moduleStart;
+        CreateModuleEditContext ??= new(CreateModuleModel);
+    }
+
+    private void ResetModuleFormState()
+    {
+        var moduleStart = Modules.LastOrDefault()?.EndDate;
         CreateModuleModel = new();
         CreateModuleModel.CourseId = CourseDetails.Id;
         CreateModuleModel.TimeCond ??= new();
@@ -241,6 +247,9 @@
         CreateModuleModel.StartDate = moduleStart;
         CreateModuleEditContext = new(CreateModuleModel);
     }
+
+    private void OnCreateActivitySubmissionRequestedAsync() => IsFormLoading = true;
+    private void OnCreateActivitySubmissionFailedAsync() => IsFormLoading = false;
 
     private async Task ShowModalAsync(string modalId)
     {

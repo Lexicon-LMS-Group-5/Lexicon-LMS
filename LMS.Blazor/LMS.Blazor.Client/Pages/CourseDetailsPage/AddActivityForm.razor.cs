@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace LMS.Blazor.Client.Pages.CourseDetailsPage;
 
-public partial class AddModuleForm
+public partial class AddActivityForm
 {
     [Inject]
     private IApiService ApiService { get; set; } = default!;
 
     [Parameter]
-    public ModuleUpsertDto? Model { get; set; }
+    public ActivityUpsertDto? Model { get; set; }
 
     [Parameter]
     public EditContext EditContext { get; set; } = default!;
@@ -33,10 +33,10 @@ public partial class AddModuleForm
     public EventCallback OnSubmissionCanceled { get; set; }
 
     [Parameter]
-    public EventCallback<ModuleReadDto> OnSubmissionSucceeded { get; set; }
+    public EventCallback<ActivityReadDto> OnSubmissionSucceeded { get; set; }
 
     private string? ErrorMessage { get; set; }
-    private ErrorBoundary? AddModuleFormErrorBoundary { get; set; }
+    private ErrorBoundary? AddActivityFormErrorBoundary { get; set; }
     private async Task SubmitAsync()
     {
         if (Model == null || !EditContext.IsModified())
@@ -55,17 +55,29 @@ public partial class AddModuleForm
                 throw new Exception("Module is missing scheduling information");
             Model.EndDate = Model.StartDate + Model.TimeCond.Duration;
             EditContext.Validate();
-            var result = await ApiService.PostAsync<ModuleUpsertDto, ModuleReadDto>($"api/modules/{Model.CourseId}", Model)
+            var result = await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>($"api/activities/{Model.ModuleId}", Model)
                 ?? throw new Exception("Updated course was not received");
 
+            var newModule = new ActivityReadDto
+            {
+                Id = result.Id,
+                Name = result.Name,
+                Description = result.Description,
+                StartDate = result.StartDate,
+                EndDate = result.EndDate,
+                ActivityTypeId = result.ActivityTypeId,
+                ActivityTypeName = result.ActivityTypeName,
+                ActivityTypeTimeExclusive = result.ActivityTypeTimeExclusive
+            };
+
             if (OnSubmissionSucceeded.HasDelegate)
-                await OnSubmissionSucceeded.InvokeAsync(result);
+                await OnSubmissionSucceeded.InvokeAsync(newModule);
         }
         catch (Exception ex)
         {
             if (OnSubmissionFailed.HasDelegate)
                 await OnSubmissionFailed.InvokeAsync();
-            
+
             ErrorMessage = ex.Message;
             throw;
         }

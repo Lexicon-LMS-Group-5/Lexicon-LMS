@@ -1,0 +1,30 @@
+﻿<ErrorBoundary @ref="AddActivityFormErrorBoundary">
+    <ChildContent>
+        <EditForm EditContext="EditContext"
+                  OnValidSubmit="SubmitAsync">
+            <DataAnnotationsValidator />
+            @if (FormContent != null)
+            {
+                @FormContent
+            }
+            @if (FormActions != null)
+            {
+                @FormActions
+            }
+        </EditForm>
+    </ChildContent>
+    <ErrorContent>
+        <div class="d-flex w-100 h-100 flex-column justify-content-center align-items-middle p-5">
+            <div class="flex flex-column text-center justify-content-center align-items-middle gap-5">
+                <h3 class="p-5">Something went wrong...</h3>
+
+                @if (ErrorMessage != null)
+                {
+                    <p>@ErrorMessage</p>
+                }
+              
+                <button class="btn btn-primary" @onclick="() => AddActivityFormErrorBoundary?.Recover()">Try to reload</button>
+            </div>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
