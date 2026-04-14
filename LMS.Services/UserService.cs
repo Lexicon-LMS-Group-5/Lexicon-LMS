@@ -48,7 +48,7 @@ public class UserService : IUserService
     }
 
     public async Task<UserReadDto> UpdateUserAsync(
-    UpdateUserRequest request,
+    UpdateUserContext request,
     string id,
     UserUpdateDto dto,
     CancellationToken ct)
@@ -85,5 +85,22 @@ public class UserService : IUserService
         }
 
         return mapper.Map<UserReadDto>(user);
+    }
+
+    public async Task<bool> DeleteUserByIdAsync(string id, CancellationToken ct)
+    {
+        var user = await userManager.FindByIdAsync(id);
+
+        if (user == null)
+            return false;
+
+        var result = await userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return true;
     }
 }

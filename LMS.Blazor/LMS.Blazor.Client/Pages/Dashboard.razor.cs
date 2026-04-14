@@ -34,42 +34,42 @@ public partial class Dashboard
         if (!authenticationState.User.IsInRole(Roles.Teacher))
         {
             Navigation.NavigateTo("my-course");
-        } else
-        {
-            PageState = new(isLoading: true, data: null);
-
-            try
-            {
-                MyCourseState = new(isLoading: true, data: null);
-
-                var result = await ApiService.GetAsync<CourseDetailsDto>("api/courses/my-course");
-                
-                if (result != null)
-                {
-                    MyCourseState = new(isLoading: false, data: result);
-                    MyCourse = result;
-                }
-            } catch
-            {
-                MyCourseState = new(isLoading: false, data: null, error: "Could not load your Course");
-            } finally
-            {
-                MyCourseState = new(isLoading: false, data: null);
-            }
-
-            try
-            {
-                var result = await ApiService.GetAsync<CoursesQueryResultDto>("api/courses")
-                    ?? throw new Exception("Could not fetch Courses");
-                PageState = new(isLoading: false, data: result);
-
-                AllCourses = [.. result.Items];
-                ActiveCourses = [.. result.Items.Where(c => c.EndDate > DateTime.Now)];
-            }
-            catch (Exception ex) {
-                PageState = new(isLoading: false, data: null, error: ex.Message);
-            } 
+            return;
         }
+
+        PageState = new(isLoading: true, data: null);
+
+        try
+        {
+            MyCourseState = new(isLoading: true, data: null);
+
+            var result = await ApiService.GetAsync<CourseDetailsDto>("api/courses/my-course");
+                
+            if (result != null)
+            {
+                MyCourseState = new(isLoading: false, data: result);
+                MyCourse = result;
+            }
+        } catch
+        {
+            MyCourseState = new(isLoading: false, data: null, error: "Could not load your Course");
+        } finally
+        {
+            MyCourseState = new(isLoading: false, data: null);
+        }
+
+        try
+        {
+            var result = await ApiService.GetAsync<CoursesQueryResultDto>("api/courses")
+                ?? throw new Exception("Could not fetch Courses");
+            PageState = new(isLoading: false, data: result);
+
+            AllCourses = [.. result.Items];
+            ActiveCourses = [.. result.Items.Where(c => c.EndDate > DateTime.Now)];
+        }
+        catch (Exception ex) {
+            PageState = new(isLoading: false, data: null, error: ex.Message);
+        } 
     }
 
     private async Task UpdateCourseListsAsync(Func<IReadOnlyList<CourseListItemDto>, IReadOnlyList<CourseListItemDto>> updateList)

@@ -1,0 +1,69 @@
+﻿@if (IsLoading || CourseDetails == null)
+{
+    <div>
+        <div class="d-flex justify-content-between w-100">
+            <h1 class="placeholder-glow">
+                <span class="rounded placeholder col-3"></span>
+            </h1>
+            <div class="btn btn-primary disabled my-auto d-flex gap-2" aria-disabled="true">
+                <div class="my-auto d-flex flex-column justify-content-center">
+                    <PencilIcon Size="16" />
+                </div>
+                <div class="">
+                    Edit course
+                </div>
+            </div>
+        </div>
+
+        <p class="placeholder-glow">
+            <span class="rounded placeholder col-3"></span>
+        </p>
+        <div class="text-secondary d-flex align-items-middle gap-2 placeholder-glow">
+            <span class="rounded-circle placeholder my-auto" style="width: 20px; height: 20px;"></span> 
+            <span class="rounded placeholder col-1"></span> 
+            <span class="rounded placeholder col-1 rounded"></span>
+        </div>
+    </div>
+} else
+{
+    <div>
+        <div class="d-flex justify-content-between w-100">
+            <h1>@CourseDetails.Name</h1>
+            <button 
+                class="btn btn-primary my-auto d-flex gap-2"
+                type="button"
+                @onclick="OpenModalAsync">
+                <div class="my-auto d-flex flex-column justify-content-center">
+                    <PencilIcon Size="16" />    
+                </div>
+                <div class="">
+                Edit course
+                </div>
+            </button>
+        </div>
+
+        <p>@CourseDetails.Description</p>
+        <div class="text-secondary d-flex align-items-middle gap-2">
+            <CalendarIcon Size="20" /> @CourseDetails.StartDate.ToShortDateString() - @CourseDetails.EndDate.ToShortDateString()
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public CourseDetailsDto CourseDetails { get; set; } = default!;
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenModal { get; set; }
+
+    private async Task OpenModalAsync()
+    {
+        if(OnOpenModal.HasDelegate)
+        {
+            await OnOpenModal.InvokeAsync();
+        }
+    }
+}

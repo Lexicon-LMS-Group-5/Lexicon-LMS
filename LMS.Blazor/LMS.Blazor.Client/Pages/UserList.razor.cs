@@ -35,11 +35,14 @@ public partial class UserList
         EditUser,
         CreateUser,
         CreateStudent,
+        DeleteUser,
     }
 
     private ModalType _activeModal = ModalType.None;
 
     private string _selectedUserId = "";
+    private string _selectedUserName = "";
+    private string? _currentUserId;
 
     private const int _courseIdTemp = 3;
 
@@ -57,6 +60,13 @@ public partial class UserList
     private void OpenTempModal()
     {
         _activeModal = ModalType.CreateStudent;
+    }
+
+    private void OpenDeleteModal(string userId, string userName)
+    {
+        _selectedUserId = userId;
+        _selectedUserName = userName;
+        _activeModal = ModalType.DeleteUser;
     }
 
     private void CloseModal()
@@ -81,6 +91,10 @@ public partial class UserList
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
+
+        var me = await ApiService.GetAsync<UserReadDto>("api/users/me");
+        _currentUserId = me?.Id;
+
         try
         {
             _allUsers = await ApiService.GetAsync<List<UserReadDto>>("api/users");
@@ -184,5 +198,10 @@ public partial class UserList
 
         _allUsers = await ApiService.GetAsync<List<UserReadDto>>("api/users");
         ApplyFilterAndSort();
+    }
+
+    private bool IsCurrentUser(string userId)
+    {
+        return _currentUserId == userId;
     }
 }
