@@ -1,0 +1,135 @@
+@using LMS.Shared.DTOs
+@using System.ComponentModel.DataAnnotations
+@inject IApiService ApiService
+
+<EditForm Model="@model" OnValidSubmit="SaveModule">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="d-flex flex-column gap-2">
+
+        <!-- Module Name -->
+        <div class="mb-3">
+            <label class="form-label">Module Name</label>
+            <input type="text" class="form-control" @bind="model.Name" />
+            <ValidationMessage For="@(() => model.Name)" class="text-danger" />
+            <div class="form-text">Add a descriptive name for your module.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" @bind="model.Description"></textarea>
+            <div class="form-text">Describe what this module covers.</div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" @bind="StartDate" />
+        </div>
+
+        <!-- End Date -->
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" @bind="EndDate" />
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-end gap-2 w-100">
+
+            <button type="button" class="btn btn-secondary" @onclick="HandleClose">
+                @ModalCloseButton
+            </button>
+
+            <button type="submit" class="btn btn-primary" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    <span class="ms-2">Saving...</span>
+                }
+                else
+                {
+                    <span>Save and continue</span>
+                }
+            </button>
+
+        </div>
+
+        @if (!string.IsNullOrEmpty(Error))
+        {
+            <div class="text-danger mt-2">@Error</div>
+        }
+
+    </div>
+</EditForm>
+
+@code {
+
+    public class ModuleFormModel
+    {
+        [Required(ErrorMessage = "Module name is required")]
+        public string Name { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+    }
+
+    [Parameter] public RenderFragment? ModalCloseButton { get; set; }
+    [Parameter] public int CourseId { get; set; }
+    [Parameter] public EventCallback OnCreated { get; set; }
+
+    private ModuleFormModel model = new();
+
+    private DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+
+    private bool IsSaving;
+    private string? Error;
+
+    private async Task SaveModule()
+    {
+        IsSaving = true;
+        Error = null;
+
+        try
+        {
+            var dto = new ModuleUpsertDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                StartDate = StartDate.ToDateTime(TimeOnly.MinValue),
+                EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
+                CourseId = CourseId
+            };
+
+            await ApiService.PostAsync<ModuleUpsertDto, ModuleReadDto>(
+                $"api/modules/{CourseId}", dto);
+
+            ResetForm();
+            await OnCreated.InvokeAsync();
+        }
+        catch
+        {
+            Error = "Something went wrong. Please try again.";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private void ResetForm()
+    {
+        model = new ModuleFormModel();
+
+        StartDate = DateOnly.FromDateTime(DateTime.Today);
+        EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+
+        Error = null;
+    }
+
+    private void HandleClose()
+    {
+        ResetForm();
+    }
+}

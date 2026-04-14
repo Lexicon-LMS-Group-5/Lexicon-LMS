@@ -1,0 +1,184 @@
+﻿@page "/dashboard"
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="d-flex flex-column gap-5 pb-5">
+    <h1>Dashboard</h1>
+
+    <div class="d-flex flex-column gap-3 p-3">
+        <h2 class="fs-5">Quick Actions</h2>
+        <div class="d-flex gap-2">
+            <div 
+                data-bs-toggle="modal"
+                data-bs-target="#createCourseFormModal">
+                <QuickActionButton>
+                    <ButtonIcon>
+                        <CirclePlusIcon />
+                    </ButtonIcon>
+                    <ButtonText>
+                        Add a new Course
+                    </ButtonText>
+                </QuickActionButton>
+            </div>
+        </div>
+    </div>
+
+    <TabContainer CurrentRoute="/dashboard" TabTitles="@(["Overview", "Courses", "Create new Course"])">
+        <Tab Title="Overview">
+            <div class="container p-0">
+                <div class="row row-cols-1 row-cols-lg-2">
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Active Courses @(ActiveCourses != null ? $"({ActiveCourses.Count.ToString()})" : "")</h2>
+                                <a class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover" href="/dashboard?tab=courses">
+                                    Show all
+                                    <span style="transform: rotate(90deg);">
+                                        <ChevronUpIcon />
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="">
+                                @if(ActiveCourses != null)
+                                {
+                                    <ul class="list-group">
+                                        @foreach(var course in ActiveCourses)
+                                        {
+                                            <li class="list-group-item">
+                                                <div class="p-2">
+                                                    <div class="d-flex justify-content-between align-items-middle">
+                                                        <div class="fs-6">
+                                                            <NavLink 
+                                                                href="@($"/dashboard/courses/{course.Id}?ref=dashboard&refTab=overview")"
+                                                                class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover">
+                                                                @course.Name
+                                                            </NavLink>
+                                                        </div>
+                                                        @if (MyCourse?.Id == course.Id) {
+                                                            <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                                        }
+                                                    </div>
+                                                    <small class="d-flex text-secondary">
+                                                        @course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex flex-column gap-3 p-3">
+                            <div class="d-flex justify-content-between">
+                                <h2 class="fs-5">Latest Activity</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Tab>
+        <Tab Title="Courses">
+            <div class="d-flex flex-column gap-3 p-3">
+                <header>
+                    <h2 class="fs-5">All Courses</h2>
+                </header>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Search courses...">
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary d-flex align-items-middle gap-2" data-bs-toggle="modal" data-bs-target="#createCourseFormModal">
+                            <div class="d-flex align-items-middle m-auto">
+                                <CirclePlusIcon Size="20" />
+                            </div>
+                            Add a new Course
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    @if (PageState.IsLoading)
+                    {
+                        <div>Loading courses...</div>
+                    }
+                    else if (AllCourses != null)
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col"><span class="visually-hidden">My assigned course</span></th>
+                                    <th scope="col">Start date</th>
+                                    <th scope="col">End date</th>
+                                    <th scope="col">Students</th>
+                                    <th scope="col">Modules</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var item in AllCourses.Select((course, index) => (course, index)))
+                                {
+                                    <tr @key="item.course.Id">
+                                        <th scope="row">
+                                            <NavLink 
+                                                href="@($"/dashboard/courses/{item.course.Id}?ref=dashboard&refTab=courses")"
+                                                class="icon-link text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover">
+                                                @item.course.Name
+                                            </NavLink>
+                                        </th>
+                                        <td>@if (MyCourse?.Id == item.course.Id)
+                                            {
+                                                <div class="badge rounded-pill text-bg-primary my-auto">My Course</div>
+                                            }
+                                        </td>
+                                        <td>@item.course.StartDate.ToShortDateString()</td>
+                                        <td>@item.course.EndDate.ToShortDateString()</td>
+                                        <td>@item.course.StudentsCount</td>
+                                        <td>@item.course.ModulesCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </Tab>
+        <Tab Title="Create new Course">
+            <div class="d-flex flex-column gap-3 p-3">
+                <header>
+                    <h2 class="fs-5">Create a new Courses</h2>
+                </header>
+                <CreateCourseForm OnCourseListsUpdated="UpdateCourseListsAsync" />
+            </div>
+        </Tab>
+    </TabContainer>
+</div>
+
+<div class="modal fade" id="createCourseFormModal" tabindex="-1" aria-labelledby="createCourseFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content h-100">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="createCourseFormModalLabel">
+                    Create a new Course
+                </h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body h-100">
+                <CreateCourseForm ModalId="createCourseFormModal" OnCourseListsUpdated="UpdateCourseListsAsync">
+                    <ModalCloseButton>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </ModalCloseButton>
+                </CreateCourseForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if(Notification != null)
+{
+<div class="toast-container position-fixed bottom-0 start-0 z-3 d-flex justify-content-center w-100">
+    <div class="alert alert-success shadow-sm" role="alert">
+        @Notification
+    </div>
+</div>
+}

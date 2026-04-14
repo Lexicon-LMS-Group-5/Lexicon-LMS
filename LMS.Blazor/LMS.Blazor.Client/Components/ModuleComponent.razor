@@ -1,42 +1,71 @@
 ﻿@using LMS.Shared.DTOs
 @inject NavigationManager NavigationManager
 
-<div class="card mb-4 shadow module-card" @onclick="NavigateToModule">
-    <div class="card-body">
-        <h4 class="card-title">@Module.Name</h4>
-        <p class="card-text text-muted">@Module.Description</p>
+<div class="accordion mb-4 shadow" id="moduleAccordion-@Module.Id">
+    <div class="accordion-item">
 
-        <small class="text-secondary">
-            <i class="bi bi-calendar"></i>
-            @Module.StartDate.ToShortDateString()
-            -
-            @Module.EndDate.ToShortDateString()
-        </small>
+        <h2 class="accordion-header" id="heading-@Module.Id">
+            <button class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-@Module.Id"
+                    aria-expanded="false"
+                    aria-controls="collapse-@Module.Id">
 
+                <div class="w-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">@Module.Name</h4>
 
+                        <small class="text-muted">
+                            @Module.StartDate.ToShortDateString()
+                            -
+                            @Module.EndDate.ToShortDateString()
+                        </small>
+                    </div>
 
-        <hr />
+                    <div class="text-muted small">
+                        @Module.Description
+                    </div>
+                </div>
 
-        <h5 class="card-title">Activities</h5>
+            </button>
+        </h2>
 
+        <div id="collapse-@Module.Id"
+             class="accordion-collapse collapse"
+             aria-labelledby="heading-@Module.Id"
+             data-bs-parent="#moduleAccordion-@Module.Id">
 
-        <div class="activities mt-3">
-            @foreach (var activity in Activities)
-            {
-                <ActivityComponent Activity="activity"
-                                   CourseId="@CourseId"
-                                   ModuleId="@Module.Id" />
-            }
+            <div class="accordion-body">
+                <button class="btn btn-outline-secondary btn-sm mb-3"
+                        @onclick="NavigateToModule">
+                    Go to Module →
+                </button>
+                <h5 class="card-title">Activities</h5>
+
+                <div class="row g-3 mt-3 activities">
+                    @foreach (var activity in Activities)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <ActivityComponent Activity="activity"
+                                               CourseId="@CourseId"
+                                               ModuleId="@Module.Id" />
+                        </div>
+                    }
+                </div>
+
+            </div>
         </div>
+
     </div>
 </div>
 
 @code {
     [Parameter, EditorRequired]
-    public CourseModuleListItemDto Module { get; set; } = default!;
+    public ModuleReadDto Module { get; set; } = default!;
 
     [Parameter]
-    public IEnumerable<ActivityReadDto> Activities { get; set; }
+    public IEnumerable<ActivityReadDto> Activities { get; set; } = [];
 
     [Parameter]
     public int CourseId { get; set; }  

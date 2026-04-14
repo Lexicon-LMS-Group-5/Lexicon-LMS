@@ -1,26 +1,86 @@
-﻿<form class="d-flex flex-column gap-2">
-    <div class="mb-3">
-        <label for="courseName" class="form-label">Course Name</label>
-        <input type="text" class="form-control" id="courseName" aria-describedby="courseNameHelp">
-        <div id="courseNameHelp" class="form-text">Add a descriptive name for your course.</div>
-    </div>
-    <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Description</label>
-        <textarea class="form-control" id="courseDescription" rows="3" aria-describedby="courseDescriptionHelp"></textarea>
-        <div id="courseDescriptionHelp" class="form-text">Describe your course content.</div>
-    </div>
-    <div class="mb-3 form-check">
-        <label class="form-check-label" for="addCreator">Add me</label>
-        <input type="checkbox" class="form-check-input" id="addCreator" aria-describedby="addCreatorHelp">
-        <div id="addCreatorHelp" class="form-text">Set this as your assigned Course.</div>
-    </div>
-    <div class="d-flex justify-content-end gap-2 w-100">
-        @ModalCloseButton
-        <button type="button" class="btn btn-primary">Save and continue</button>
-    </div>
-</form>
+﻿<ErrorBoundary @ref="CreateCourseFormErrorBoundary">
+    <ChildContent>
+        <EditForm class="d-flex flex-column gap-2" EditContext="editContext" OnValidSubmit="SubmitAsync" FormName="create-course-form">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="courseName" class="form-label">Course Name</label>
+                    <InputText 
+                        @bind-Value="Model!.Name"
+                        type="text" 
+                        class="form-control" 
+                        id="courseName" 
+                        aria-describedby="courseNameHelp" />
+ 
+                    <ValidationMessage For="() => Model!.Name" class="text-danger" />
+                <div id="courseNameHelp" class="form-text">Add a descriptive name for the course.</div>
+            </div>
+            <div class="mb-3">
+                <label for="courseDescription" class="form-label">Description</label>
+                <InputTextArea 
+                    @bind-Value="Model!.Description"
+                    class="form-control" 
+                    id="courseDescription" 
+                    rows="3" 
+                    aria-describedby="courseDescriptionHelp">
+                </InputTextArea>
+                <ValidationMessage For="() => Model!.Description" />
+                <div id="courseDescriptionHelp" class="form-text">Describe the course content.</div>
+            </div>
+            <div class="mb-3 d-flex gap-3">
+                <div class="d-flex flex-column gap-2">
+                    <label class="form-check-label" for="startDate">Start date</label>
+                    <InputDate 
+                        @bind-Value="Model!.StartDate" 
+                        class="form-control"
+                        id="startDate"/>
+                    <ValidationMessage For="() => Model!.StartDate" />
+                    <div id="startDateHelp" class="form-text">Set the start date for the Course.</div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <label class="form-check-label" for="endDate">End date</label>
+                    <InputDate 
+                        @bind-Value="Model!.EndDate" 
+                        class="form-control"
+                        id="endDate"/>
+                    <ValidationMessage For="() => Model!.EndDate" />
+                    <div id="endDateHelp" class="form-text">Set the end date for the Course.</div>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <label class="form-check-label" for="addCreator">Add me</label>
+                <InputCheckbox 
+                    @bind-Value="Model!.AddCreator"
+                    type="checkbox" 
+                    class="form-check-input" 
+                    id="addCreator" 
+                    aria-describedby="addCreatorHelp" />
+                <div id="addCreatorHelp" class="form-text">Set this as your assigned Course.</div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 w-100">
+                @ModalCloseButton
+                <button 
+                    disabled="@(!IsSaveEnabled)" 
+                    type="submit" 
+                    data-bs-dismiss="@(ModalId != null ? "modal" : "")" 
+                    data-bs-target="#@ModalId" 
+                    class="btn btn-primary">
+                    Save and continue
+                </button>
+            </div>
+        </EditForm>
+    </ChildContent>
+    <ErrorContent>
+        <div class="d-flex w-100 h-100 flex-column justify-content-center align-items-middle">
+            <div class="flex flex-column text-center justify-content-center align-items-middle gap-5">
+                <h3 class="p-5">Something went wrong...</h3>
 
-@code{
-    [Parameter]
-    public RenderFragment? ModalCloseButton { get; set; }
-}
+                @if(ErrorMessage != null)
+                {
+                    <p>@ErrorMessage</p>
+                }
+              
+                <button class="btn btn-primary" @onclick="() => CreateCourseFormErrorBoundary?.Recover()">Try to reload</button>
+            </div>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>

@@ -49,17 +49,20 @@ public class UserRepository(ApplicationDbContext context) : RepositoryBase<Appli
 
     private IQueryable<UserRoleResult> GetUserRolesQuery(bool trackChanges)
     {
-        var users = trackChanges ? _context.Users.Include(u => u.Course) : _context.Users.Include(u => u.Course).AsNoTracking();
+        var users = trackChanges ? _context.Users.Include(u => u.Course)
+                                 : _context.Users.Include(u => u.Course).AsNoTracking();
 
         return from user in users
                join userRole in _context.UserRoles
-                   on user.Id equals userRole.UserId
+                   on user.Id equals userRole.UserId into ur
+               from userRole in ur.DefaultIfEmpty()
                join role in _context.Roles
-                   on userRole.RoleId equals role.Id
+                   on userRole.RoleId equals role.Id into r
+               from role in r.DefaultIfEmpty()
                select new UserRoleResult
                {
                    User = user,
-                   RoleName = role.Name!
+                   RoleName = role != null ? role.Name! : string.Empty
                };
     }
 

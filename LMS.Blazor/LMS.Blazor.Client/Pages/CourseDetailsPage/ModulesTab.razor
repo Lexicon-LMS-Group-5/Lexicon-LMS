@@ -1,0 +1,391 @@
+﻿<ErrorBoundary @ref="ModulesTabErrorBoundary">
+    <ChildContent>
+        <div class="d-flex flex-column gap-3 p-3">
+            <TabHeader Title="Modules">
+                <TabActions>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary d-flex align-items-middle gap-2" 
+                        @onclick="async () => await ShowModalAsync(CreateModuleModalId)">
+                        <div class="d-flex align-items-middle m-auto">
+                            <CirclePlusIcon Size="20" />
+                        </div>
+                        Add a new Module
+                    </button>
+                </TabActions>
+            </TabHeader>
+            <div class="modules-list rounded-3 overflow-hidden shadow-sm">
+                @foreach (var module in Modules)
+                {
+                    <button class="module-list-item accordion-button d-flex gap-3 p-3 w-100 text-start"
+                            @onclick="() => selectedModuleId = selectedModuleId == module.Id ? null : module.Id"
+                            data-bs-toggle="collapse" 
+                            data-bs-target="@($"#module-item-{module.Id}")"
+                            aria-expanded="false" 
+                            aria-controls="@($"module-item-{module.Id}")">
+                        <div class="d-flex my-auto rounded-circle bg-primary-subtle text-primary p-2">
+                            <LayersIcon />
+                        </div>
+                        <div class="d-flex flex-column gap-1 flex-grow-1">
+                            <div>
+                                @module.Name
+                            </div>
+                            <div class="text-secondary">
+                                @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
+                            </div>
+                        </div>
+                        <div class="my-auto">
+                            <div class="text-secondary" style="@(module.Id == selectedModuleId ? openedChevronIconStyles : closedChevronIconStyles)">
+                                <ChevronUpIcon />
+                            </div>
+                        </div>
+                    </button>
+                    <div class="@($"collapse {(module.Id == selectedModuleId ? "show" : "")}")" id="@($"module-item-{module.Id}")">
+                        <div class="p-4 d-flex flex-column gap-3">
+                            <div>
+                                @module.Description
+                            </div>
+                            <div>
+                                <h3 class="fs-6 fw-bold">Activities</h3>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                @foreach (var activity in module.Activities)
+                                {
+                                    <div class="p-3 bg-body rounded border">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="d-flex flex-column gap-1">
+                                                <div class="d-flex gap-2">
+                                                    <div class="badge bg-primary-subtle text-primary rounded-pill my-auto">
+                                                        @activity.ActivityTypeName
+                                                    </div>
+                                                    <div>
+                                                        @activity.Name
+                                                    </div>
+                                                </div>
+                                                <div class="text-secondary fw-bold d-flex gap-2" style="font-size: .75em">
+                                                    <CalendarIcon Size="16" /> 
+                                                    <div>@activity.EndDate.ToShortDateString()</div>
+                                                </div>
+                                            </div>
+                                            <div class="border-bottom"></div>
+                                            <div>
+                                                <div class="text-secondary fw-bold d-flex gap-2" style="font-size: .75em">
+                                                    Documents
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <button 
+                                    class="d-flex justify-content-center gap-2 p-2 align-items-middle add-activity-button rounded text-secondary"
+                                        @onclick="() => OnClickAddActivity(module)">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <CirclePlusIcon Size="20" /> 
+                                    </div>
+                                        Add a new Activity
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @* <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+                        <ModalHeader 
+                            ModalId="@CreateActivityModalId" 
+                            Title="@($"Add a new Activity to \"{module.Name}\"")" />
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </Modal> *@
+                }
+            </div>
+        </div>
+    </ChildContent>
+    <ErrorContent>
+        <div class="d-flex w-100 h-100 flex-column justify-content-center align-items-middle">
+            <div class="flex flex-column text-center justify-content-center align-items-middle gap-5">
+                <h3 class="p-5">Something went wrong...</h3>
+
+                @if (ErrorMessage != null)
+                {
+                    <p>@ErrorMessage</p>
+                }
+              
+                <button class="btn btn-primary" @onclick="() => ModulesTabErrorBoundary?.Recover()">Try to reload</button>
+            </div>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
+
+@if (CreateModuleEditContext != null)
+{
+    <Modal ModalId="@CreateModuleModalId">
+        <ModalHeader 
+            ModalId="@CreateModuleModalId" 
+            Title="Add a new Module" />
+        <AddModuleForm 
+            Model="CreateModuleModel"
+            EditContext="CreateModuleEditContext"
+            OnSubmissionRequested="OnCreateModuleSubmissionRequestedAsync"
+            OnSubmissionFailed="OnCreateModuleSubmissionFailedAsync"
+            OnSubmissionCanceled="OnCreateModuleSubmissionCanceledAsync"
+            OnSubmissionSucceeded="OnCreateModuleSubmissionSucceededAsync">
+            <FormContent>
+                <ModalBody>
+                    <AddModuleFormContent Model="CreateModuleModel" />
+                </ModalBody>
+            </FormContent>
+            <FormActions>
+                <ModalFooter>
+                    <button class="btn btn-secondary"
+                            type="button"
+                            @onclick="OnCreateModuleSubmissionCanceledAsync">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary"
+                            type="submit">
+                        Save changes
+                    </button>
+                </ModalFooter>
+            </FormActions>
+        </AddModuleForm>
+    </Modal>
+}
+
+@foreach(var module in Modules)
+{
+    <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+        @if (CreateActivityEditContext != null)
+        {
+            <ModalHeader ModalId="@GetCreateActivityModalId(module.Id)"
+                         Title="@($"Add an Activity for \"{module.Name}\"")" />
+            <AddActivityForm Model="CreateActivityModel"
+                           EditContext="CreateActivityEditContext"
+                           OnSubmissionRequested="OnCreateActivitySubmissionRequestedAsync"
+                           OnSubmissionFailed="OnCreateActivitySubmissionFailedAsync"
+                           OnSubmissionCanceled="OnCreateActivitySubmissionCanceledAsync"
+                           OnSubmissionSucceeded="OnCreateActivitySubmissionSucceededAsync">
+                <FormContent>
+                    <ModalBody>
+                        <AddActivityFormContent 
+                            Model="CreateActivityModel" 
+                            ActivityTypes="ActivityTypes" />
+                    </ModalBody>
+                </FormContent>
+                <FormActions>
+                    <ModalFooter>
+                        <button class="btn btn-secondary"
+                                type="button"
+                                @onclick="OnCreateActivitySubmissionCanceledAsync">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary"
+                                type="submit">
+                            Save changes
+                        </button>
+                    </ModalFooter>
+                </FormActions>
+            </AddActivityForm>
+        }
+    </Modal>
+}
+
+
+@code {
+    [Inject]
+    private IApiService ApiService { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
+    [Parameter]
+    public int CourseId { get; set; }
+
+    [Parameter]
+    public CourseDetailsDto CourseDetails { get; set; } = default!;
+
+    private bool IsActivitiesLoading { get; set; }
+    private IReadOnlyList<ActivityTypeReadDto> ActivityTypes { get; set; } = [];
+    private int DefaultActivityTypeId { get; set; }
+
+    private bool IsLoading { get; set; }
+    private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
+    private string? ErrorMessage { get; set; }
+    private ErrorBoundaryBase? ModulesTabErrorBoundary { get; set; }
+
+    private const string CreateModuleModalId = "createModuleModal";
+
+    private string CreateActivityModalId { get; set; } = string.Empty;
+
+    private string GetCreateActivityModalId(int moduleId) => $"createActivityModal-{moduleId}";
+
+    private int? selectedModuleId = null;
+    private string closedChevronIconStyles = "transform: rotate(90deg);";
+    private string openedChevronIconStyles = "transform: rotate(180deg);";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CourseDetails == null)
+            throw new Exception("Could not find a Course for this Module");
+        selectedModuleId = CourseDetails.Modules.FirstOrDefault()?.Id ?? null;
+
+        IsActivitiesLoading = true;
+        try
+        {
+            var activitiesResult = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activities/types")
+            ?? throw new Exception("Could not fetch activity types");
+
+            ActivityTypes = activitiesResult.ToList();
+            DefaultActivityTypeId = ActivityTypes.FirstOrDefault()?.Id
+                ?? throw new Exception("No activity types were found");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            IsActivitiesLoading = false;
+        }
+
+        IsLoading = true;
+        try
+        {
+            Modules = await ApiService.GetAsync<IReadOnlyList<ModuleReadDto>>($"api/modules/{CourseId}")
+                ?? throw new Exception("Could not fetch modules");
+
+            InitializeModuleFormState();
+            InitializeActivityFormState();
+        } catch(Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        } finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private EditContext? CreateModuleEditContext { get; set; }
+    private ModuleUpsertDto? CreateModuleModel { get; set; }
+    private bool IsModuleFormLoading { get; set; }
+    private void OnCreateModuleSubmissionRequestedAsync() => IsModuleFormLoading = true;
+    private void OnCreateModuleSubmissionFailedAsync() => IsModuleFormLoading = false;
+    private async Task OnCreateModuleSubmissionCanceledAsync()
+    {
+        ResetModuleFormState();
+        IsModuleFormLoading = false;
+        await HideModalAsync(CreateModuleModalId);
+    }
+
+    private async Task OnCreateModuleSubmissionSucceededAsync(ModuleReadDto moduleDto)
+    {
+        // Re-initialize form state
+        ResetModuleFormState();
+
+        // Update the Modules list
+        Modules = [.. Modules, moduleDto];
+        IsModuleFormLoading = false;
+        await HideModalAsync(CreateModuleModalId);
+    }
+
+    private void InitializeModuleFormState()
+    {
+        var moduleStart = Modules.LastOrDefault()?.EndDate ?? CourseDetails.StartDate;
+        CreateModuleModel ??= new();
+        CreateModuleModel.CourseId = CourseDetails.Id;
+        CreateModuleModel.TimeCond ??= new();
+        CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
+        CreateModuleModel.StartDate = moduleStart;
+        CreateModuleEditContext ??= new(CreateModuleModel);
+    }
+
+    private void ResetModuleFormState()
+    {
+        var moduleStart = Modules.LastOrDefault()?.EndDate;
+        CreateModuleModel = new();
+        CreateModuleModel.CourseId = CourseDetails.Id;
+        CreateModuleModel.TimeCond ??= new();
+        CreateModuleModel.TimeCond.StartingAfter ??= moduleStart;
+        CreateModuleModel.StartDate = moduleStart;
+        CreateModuleEditContext = new(CreateModuleModel);
+    }
+
+    private async Task OnClickAddActivity(ModuleReadDto module)
+    {
+        CreateActivityModalId = GetCreateActivityModalId(module.Id);
+        SetActivityFormState(module);
+        await ShowModalAsync(CreateActivityModalId);
+    }
+
+    private EditContext? CreateActivityEditContext { get; set; }
+    private ActivityUpsertDto? CreateActivityModel { get; set; }
+    private bool IsActivityFormLoading { get; set; }
+
+    private void OnCreateActivitySubmissionRequestedAsync() => IsActivityFormLoading = true;
+    private void OnCreateActivitySubmissionFailedAsync() => IsActivityFormLoading = false;
+    private async Task OnCreateActivitySubmissionCanceledAsync()
+    {
+        IsActivityFormLoading = false;
+        await HideModalAsync(CreateActivityModalId);
+        await Task.Delay(300);
+        ResetActivityFormState();
+    }
+
+    private async Task OnCreateActivitySubmissionSucceededAsync(ActivityReadDto activityDto)
+    {
+        // Re-initialize form state
+        ResetActivityFormState();
+
+        // Update the Modules list
+        var updatedModueles = Modules.Select(m =>
+        {
+            if (m.Id != activityDto.ModuleId)
+                return m;
+
+            m.Activities = [.. m.Activities, activityDto];
+            return m;
+        }).ToList();
+        Modules = updatedModueles;
+        IsModuleFormLoading = false;
+        await HideModalAsync(CreateActivityModalId);
+    }
+
+    private void InitializeActivityFormState()
+    {
+        CreateActivityModel ??= new();
+        CreateActivityModel.ActivityTypeId = DefaultActivityTypeId;
+        CreateActivityEditContext ??= new(CreateActivityModel);
+    }
+
+    private void SetActivityFormState(ModuleReadDto module)
+    {
+        var activityStart = module.Activities.LastOrDefault()?.EndDate ?? module.StartDate;
+        var defaultTimeSpan = new TimeSpan(0, hours: 1, 0, 0);
+
+        CreateActivityModel ??= new();
+        CreateActivityModel.ModuleId = module.Id;
+        CreateActivityModel.ActivityTypeId = DefaultActivityTypeId;
+        CreateActivityModel.TimeCond ??= new();
+        CreateActivityModel.TimeCond.StartingAfter ??= activityStart;
+        CreateActivityModel.TimeCond.Duration = defaultTimeSpan;
+        CreateActivityModel.StartDate = activityStart;
+        CreateActivityModel.EndDate = activityStart.Add(defaultTimeSpan);
+        CreateActivityEditContext ??= new(CreateActivityModel);
+    }
+
+    private void ResetActivityFormState()
+    {
+        CreateActivityModel = new();
+        CreateActivityEditContext = new(CreateActivityModel);
+    }
+
+    private async Task ShowModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("showModal", modalId);
+    }
+
+    private async Task HideModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("hideModal", modalId);
+    }
+}

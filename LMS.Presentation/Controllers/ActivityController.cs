@@ -1,16 +1,19 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
 namespace LMS.API.Controllers;
 // TODO: FIX THIS
 [ApiController]
-[Route("api/[controller]")]
-public class ActivitiesController : ControllerBase
+[Route("api/activities")]
+public class ActivityController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
 
-    public ActivitiesController(IServiceManager service)
+    public ActivityController(IServiceManager service)
     {
         serviceManager = service;
     }
@@ -49,6 +52,13 @@ public class ActivitiesController : ControllerBase
         return Ok(activities);
     }
 
+    [HttpGet("types")]
+    public async Task<ActionResult<List<ActivityTypeReadDto>>> GetAllTypes(int typeId, CancellationToken ct)
+    {
+        var types = await serviceManager.ActivityTypeService.GetAllActivityTypesAsync(ct);
+        return Ok(types);
+    }
+
     // GET: api/activities/daterange?startDate=...&endDate=...
     [HttpGet("daterange")]
     public async Task<ActionResult<List<ActivityReadDto>>> GetByDateRange(
@@ -61,6 +71,7 @@ public class ActivitiesController : ControllerBase
     }
 
     // POST: api/activities
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPost]
     public async Task<ActionResult<ActivityReadDto>> Create(
         [FromBody] ActivityUpsertDto dto,
@@ -78,6 +89,7 @@ public class ActivitiesController : ControllerBase
     }
 
     // PUT: api/activities/5
+    [Authorize(Roles = Roles.Teacher)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ActivityReadDto>> Update(
         int id,
@@ -92,7 +104,9 @@ public class ActivitiesController : ControllerBase
     }
 
     // DELETE: api/activities/5
+    [Authorize(Roles = Roles.Teacher)]
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await serviceManager.ActivityService.DeleteActivityAsync(id, ct);

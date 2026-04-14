@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Repositories;
+﻿using System.Linq.Expressions;
+using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using LMS.Infractructure.Data;
 using LMS.Shared.DTOs;
@@ -21,20 +22,31 @@ namespace LMS.Infractructure.Repositories
                 : baseQuery.OrderByDescending(c => c.StartDate);
 
             return await orderedCourses
+                .Include(c => c.Participants)
+                .Include(c => c.Modules)
                 .Skip(query.Skip)
                 .Take(query.Size)
                 .ToListAsync(ct);
         }
 
+        public async Task<Course?> GetCourseDetailsByConditionAsync(Expression<Func<Course, bool>> expression, bool trackChanges = false, CancellationToken ct = default)
+        {
+            return await FindByCondition(expression, trackChanges)
+                .Include(c => c.Participants)
+                .Include(c => c.Modules)
+                    .ThenInclude(m => m.Activities)
+                        .ThenInclude(a => a.ActivityType)
+                .FirstOrDefaultAsync(ct);
+        }
+
         public async Task<Course?> GetCourseDetailsByIdAsync(int courseId, bool trackChanges = false, CancellationToken ct = default)
         {
-            var baseQuery = !trackChanges ? context.Courses.AsNoTracking() : context.Courses;
-
             return await FindByCondition(c => c.Id == courseId, trackChanges)
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
-                .SingleAsync(ct);
+                        .ThenInclude(a => a.ActivityType)
+                .FirstOrDefaultAsync(ct);
         }
     }
 }

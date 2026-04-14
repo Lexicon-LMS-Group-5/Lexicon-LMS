@@ -1,0 +1,62 @@
+﻿@if (Model == null)
+{
+    <div>
+        Loading...
+    </div>
+} else
+{
+    
+    <div class="d-flex flex-column gap-2">
+        <div class="mb-3">
+            <label for="courseName" class="form-label">Course Name</label>
+            <InputText @bind-Value="Model!.Name"
+                       type="text"
+                       class="form-control"
+                       id="courseName"
+                       aria-describedby="courseNameHelp" />
+ 
+            <ValidationMessage For="() => Model!.Name" class="text-danger" />
+            <div id="courseNameHelp" class="form-text">Add a descriptive name for the course.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Description</label>
+            <InputTextArea @bind-Value="Model!.Description"
+                           class="form-control"
+                           id="courseDescription"
+                           rows="3"
+                           aria-describedby="courseDescriptionHelp">
+            </InputTextArea>
+            <ValidationMessage For="() => Model!.Description" />
+            <div id="courseDescriptionHelp" class="form-text">Describe the course content.</div>
+        </div>
+        <div class="mb-3 d-flex gap-3">
+            <div class="d-flex flex-column gap-2">
+                <label class="form-check-label" for="startDate">Start date</label>
+                <InputDate @bind-Value="Model!.StartDate"
+                           class="form-control"
+                           id="startDate" />
+                <ValidationMessage For="() => Model!.StartDate" />
+                <div id="startDateHelp" class="form-text">Set the start date for the Course.</div>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <label class="form-check-label" for="endDate">End date</label>
+                <InputDate @bind-Value="Model!.EndDate"
+                           class="form-control"
+                           id="endDate" />
+                <ValidationMessage For="() => Model!.EndDate" />
+                <div id="endDateHelp" class="form-text">Set the end date for the Course.</div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public CourseUpdateDto? Model { get; set; }
+
+    [Parameter]
+    public RenderFragment? FormContent { get; set; }
+
+    [Parameter]
+    public CourseDetailsDto CourseDetails { get; set; } = default!;
+}
