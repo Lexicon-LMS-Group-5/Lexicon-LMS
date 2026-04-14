@@ -49,7 +49,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("edit/{id}")]
-    [Authorize(Roles = Roles.Teacher)]//Remove this if you want students to be able to edit their own info
+    [Authorize(Roles = Roles.Teacher)] //Remove this if you want students to be able to edit their own info
     public async Task<ActionResult<UserReadDto>> UpdateUser(
         string id,
         [FromBody] UserUpdateDto dto,
@@ -59,7 +59,7 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (userId is null)
-            return Unauthorized();
+            throw new UnauthorizedAccessException();
 
         var request = new UpdateUserContext
         {
@@ -67,19 +67,9 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
             IsTeacher = User.IsInRole(Roles.Teacher)
         };
 
-        try
-        {
-            var updated = await _serviceManager.UserService.UpdateUserAsync(request, id, dto, ct);
+        var updated = await _serviceManager.UserService.UpdateUserAsync(request, id, dto, ct);
 
-            if (updated == null)
-                return NotFound();
-
-            return Ok(updated);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid("Not allowed to update this user");
-        }
+        return Ok(updated);
     }
 
     [HttpPost]
@@ -100,8 +90,12 @@ public class UserController(IServiceManager serviceManager) : ControllerBase
         }
     }
     [HttpDelete("delete/{id}")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult> DeleteUserById(string id, CancellationToken ct)
     {
+        if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id)
+            return Forbid("You cannot delete your own account");
+
         await _serviceManager.UserService.DeleteUserByIdAsync(id, ct);
 
         return NoContent();

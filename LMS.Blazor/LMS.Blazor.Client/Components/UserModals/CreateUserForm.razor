@@ -25,14 +25,15 @@
         <div class="alert alert-danger">@Error</div>
     }
 
-    <button type="submit" class="btn btn-primary me-2" disabled="@IsSubmitting">
-        Create
-    </button>
-
     <button type="button" class="btn btn-secondary"
             @onclick="@(() => { Error = string.Empty; OnCancel.InvokeAsync(); })">
         Cancel
     </button>
+
+    <button type="submit" class="btn btn-primary me-2" disabled="@IsSubmitting">
+        Create
+    </button>
+
 </EditForm>
 
 @code {

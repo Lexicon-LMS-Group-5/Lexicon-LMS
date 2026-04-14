@@ -9,6 +9,12 @@
         <div class="alert alert-danger">@Error</div>
     }
 
+    <button class="btn btn-secondary"
+            @onclick="Cancel"
+            disabled="@IsDeleting">
+        Cancel
+    </button>
+
     <button class="btn btn-danger me-2"
             @onclick="ConfirmDelete"
             disabled="@IsDeleting">
@@ -22,11 +28,6 @@
         }
     </button>
 
-    <button class="btn btn-secondary"
-            @onclick="Cancel"
-            disabled="@IsDeleting">
-        Cancel
-    </button>
 </div>
 
 @code {
