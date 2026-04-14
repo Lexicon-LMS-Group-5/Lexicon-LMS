@@ -5,13 +5,8 @@
             <h1 class="placeholder-glow">
                 <span class="rounded placeholder col-3"></span>
             </h1>
-            <div class="btn btn-primary disabled my-auto d-flex gap-2" aria-disabled="true">
-                <div class="my-auto d-flex flex-column justify-content-center">
-                    <PencilIcon Size="16" />
-                </div>
-                <div class="">
-                    Edit course
-                </div>
+            <div class="d-flex gap-2">
+                @CourseDetailsHeaderActions
             </div>
         </div>
 
@@ -29,17 +24,10 @@
     <div>
         <div class="d-flex justify-content-between w-100">
             <h1>@CourseDetails.Name</h1>
-            <button 
-                class="btn btn-primary my-auto d-flex gap-2"
-                type="button"
-                @onclick="OpenModalAsync">
-                <div class="my-auto d-flex flex-column justify-content-center">
-                    <PencilIcon Size="16" />    
-                </div>
-                <div class="">
-                Edit course
-                </div>
-            </button>
+            <div class="d-flex gap-2">
+                
+                @CourseDetailsHeaderActions
+            </div>
         </div>
 
         <p>@CourseDetails.Description</p>
@@ -55,6 +43,9 @@
 
     [Parameter]
     public bool IsLoading { get; set; }
+
+    [Parameter]
+    public RenderFragment CourseDetailsHeaderActions { get; set; } = default!;
 
     [Parameter]
     public EventCallback OnOpenModal { get; set; }

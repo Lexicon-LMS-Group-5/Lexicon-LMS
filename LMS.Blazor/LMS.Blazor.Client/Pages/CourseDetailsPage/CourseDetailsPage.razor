@@ -13,17 +13,34 @@
         </span>
         Back to Dashboard
     </NavLink>
-    <AuthorizeView Roles="Teacher">
-        <button class="btn btn-outline-secondary btn-sm mb-3"
-                @onclick="DeleteThis">
-            Delete this course
-        </button>
-    </AuthorizeView>
     </div>
 }
 
 <div class="d-flex flex-column gap-5 pb-5">
-    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="ShowModalAsync" />
+    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="() => ShowModalAsync(EditCourseModalId)">
+        <CourseDetailsHeaderActions>
+            <AuthorizeView Roles="Teacher">
+                <button class="btn btn-primary my-auto d-flex gap-2"
+                        type="button"
+                        disabled="@(CourseDetails == null)"
+                        @onclick="() => ShowModalAsync(EditCourseModalId)">
+                    <div class="my-auto d-flex flex-column justify-content-center">
+                        <PencilIcon Size="16" />
+                    </div>
+                    <div class="">
+                        Edit course
+                    </div>
+                </button>
+                <button 
+                    class="btn btn-outline-danger my-auto"
+                    disabled="@(CourseDetails == null)"
+                        @onclick="() => ShowModalAsync(DeleteConfirmationModalId)">
+                    <TrashIcon />
+                </button>
+            </AuthorizeView>
+        </CourseDetailsHeaderActions>
+    </CourseDetailsHeader>
+
 
     <TabContainer 
         CurrentRoute="@($"/dashboard/courses/{CourseId}")" 
@@ -106,6 +123,31 @@
     </TabContainer>
 </div>
 
+<Modal ModalId="@DeleteConfirmationModalId">
+    <ModalHeader
+        ModalId="@DeleteConfirmationModalId"
+        Title="Are you sure?" />
+    <ModalBody>
+        <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
+            <div>
+                This will permanently delete this course and all of its content.
+            </div>
+        </div>
+    </ModalBody>
+    <ModalFooter>
+        <button
+            class="btn btn-outline-secondary"
+            @onclick="() => HideModalAsync(DeleteConfirmationModalId)">
+            Cancel
+        </button>
+        <button
+            class="btn btn-danger"
+            @onclick="DeleteThisAsync">
+            Delete
+        </button>
+    </ModalFooter>
+</Modal>
+
 @if (CourseDetails != null && EditContext != null)
 {
     <Modal ModalId="@EditCourseModalId">
@@ -124,8 +166,7 @@
                 <ModalBody>
                     <EditCourseFormContent 
                         CourseDetails="CourseDetails" 
-                        Model="EditCourseModel"
-                        IsLoading="IsFormLoading" />
+                        Model="EditCourseModel" />
                 </ModalBody>
             </FormContent>
             <FormActions>
@@ -133,7 +174,7 @@
                     <button 
                         class="btn btn-secondary"
                         type="button" 
-                        @onclick="HideModalAsync">
+                        @onclick="OnEditCourseSubmissionCanceledAsync">
                         Cancel
                     </button>
                     <button 
