@@ -228,7 +228,7 @@ public class DataSeedHostingService : IHostedService
             {
                 a.Name = f.Company.Bs().ApplyCase(LetterCasing.Title);
                 a.Description = f.Hacker.Phrase().ApplyCase(LetterCasing.Sentence);
-                a.Type = f.PickRandom(activityTypes);
+                a.ActivityType = f.PickRandom(activityTypes);
             });
         return activityGenerator;
     }

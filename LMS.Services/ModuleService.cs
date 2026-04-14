@@ -89,12 +89,7 @@ namespace LMS.Services
                 throw new NotFoundException($"ModuleId={moduleId}.");
             }
 
-            var modulesDto = mapper.Map<ModuleReadDto>(module);
-
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId);
-			modulesDto.CourseName = course.Name;
-
-			return modulesDto;
+			return mapper.Map<ModuleReadDto>(module);
         }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
             int courseId, 
@@ -106,17 +101,7 @@ namespace LMS.Services
                     trackChanges,
                     ct);
 
-            var moduleReadDtos = modules.Select(m => {
-                var moduleDto = mapper.Map<ModuleReadDto>(m);
-				moduleDto.Activities = m.Activities.Select(a => {
-                    var activityDto = mapper.Map<ActivityReadDto>(a);
-                    activityDto.ActivityTypeName = a.Type.Name;                    
-					return activityDto;
-                }).ToList();
-                return moduleDto;
-            }).ToList();
-
-            return moduleReadDtos;
+            return mapper.Map<List<ModuleReadDto>>(modules);
         }
 
         public async Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto dto, CancellationToken ct = default)

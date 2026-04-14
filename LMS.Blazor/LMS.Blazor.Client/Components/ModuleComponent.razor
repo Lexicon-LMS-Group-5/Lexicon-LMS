@@ -62,7 +62,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public CourseModuleListItemDto Module { get; set; } = default!;
+    public ModuleReadDto Module { get; set; } = default!;
 
     [Parameter]
     public IEnumerable<ActivityReadDto> Activities { get; set; } = [];

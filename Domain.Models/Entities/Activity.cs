@@ -8,7 +8,7 @@ public class Activity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int ActivityTypeId { get; set; }
-    public required ActivityType Type { get; set; }
+    public required ActivityType ActivityType { get; set; }
     public int ModuleId { get; set; }
     public required Module Module { get; set; }
 }

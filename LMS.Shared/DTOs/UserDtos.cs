@@ -10,7 +10,7 @@ public class UserReadDto
     public string FullName => $"{FirstName} {LastName}";
     public string Email { get; set; } = string.Empty;
     public int? CourseId { get; set; }
-    public CourseReadDto? Course { get; set; }
+    public string? CourseName { get; set; }
     public List<string> Roles { get; set; } = [];
 }
 

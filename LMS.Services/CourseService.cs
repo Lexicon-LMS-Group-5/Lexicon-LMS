@@ -48,10 +48,10 @@ namespace LMS.Services
             };
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(int courseId, CancellationToken ct = default)
         {
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct)
-                ?? throw new CourseNotFoundException(query.CourseId);
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(courseId, trackChanges: false, ct)
+                ?? throw new CourseNotFoundException(courseId);
 
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
@@ -71,7 +71,7 @@ namespace LMS.Services
             return courseDetailsDto;
         }
 
-        public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
+        public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseDto command, CancellationToken ct = default)
         {
             ApplicationUser user = await unitOfWork.Users.GetByIdAsync(command.CreatorId, true, ct)
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
@@ -96,22 +96,15 @@ namespace LMS.Services
             return mapper.Map<CreateCourseResultDto>(course);
         }
 
-        private async Task<List<CourseParticipantWithRoleInfoDto>> GetCourseParticipantsWithRoleInfoAsync(
+        private async Task<List<CourseParticipantDto>> GetCourseParticipantsWithRoleInfoAsync(
             Course course, CancellationToken ct)
         {
             var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
-            var courseParticipantsWithRoleInfo = participants
-                .Select(p =>
-                {
-                    var participantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(p);
-                    participantWithRoleInfo.Role = p.Roles.Single();
-                    return participantWithRoleInfo;
-                }).ToList();
 
-            return courseParticipantsWithRoleInfo;
+            return mapper.Map<List<CourseParticipantDto>>(participants);
         }
         public async Task<CourseDetailsDto> UpdateCourseAsync(
-        UpdateCourseCommandDto dto,
+        CourseUpdateDto dto,
         CancellationToken ct = default)
         {
             Course? course = await unitOfWork

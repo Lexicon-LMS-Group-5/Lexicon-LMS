@@ -34,7 +34,6 @@ public partial class UserList
         None,
         EditUser,
         CreateUser,
-        CreateStudent,
         DeleteUser,
     }
 
@@ -61,12 +60,6 @@ public partial class UserList
         ShowModalAnimation();
     }
 
-    private void OpenTempModal()
-    {
-        _activeModal = ModalType.CreateStudent;
-        ShowModalAnimation();
-    }
-
     private void OpenDeleteModal(string userId, string userName)
     {
         _selectedUserId = userId;
@@ -83,6 +76,8 @@ public partial class UserList
         await Task.Delay(200);
 
         _activeModal = ModalType.None;
+        _selectedUserId = "";
+        _selectedUserName = "";
         StateHasChanged();
     }
 
@@ -153,7 +148,7 @@ public partial class UserList
                 u.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                u.Course != null && u.Course.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.CourseName != null && u.CourseName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 (u.Roles != null && u.Roles.Any(r =>
                     r.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))));
         }

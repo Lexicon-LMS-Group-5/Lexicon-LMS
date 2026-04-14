@@ -1,6 +1,7 @@
 ﻿@page "/module/{CourseId:int}/{ModuleId:int}"
 @using LMS.Blazor.Client.Components
 @using LMS.Shared.DTOs
+@using LMS.Shared
 @inject IJSRuntime JS
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
@@ -29,7 +30,7 @@ else
     <div class="container py-4">
         <div class="mb-4">
             
-            <AuthorizeView Roles="Teacher">
+            <AuthorizeView Roles=@Roles.Teacher>
                 <button class="btn btn-outline-secondary btn-sm mb-3"
                         @onclick="DeleteThis">
                     Delete this module
@@ -62,7 +63,7 @@ else
             <h3 class="fw-semibold">Activities</h3>
         </div>
 
-        <AuthorizeView Roles="Teacher">
+        <AuthorizeView Roles=@Roles.Teacher>
             <div data-bs-toggle="modal"
                  data-bs-target="#createActivityModal">
                 <button class="btn btn-primary btn-sm mb-3">
@@ -93,7 +94,7 @@ else
 
     </div>
 
-    <AuthorizeView Roles="Teacher">
+    <AuthorizeView Roles=@Roles.Teacher>
         <div class="modal fade" id="createActivityModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
