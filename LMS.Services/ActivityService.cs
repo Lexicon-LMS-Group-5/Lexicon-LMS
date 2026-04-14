@@ -43,57 +43,57 @@ public class ActivityService : IActivityService
             activityUpsertDto.ModuleId, true, ct);
         if (module == null) throw new NotFoundException($"ModuleId={activityUpsertDto.ModuleId}");
 
-        //DateRangeHelper drh = new(module);
-        //if (DateRangeHelper.Absent(activityUpsertDto.StartDate)
-        //    || DateRangeHelper.Absent(activityUpsertDto.EndDate))
-        //{
-        //    if (activityUpsertDto.TimeCond == null) throw new BadRequestException("time parameters");
-        //}
-        //var timeResp = drh.GetDateRange(activityUpsertDto.TimeCond!);
-        //if (timeResp != null)
-        //{
-        //    activityUpsertDto.StartDate = DateRangeHelper.OneOf(activityUpsertDto.StartDate, timeResp.Start);
-        //    activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
-        //}
-        //Activity activity = mapper.Map<Activity>(activityUpsertDto);
-        //StartEnd newStartEnd = new(activity);
-        //drh.CheckNew(newStartEnd);
-
-        var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(
-            module.CourseId, trackChanges: true, ct) ?? throw new CourseNotFoundException(module.CourseId);
-
-        if (activityUpsertDto.EndDate < activityUpsertDto.StartDate)
-            throw new BadRequestException("The module's End date must be after the End date");
-
-        if (module.Activities.Count > 0)
+        DateRangeHelper drh = new(module);
+        if (DateRangeHelper.Absent(activityUpsertDto.StartDate)
+            || DateRangeHelper.Absent(activityUpsertDto.EndDate))
         {
-            var lastModule = module.Activities.LastOrDefault();
-            if (lastModule != null && lastModule.EndDate > activityUpsertDto.StartDate)
-                throw new BadRequestException("The new module must begin after the current last module in the course");
+            if (activityUpsertDto.TimeCond == null) throw new BadRequestException("time parameters");
         }
-
-        var activity = mapper.Map<Activity>(activityUpsertDto);
-
-        unitOfWork.Activities.Create(activity);
-        module.Activities.Add(activity);
-
-        if (module.EndDate < activityUpsertDto.EndDate)
-            module.EndDate = activityUpsertDto.EndDate;
-
-        var moduleIndex = course.Modules.ToList().IndexOf(module);
-
-        foreach (var item in course.Modules.Select((module, index) => (module, index)))
+        var timeResp = drh.GetDateRange(activityUpsertDto.TimeCond!);
+        if (timeResp != null)
         {
-
-            if (item.module != module && moduleIndex < item.index)
-            {
-
-            }
+            activityUpsertDto.StartDate = DateRangeHelper.OneOf(activityUpsertDto.StartDate, timeResp.Start);
+            activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
         }
+        Activity activity = mapper.Map<Activity>(activityUpsertDto);
+        StartEnd newStartEnd = new(activity);
+        drh.CheckNew(newStartEnd);
+
+        //var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(
+        //    module.CourseId, trackChanges: true, ct) ?? throw new CourseNotFoundException(module.CourseId);
+
+        //if (activityUpsertDto.EndDate < activityUpsertDto.StartDate)
+        //    throw new BadRequestException("The module's End date must be after the End date");
+
+        //if (module.Activities.Count > 0)
+        //{
+        //    var lastModule = module.Activities.LastOrDefault();
+        //    if (lastModule != null && lastModule.EndDate > activityUpsertDto.StartDate)
+        //        throw new BadRequestException("The new module must begin after the current last module in the course");
+        //}
+
+        //var activity = mapper.Map<Activity>(activityUpsertDto);
+
+        //unitOfWork.Activities.Create(activity);
+        //module.Activities.Add(activity);
+
+        //if (module.EndDate < activityUpsertDto.EndDate)
+        //    module.EndDate = activityUpsertDto.EndDate;
+
+        //var moduleIndex = course.Modules.ToList().IndexOf(module);
+
+        //foreach (var item in course.Modules.Select((module, index) => (module, index)))
+        //{
+
+        //    if (item.module != module && moduleIndex < item.index)
+        //    {
+
+        //    }
+        //}
 
 
-        if (course.EndDate < module.EndDate)
-            course.EndDate = module.EndDate;
+        //if (course.EndDate < module.EndDate)
+        //    course.EndDate = module.EndDate;
 
         await unitOfWork.CompleteAsync(ct);
         return mapper.Map<ActivityReadDto>(activity);

@@ -56,7 +56,7 @@ public partial class AddModuleForm
             Model.EndDate = Model.StartDate + Model.TimeCond.Duration;
             EditContext.Validate();
             var result = await ApiService.PostAsync<ModuleUpsertDto, ModuleReadDto>($"api/modules/{Model.CourseId}", Model)
-                ?? throw new Exception("Updated course was not received");
+                ?? throw new Exception("Updated module was not received");
 
             if (OnSubmissionSucceeded.HasDelegate)
                 await OnSubmissionSucceeded.InvokeAsync(result);

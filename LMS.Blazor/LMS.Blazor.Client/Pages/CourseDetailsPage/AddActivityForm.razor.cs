@@ -55,23 +55,11 @@ public partial class AddActivityForm
                 throw new Exception("Module is missing scheduling information");
             Model.EndDate = Model.StartDate + Model.TimeCond.Duration;
             EditContext.Validate();
-            var result = await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>($"api/activities/{Model.ModuleId}", Model)
-                ?? throw new Exception("Updated course was not received");
-
-            var newModule = new ActivityReadDto
-            {
-                Id = result.Id,
-                Name = result.Name,
-                Description = result.Description,
-                StartDate = result.StartDate,
-                EndDate = result.EndDate,
-                ActivityTypeId = result.ActivityTypeId,
-                ActivityTypeName = result.ActivityTypeName,
-                ActivityTypeTimeExclusive = result.ActivityTypeTimeExclusive
-            };
+            var result = await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>($"api/activities", Model)
+                ?? throw new Exception("Updated activity was not received");
 
             if (OnSubmissionSucceeded.HasDelegate)
-                await OnSubmissionSucceeded.InvokeAsync(newModule);
+                await OnSubmissionSucceeded.InvokeAsync(result);
         }
         catch (Exception ex)
         {

@@ -335,6 +335,7 @@
     {
         var activityStart = module.EndDate;
         var defaultTimeSpan = new TimeSpan(days: 1, 0, 0, 0);
+
         CreateActivityModel ??= new();
         CreateActivityModel.ModuleId = module.Id;
         CreateActivityModel.TimeCond ??= new();
