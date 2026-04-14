@@ -7,7 +7,7 @@
 
 @if (Module == null)
 {
-    <div class="d-flex justify-content-center mt-5">
+        <div class="d-flex justify-content-center mt-5">
         <div class="spinner-border text-primary"></div>
     </div>
 }
@@ -20,6 +20,11 @@ else
             <button type="button" class="btn-close" @onclick="() => ShowSuccessMessage = false"></button>
         </div>
     }
+
+    <Breadcrumbs CourseId="@CourseId"
+                 ModuleId="@Module.Id"
+                 CourseName="@Module.CourseName"
+                 ModuleName="@Module.Name" />
 
     <div class="container py-4">
         <div class="mb-4">
