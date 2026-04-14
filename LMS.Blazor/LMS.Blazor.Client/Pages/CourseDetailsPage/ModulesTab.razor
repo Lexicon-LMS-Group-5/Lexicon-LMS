@@ -17,29 +17,51 @@
             <div class="modules-list rounded-3 overflow-hidden shadow-sm">
                 @foreach (var module in Modules)
                 {
-                    <button class="module-list-item accordion-button d-flex gap-3 p-3 w-100 text-start"
+                    <div class="module-list-item">
+                        <button 
+                            tabindex="0"
+                            class="accordion-button d-flex gap-3 p-3 w-100 text-start focus-ring"
                             @onclick="() => selectedModuleId = selectedModuleId == module.Id ? null : module.Id"
                             data-bs-toggle="collapse" 
                             data-bs-target="@($"#module-item-{module.Id}")"
                             aria-expanded="false" 
                             aria-controls="@($"module-item-{module.Id}")">
-                        <div class="d-flex my-auto rounded-circle bg-primary-subtle text-primary p-2">
-                            <LayersIcon />
-                        </div>
-                        <div class="d-flex flex-column gap-1 flex-grow-1">
-                            <div>
-                                @module.Name
+                            <div class="d-flex my-auto rounded-circle bg-primary-subtle text-primary p-2">
+                                <LayersIcon />
                             </div>
-                            <div class="text-secondary">
-                                @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
+                            <div class="d-flex flex-column gap-1 flex-grow-1">  
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        @module.Name
+                                    </div>
+                                </div>
+                                <div class="text-secondary">
+                                    @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
+                                </div>
                             </div>
-                        </div>
-                        <div class="my-auto">
-                            <div class="text-secondary" style="@(module.Id == selectedModuleId ? openedChevronIconStyles : closedChevronIconStyles)">
-                                <ChevronUpIcon />
+                            <div class="my-auto">
+                                <div class="text-secondary" style="@(module.Id == selectedModuleId ? openedChevronIconStyles : closedChevronIconStyles)">
+                                    <ChevronUpIcon />
+                                </div>
                             </div>
+                        </button>
+                        <div class="module-list-item-actions">
+                            <button tabindex="0"
+                                    class="btn btn-sm btn-outline-primary p-0 rounded"
+                                    style="width: 24px; height: 24px">
+                                <div class="d-flex flex-column justify-content-center p-1 w-100 h-100">
+                                    <PencilIcon Size="16" />
+                                </div>
+                            </button>
+                            <button tabindex="0"
+                                    class="btn btn-sm btn-outline-danger p-0 rounded"
+                                    style="width: 24px; height: 24px">
+                                <div class="d-flex flex-column justify-content-center p-1 w-100 h-100">
+                                    <TrashIcon Size="16" />
+                                </div>
+                            </button>
                         </div>
-                    </button>
+                    </div>
                     <div class="@($"collapse {(module.Id == selectedModuleId ? "show" : "")}")" id="@($"module-item-{module.Id}")">
                         <div class="p-4 d-flex flex-column gap-3">
                             <div>
@@ -87,15 +109,6 @@
                             </div>
                         </div>
                     </div>
-                    @* <Modal ModalId="@GetCreateActivityModalId(module.Id)">
-                        <ModalHeader 
-                            ModalId="@CreateActivityModalId" 
-                            Title="@($"Add a new Activity to \"{module.Name}\"")" />
-                        <div class="modal-body">
-                        </div>
-                        <div class="modal-footer">
-                        </div>
-                    </Modal> *@
                 }
             </div>
         </div>

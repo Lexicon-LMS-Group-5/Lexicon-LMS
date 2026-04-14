@@ -1,15 +1,44 @@
-﻿.modules-list > button {
+﻿.modules-list > .module-list-item > button {
     border: none;
     border-top: 2px solid var(--bs-light-border-subtle);
     background-color: var(--bs-body-bg);
 }
 
-.modules-list > button:hover {
+.modules-list > .module-list-item > button:hover {
     background-color: var(--bs-light);
 }
 
-.modules-list > button:first-child {
+.modules-list > .module-list-item > button:first-child {
     border-top: 0px;
+}
+
+.module-list-item {
+    position: relative;
+}
+
+
+.module-list-item-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 8px;
+    margin-right: 80px;
+    z-index: 1000;
+    display: flex;
+    transition: opacity .3s;
+    gap: 8px;
+}
+
+.module-list-item > .module-list-item-actions {
+        opacity: 0;
+}
+
+.module-list-item:hover > .module-list-item-actions {
+    opacity: 1;
+}
+
+.module-list-item-actions:has(button:focus) {
+    opacity: 1;
 }
 
 .add-activity-button
