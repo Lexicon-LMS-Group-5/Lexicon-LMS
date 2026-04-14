@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Domain.Contracts.Repositories;
+using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
-using Domain.Models.Entities;
-
 using Service.Contracts;
+using System.Collections;
 
 namespace LMS.Services;
 
@@ -12,14 +12,19 @@ public class ActivityService : IActivityService
 {
     private readonly IMapper mapper;
     private readonly IUnitOfWork unitOfWork;
+    private readonly IModuleService moduleService;
+    private readonly ICourseService courseService;
 
     public ActivityService(
-        IMapper mapper, IUnitOfWork unitOfWork
-        )
+        IMapper mapper, IUnitOfWork unitOfWork, IModuleService moduleService, ICourseService courseService
+		)
     {
         this.mapper = mapper;
         this.unitOfWork = unitOfWork;
-    }
+        this.moduleService = moduleService;
+        this.courseService = courseService;
+
+	}
 
     public async Task<List<ActivityReadDto>> GetAllActivitiesAsync(CancellationToken ct)
     {
@@ -30,11 +35,21 @@ public class ActivityService : IActivityService
 
     public async Task<ActivityReadDto> GetActivityAsync(int id, CancellationToken ct)
     {
-        var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: false, ct);
+		var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: false, ct);
 
         if (activity == null) throw new NotFoundException($"Activity {id} not found");
 
-        return mapper.Map<ActivityReadDto>(activity);
+        var activityDto = mapper.Map<ActivityReadDto>(activity);
+
+        var module = await moduleService.GetModuleDetailsByIdAsync(activity.ModuleId);
+		var query = new CourseDetailsQueryDto(module.CourseId);
+		var course = await courseService.GetCourseDetailsAsync(query);
+
+		activityDto.CourseName = course.Name;
+        activityDto.ModuleName = module.Name;
+        activityDto.Name = activity.Name;
+
+		return activityDto;
     }
 
     public async Task<ActivityReadDto> CreateActivityAsync(ActivityUpsertDto activityUpsertDto, CancellationToken ct)

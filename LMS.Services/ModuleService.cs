@@ -85,7 +85,10 @@ namespace LMS.Services
             }
 
             var modulesDto = mapper.Map<ModuleReadDto>(module);
-            modulesDto.CourseName = module.Course.Name;
+
+            var query = new CourseDetailsQueryDto(module.CourseId);
+            var course = await courseService.GetCourseDetailsAsync(query);
+			modulesDto.CourseName = course.Name;
 
 			return modulesDto;
         }

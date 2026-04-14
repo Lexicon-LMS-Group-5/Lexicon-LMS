@@ -28,11 +28,7 @@ else
 
     <div class="container py-4">
         <div class="mb-4">
-            <button class="btn btn-outline-secondary btn-sm mb-3"
-                    @onclick="GoBack">
-                ← Back to course
-            </button>
-            <button class="btn btn-outline-secondary btn-sm mb-3"
+                       <button class="btn btn-outline-secondary btn-sm mb-3"
                     @onclick="DeleteThis">
                 Delete this module
             </button>
@@ -160,10 +156,6 @@ else
         Module = m ?? new();
     }
 
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo($"/my-course");
-    }
     private async Task DeleteThis()
     {
         await ApiService.DeleteAsync(Url);

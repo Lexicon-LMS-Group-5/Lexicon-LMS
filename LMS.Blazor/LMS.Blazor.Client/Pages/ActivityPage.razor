@@ -21,10 +21,6 @@ else
 
         <div class="mb-4">
             <button class="btn btn-outline-secondary btn-sm mb-3"
-                    @onclick="GoBack">
-                ← Back to module
-            </button>
-            <button class="btn btn-outline-secondary btn-sm mb-3"
                     @onclick="DeleteThis">
                 Delete this activity
             </button>
@@ -74,11 +70,6 @@ else
     {
         Activity = await ApiService.GetAsync<ActivityReadDto>(
             $"api/activities/{ActivityId}");
-    }
-
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo($"/module/{CourseId}/{ModuleId}");
     }
     private async Task DeleteThis()
     {
