@@ -205,6 +205,7 @@
 
     private bool IsActivitiesLoading { get; set; }
     private IReadOnlyList<ActivityTypeReadDto> ActivityTypes { get; set; } = [];
+    private int DefaultActivityTypeId { get; set; }
 
     private bool IsLoading { get; set; }
     private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
@@ -234,6 +235,8 @@
             ?? throw new Exception("Could not fetch activity types");
 
             ActivityTypes = activitiesResult.ToList();
+            DefaultActivityTypeId = ActivityTypes.FirstOrDefault()?.Id
+                ?? throw new Exception("No activity types were found");
         }
         catch (Exception ex)
         {
@@ -350,6 +353,7 @@
     private void InitializeActivityFormState()
     {
         CreateActivityModel ??= new();
+        CreateActivityModel.ActivityTypeId = DefaultActivityTypeId;
         CreateActivityEditContext ??= new(CreateActivityModel);
     }
 
@@ -360,6 +364,7 @@
 
         CreateActivityModel ??= new();
         CreateActivityModel.ModuleId = module.Id;
+        CreateActivityModel.ActivityTypeId = DefaultActivityTypeId;
         CreateActivityModel.TimeCond ??= new();
         CreateActivityModel.TimeCond.StartingAfter ??= activityStart;
         CreateActivityModel.TimeCond.Duration = defaultTimeSpan;
