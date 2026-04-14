@@ -20,6 +20,16 @@ else
             <div id="activityNameHelp" class="form-text">Add a descriptive name for this activity.</div>
         </div>
         <div class="mb-3">
+            <label class="form-label">Activity Type</label>
+            <select class="form-select" @bind="Model.ActivityTypeId">
+                @foreach (var type in ActivityTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => Model.ActivityTypeId)" class="text-danger" />
+        </div>
+        <div class="mb-3">
             <label for="activityDescription" class="form-label">Description</label>
             <InputTextArea @bind-Value="Model!.Description"
                            class="form-control"
@@ -65,6 +75,9 @@ else
 @code {
     [Parameter]
     public ActivityUpsertDto? Model { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<ActivityTypeReadDto> ActivityTypes { get; set; } = [];
 
     private int durationValue { get => Model?.TimeCond?.Duration.Hours ?? 0; }
     private void SetDuration(int value)
