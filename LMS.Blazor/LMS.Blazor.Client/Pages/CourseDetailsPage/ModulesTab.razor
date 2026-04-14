@@ -333,8 +333,8 @@
 
     private void SetActivityFormState(ModuleReadDto module)
     {
-        var activityStart = module.EndDate;
-        var defaultTimeSpan = new TimeSpan(days: 1, 0, 0, 0);
+        var activityStart = module.Activities.LastOrDefault()?.EndDate ?? module.StartDate;
+        var defaultTimeSpan = new TimeSpan(0, hours: 1, 0, 0);
 
         CreateActivityModel ??= new();
         CreateActivityModel.ModuleId = module.Id;

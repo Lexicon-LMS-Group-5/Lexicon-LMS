@@ -30,11 +30,19 @@ else
             <ValidationMessage For="() => Model.Description" />
             <div id="activityDescriptionHelp" class="form-text">Describe the activity.</div>
         </div>
-        <div class="mb-3 d-flex gap-3">
-            <InputNumber @bind-Value:get="@durationValue" @bind-Value:set="(val) => SetDuration(val)" />
+        <div class="mb-3 d-flex flex-column gap-1">
+            <label class="form-check-label" for="activityDuration">Hours</label>
+            <InputNumber 
+                @bind-Value:get="@durationValue" 
+                @bind-Value:set="(val) => SetDuration(val)"
+                min="1"
+                max="365"
+                class="form-control"
+                id="activityDuration" />
+        <div id="activityDurationHelp" class="form-text">How many hours is this activity?</div>
         </div>
         <div class="mb-3 d-flex gap-3">
-            <div class="d-flex flex-column gap-2">
+            <div class="d-flex flex-column gap-1">
                 <label class="form-check-label" for="startDate">Start date</label>
                 <InputDate @bind-Value="Model.StartDate"
                            class="form-control"
@@ -42,7 +50,7 @@ else
                 <ValidationMessage For="() => Model.StartDate" />
                 <div id="startDateHelp" class="form-text">Set the start date for the Activity.</div>
             </div>
-            <div class="d-flex flex-column gap-2">
+            <div class="d-flex flex-column gap-1">
                 <label class="form-check-label" for="endDate">End date</label>
                 <InputDate @bind-Value="Model.EndDate"
                            class="form-control"
@@ -58,14 +66,14 @@ else
     [Parameter]
     public ActivityUpsertDto? Model { get; set; }
 
-    private int durationValue { get => Model?.TimeCond?.Duration.Days ?? 0; }
+    private int durationValue { get => Model?.TimeCond?.Duration.Hours ?? 0; }
     private void SetDuration(int value)
     {
         if (Model?.TimeCond == null)
             return;
 
         var currentTimeCondition = Model.TimeCond;
-        var duration = new TimeSpan(days: value, 0, 0, 0);
+        var duration = new TimeSpan(0, hours: value, 0, 0);
 
         Model.TimeCond = new DateRangeRequestDto
         {
