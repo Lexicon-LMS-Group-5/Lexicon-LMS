@@ -176,6 +176,11 @@ namespace LMS.Services
         {}
         public DateRangeResponseDto? GetDateRange(DateRangeRequestDto request)
         { 
+            if (request == null)
+            {
+                return null;
+            }
+
             foreach (var f in freeIntervals_)
             {
                 DateTime startingAfter = OneOf(request.StartingAfter,f.Start);

@@ -8,7 +8,7 @@ namespace Service.Contracts
         Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default);
         Task<CourseDetailsDto> GetCourseDetailsByUserIdAsync(string userId, CancellationToken ct = default);
         Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default);
-        Task<CourseReadDto> UpdateCourseAsync(int id, CourseUpsertDto dto, CancellationToken ct = default);
+        Task<CourseDetailsDto> UpdateCourseAsync(UpdateCourseCommandDto command, CancellationToken ct = default);
         public Task DeleteCourseAsync(int id, CancellationToken ct = default);
     }
 }
