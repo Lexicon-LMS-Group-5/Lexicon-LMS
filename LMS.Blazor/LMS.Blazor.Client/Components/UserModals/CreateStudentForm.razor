@@ -40,7 +40,7 @@
     private IApiService ApiService { get; set; } = default!;
 
     [Parameter]
-    public EventCallback OnSaved { get; set; }
+    public EventCallback<UserReadDto> OnSaved { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
@@ -72,7 +72,8 @@
                 return;
             }
 
-            await OnSaved.InvokeAsync();
+            if (OnSaved.HasDelegate)
+                await OnSaved.InvokeAsync(result);
         }
         catch (Exception ex)
         {
