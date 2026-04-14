@@ -11,19 +11,19 @@
 }
 else
 {
+    <Breadcrumbs CourseId="@CourseId"
+                 ModuleId="@ModuleId"
+                 CourseName="@Activity.CourseName"
+                 ModuleName="@Activity.ModuleName"
+                 ActivityName="@Activity.Name" />
+
     <div class="container py-4">
 
         <div class="mb-4">
             <button class="btn btn-outline-secondary btn-sm mb-3"
-                    @onclick="GoBack">
-                ← Back to module
+                    @onclick="DeleteThis">
+                Delete this activity
             </button>
-            <AuthorizeView Roles="Teacher">
-                <button class="btn btn-outline-secondary btn-sm mb-3"
-                        @onclick="DeleteThis">
-                    Delete this activity
-                </button>
-            </AuthorizeView>
 
             <h1 class="fw-bold">@Activity.Name</h1>
             <p class="text-muted">@Activity.Description</p>
