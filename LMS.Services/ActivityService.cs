@@ -4,7 +4,6 @@ using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
 using Service.Contracts;
-using System.Collections;
 
 namespace LMS.Services;
 
@@ -15,12 +14,12 @@ public class ActivityService : IActivityService
 
     public ActivityService(
         IMapper mapper, IUnitOfWork unitOfWork
-		)
+        )
     {
         this.mapper = mapper;
         this.unitOfWork = unitOfWork;
 
-	}
+    }
 
     public async Task<List<ActivityReadDto>> GetAllActivitiesAsync(CancellationToken ct)
     {
@@ -31,22 +30,11 @@ public class ActivityService : IActivityService
 
     public async Task<ActivityReadDto> GetActivityAsync(int id, CancellationToken ct)
     {
-		var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: false, ct);
+        var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: false, ct);
 
         if (activity == null) throw new NotFoundException($"Activity {id} not found");
 
-        var activityDto = mapper.Map<ActivityReadDto>(activity);
-
-        var module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(activityDto.ModuleId)
-            ?? throw new NotFoundException($"Couold not find module with ID={activityDto.ModuleId}");
-		var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId)
-            ?? throw new CourseNotFoundException(module.CourseId);
-
-		activityDto.CourseName = course.Name;
-        activityDto.ModuleName = module.Name;
-        activityDto.Name = activity.Name;
-
-		return activityDto;
+        return mapper.Map<ActivityReadDto>(activity);
     }
 
     public async Task<ActivityReadDto> CreateActivityAsync(ActivityUpsertDto activityUpsertDto, CancellationToken ct)
@@ -67,9 +55,9 @@ public class ActivityService : IActivityService
             activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
         }
         Activity activity = mapper.Map<Activity>(activityUpsertDto);
-		activity.Module = module;
+        activity.Module = module;
 
-		StartEnd newStartEnd = new(activity);
+        StartEnd newStartEnd = new(activity);
         drh.CheckNew(newStartEnd);
         unitOfWork.Activities.Create(activity);
 
@@ -110,7 +98,10 @@ public class ActivityService : IActivityService
     public async Task<List<ActivityReadDto>> GetActivitiesByModuleIdAsync(int moduleId, CancellationToken ct)
     {
         var activities = await unitOfWork.Activities.GetActivitiesByModuleIdAsync(moduleId, trackChanges: false, ct);
-
+        foreach (var activity in activities)
+        {
+            Console.WriteLine(activity.ActivityType?.Name);
+        }
         return mapper.Map<List<ActivityReadDto>>(activities);
     }
 

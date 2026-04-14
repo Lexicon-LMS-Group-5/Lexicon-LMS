@@ -45,8 +45,8 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
             .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Module.Course.Id))
             .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Module.Course.Name))
-            .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
-            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Module.Course.Id))
-            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Module.Course.Name));
+            .ForMember(dest => dest.ActivityTypeId, opt => opt.MapFrom(src => src.ActivityTypeId))
+            .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.ActivityType.Name))
+            .ForMember(dest => dest.ActivityTypeTimeExclusive, opt => opt.MapFrom(src => src.ActivityType.TimeExclusive));
     }
 }

@@ -171,19 +171,6 @@ else
                             </div>
                             break;
 
-                        case ModalType.CreateStudent:
-                            <div class="modal-header">
-                                <h5>Add Student</h5>
-                                <button class="btn-close" @onclick="CloseModal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <CreateStudentForm @key="_courseIdTemp"
-                                                   CourseId="@_courseIdTemp"
-                                                   OnSaved="HandleUserSaved"
-                                                   OnCancel="CloseModal" />
-                            </div>
-                            break;
-
                         case ModalType.DeleteUser:
                             <div class="modal-header">
                                 <h5>Confirmation</h5>

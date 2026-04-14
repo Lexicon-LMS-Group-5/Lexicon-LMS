@@ -10,7 +10,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="badge bg-primary">
-                @Activity.Type?.Name TEXT
+                @Activity.ActivityTypeName
             </span>
         </div>
 
@@ -25,7 +25,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public ActivityReadDto Activity { get; set; } = default!;
+    public ActivityReadDto Activity { get; set; }
 
     [Parameter] public int CourseId { get; set; }
 

@@ -35,6 +35,7 @@ namespace LMS.Infractructure.Repositories
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
+                        .ThenInclude(a => a.ActivityType)
                 .FirstOrDefaultAsync(ct);
         }
 
@@ -44,6 +45,7 @@ namespace LMS.Infractructure.Repositories
                 .Include(c => c.Participants)
                 .Include(c => c.Modules)
                     .ThenInclude(m => m.Activities)
+                        .ThenInclude(a => a.ActivityType)
                 .FirstOrDefaultAsync(ct);
         }
     }

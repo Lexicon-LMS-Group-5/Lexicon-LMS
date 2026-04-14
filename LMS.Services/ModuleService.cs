@@ -89,12 +89,7 @@ namespace LMS.Services
                 throw new NotFoundException($"ModuleId={moduleId}.");
             }
 
-            var modulesDto = mapper.Map<ModuleReadDto>(module);
-
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId);
-			modulesDto.CourseName = course.Name;
-
-			return modulesDto;
+			return mapper.Map<ModuleReadDto>(module);
         }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
             int courseId, 

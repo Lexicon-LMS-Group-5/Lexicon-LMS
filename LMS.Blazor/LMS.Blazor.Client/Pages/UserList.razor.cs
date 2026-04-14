@@ -148,7 +148,7 @@ public partial class UserList
                 u.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                u.CourseName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.CourseName != null && u.CourseName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 (u.Roles != null && u.Roles.Any(r =>
                     r.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))));
         }
