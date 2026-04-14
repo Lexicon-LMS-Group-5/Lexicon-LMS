@@ -48,6 +48,8 @@ public partial class CourseOverview
                 if (participant.Roles.Contains(Roles.Teacher))
                     teachers.Add(participant);
             }
+            students.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
+            teachers.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
 
         } catch (Exception ex)
         {
