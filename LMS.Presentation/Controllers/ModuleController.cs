@@ -27,7 +27,8 @@ namespace LMS.Presentation.Controllers
             // TODO: CancellationToken ?!
             List<ModuleReadDto> module_dtos = await serviceManager
                 .ModuleService.GetModulesByCourseIdAsync(cid);
-            return Ok(module_dtos);
+
+			return Ok(module_dtos);
         }
         [HttpGet("{cid:int}/{mid:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]

@@ -1,0 +1,47 @@
+﻿<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+
+        @if (!string.IsNullOrEmpty(CourseName))
+        {
+            <li class="breadcrumb-item">
+                <a class="breadcrumb-link" @onclick="GoToCourse">@CourseName</a>
+            </li>
+        }
+
+        @if (!string.IsNullOrEmpty(ModuleName))
+        {
+            <li class="breadcrumb-item">
+                <a class="breadcrumb-link"  @onclick="GoToModule">@ModuleName</a>
+            </li>
+        }
+
+        @if (!string.IsNullOrEmpty(ActivityName))
+        {
+            <li class="breadcrumb-item active" aria-current="page">
+                @ActivityName
+            </li>
+        }
+
+    </ol>
+</nav>
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+    [Parameter] public int ModuleId { get; set; }
+
+    [Parameter] public string? CourseName { get; set; }
+    [Parameter] public string? ModuleName { get; set; }
+    [Parameter] public string? ActivityName { get; set; }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private void GoToCourse()
+    {
+        NavigationManager.NavigateTo("/my-course");
+    }
+
+    private void GoToModule()
+    {
+        NavigationManager.NavigateTo($"/module/{CourseId}/{ModuleId}");
+    }
+}

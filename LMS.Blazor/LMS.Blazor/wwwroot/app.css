@@ -102,3 +102,7 @@ h1:focus {
 li:has(.active-nav-link) {
 	border-bottom: 3px solid var(--bs-primary) !important;
 }
+
+.breadcrumb-link {
+	cursor: pointer;
+}
