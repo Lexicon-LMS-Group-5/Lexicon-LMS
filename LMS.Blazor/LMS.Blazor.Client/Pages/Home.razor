@@ -1,0 +1,26 @@
+﻿@page "/"
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await authenticationStateTask;
+
+        if (authenticationState.User.IsInRole("Student"))
+        {
+            Navigation.NavigateTo("/my-course");
+        }
+        else if (authenticationState.User.IsInRole("Teacher"))
+        {
+            Navigation.NavigateTo("/dashboard");
+        } else
+        {
+            Navigation.NavigateTo("/Account/Login", forceLoad: true);
+        }
+    }
+}

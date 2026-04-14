@@ -29,6 +29,7 @@ namespace LMS.Infractructure.Repositories
         {
             return await FindByCondition(m => m.CourseId == courseId, trackChanges)
                 .Include(m => m.Activities)
+                    .ThenInclude(a => a.Type)
                 .ToListAsync(ct);
         }
     }
