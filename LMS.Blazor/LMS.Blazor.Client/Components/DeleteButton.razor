@@ -1,0 +1,23 @@
+﻿<button tabindex="0"
+        title="@Title"
+        @onclick="Click"
+        class="btn btn-sm btn-outline-danger p-0 rounded"
+        style="width: 24px; height: 24px">
+    <div class="d-flex flex-column justify-content-center p-1 w-100 h-100">
+        <TrashIcon Size="16" />
+    </div>
+</button>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task Click()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+}

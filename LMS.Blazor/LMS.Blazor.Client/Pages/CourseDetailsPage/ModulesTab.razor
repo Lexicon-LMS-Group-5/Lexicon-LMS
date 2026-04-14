@@ -53,16 +53,9 @@
                                     <PencilIcon Size="16" />
                                 </div>
                             </button> *@
-                            <button 
-                                tabindex="0"
+                            <DeleteButton 
                                 title="@($"Delete module \"{module.Name}\"")"
-                                @onclick="() => RequestDeleteModuleAsync(module)"
-                                class="btn btn-sm btn-outline-danger p-0 rounded"
-                                style="width: 24px; height: 24px">
-                                <div class="d-flex flex-column justify-content-center p-1 w-100 h-100">
-                                    <TrashIcon Size="16" />
-                                </div>
-                            </button>
+                                @onclick="() => RequestDeleteModuleAsync(module)" />
                         </div>
                     </div>
                     <div class="@($"collapse {(module.Id == selectedModuleId ? "show" : "")}")" id="@($"module-item-{module.Id}")">
