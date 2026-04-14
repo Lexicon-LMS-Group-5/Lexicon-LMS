@@ -71,8 +71,14 @@ else
         Activity = await ApiService.GetAsync<ActivityReadDto>(
             $"api/activities/{ActivityId}");
     }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo($"/module/{CourseId}/{ModuleId}");
+    }
     private async Task DeleteThis()
     {
         await ApiService.DeleteAsync($"api/activities/{ActivityId}");
+        GoBack();
     }
 }

@@ -17,7 +17,30 @@
 }
 
 <div class="d-flex flex-column gap-5 pb-5">
-    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="OpenModalAsync" />
+    <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="() => ShowModalAsync(EditCourseModalId)">
+        <CourseDetailsHeaderActions>
+            <AuthorizeView Roles="Teacher">
+                <button class="btn btn-primary my-auto d-flex gap-2"
+                        type="button"
+                        disabled="@(CourseDetails == null)"
+                        @onclick="() => ShowModalAsync(EditCourseModalId)">
+                    <div class="my-auto d-flex flex-column justify-content-center">
+                        <PencilIcon Size="16" />
+                    </div>
+                    <div class="">
+                        Edit course
+                    </div>
+                </button>
+                <button 
+                    class="btn btn-outline-danger my-auto"
+                    disabled="@(CourseDetails == null)"
+                        @onclick="() => ShowModalAsync(DeleteConfirmationModalId)">
+                    <TrashIcon />
+                </button>
+            </AuthorizeView>
+        </CourseDetailsHeaderActions>
+    </CourseDetailsHeader>
+
 
     <TabContainer 
         CurrentRoute="@($"/dashboard/courses/{CourseId}")" 
@@ -93,74 +116,75 @@
             }
         </Tab>
         <Tab Title="Students">
-            <div class="d-flex flex-column gap-3 p-3">
-                <header>
-                    <h2 class="fs-5">Students</h2>
-                </header>
-            </div>
+            @if (CourseDetails != null) {
+                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Role == "Student").ToList())" />
+            }
         </Tab>
     </TabContainer>
 </div>
 
-@if (CourseDetails != null && EditContext != null)
-{
-    <div class="modal fade" id="@EditCourseModalId" tabindex="-1" aria-labelledby="editCourseFormModalLabel">
-        <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content overflow-y-auto">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="@($"{EditCourseModalId}Label")">
-                        Edit Course
-                    </h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <EditCourseForm 
-                    EditContext="EditContext" 
-                    CourseDetails="CourseDetails" 
-                    Model="EditCourseModel"
-                    OnSubmissionRequested="OnEditCourseSubmissionRequested"
-                    OnSubmissionFailed="OnEditCourseSubmissionFailed"
-                    OnSubmissionCanceled="OnEditCourseSubmissionCanceledAsync"
-                    OnSubmissionSucceeded="OnEditCourseSubmissionSucceededAsync">
-                    <FormContent>
-                        <div class="modal-body h-100">
-                            <EditCourseFormContent 
-                                CourseDetails="CourseDetails" 
-                                Model="EditCourseModel" />
-                        </div>
-                    </FormContent>
-                    <FormActions>
-                        <div class="modal-footer">
-                            <button 
-                                class="btn btn-secondary"
-                                type="button" 
-                                @onclick="CloseModalAsync">
-                                Cancel
-                            </button>
-                            <button 
-                                class="btn btn-primary"
-                                type="submit"
-                                disabled="@IsFormLoading">
-                                Save changes
-                            </button>
-                        </div>
-                    </FormActions>
-                </EditCourseForm>
+<Modal ModalId="@DeleteConfirmationModalId">
+    <ModalHeader
+        ModalId="@DeleteConfirmationModalId"
+        Title="Are you sure?" />
+    <ModalBody>
+        <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
+            <div>
+                This will permanently delete this course and all of its content.
             </div>
         </div>
-    </div>
+    </ModalBody>
+    <ModalFooter>
+        <button
+            class="btn btn-outline-secondary"
+            @onclick="() => HideModalAsync(DeleteConfirmationModalId)">
+            Cancel
+        </button>
+        <button
+            class="btn btn-danger"
+            @onclick="DeleteThisAsync">
+            Delete
+        </button>
+    </ModalFooter>
+</Modal>
 
-    <script>
-        
-        function openModal() {
-            const modalNode = document.getElementById("editCourseFormModal")
-            const modal = bootstrap.Modal.getOrCreateInstance(modalNode)
-            modal.show()
-        }
-
-        function closeModal() {
-            const modalNode = document.getElementById("editCourseFormModal")
-            const modal = bootstrap.Modal.getInstance(modalNode)
-            modal.hide()
-        }
-    </script>
+@if (CourseDetails != null && EditContext != null)
+{
+    <Modal ModalId="@EditCourseModalId">
+        <ModalHeader 
+            ModalId="@EditCourseModalId" 
+            Title="Edit Course" />
+        <EditCourseForm 
+            EditContext="EditContext" 
+            CourseDetails="CourseDetails" 
+            Model="EditCourseModel"
+            OnSubmissionRequested="OnEditCourseSubmissionRequested"
+            OnSubmissionFailed="OnEditCourseSubmissionFailed"
+            OnSubmissionCanceled="OnEditCourseSubmissionCanceledAsync"
+            OnSubmissionSucceeded="OnEditCourseSubmissionSucceededAsync">
+            <FormContent>
+                <ModalBody>
+                    <EditCourseFormContent 
+                        CourseDetails="CourseDetails" 
+                        Model="EditCourseModel" />
+                </ModalBody>
+            </FormContent>
+            <FormActions>
+                <ModalFooter>
+                    <button 
+                        class="btn btn-secondary"
+                        type="button" 
+                        @onclick="OnEditCourseSubmissionCanceledAsync">
+                        Cancel
+                    </button>
+                    <button 
+                        class="btn btn-primary"
+                        type="submit"
+                        disabled="@IsFormLoading">
+                        Save changes
+                    </button>
+                </ModalFooter>
+            </FormActions>
+        </EditCourseForm>
+    </Modal>
 }
