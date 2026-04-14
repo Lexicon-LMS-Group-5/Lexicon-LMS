@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using LMS.Shared
 
 @code {
     [CascadingParameter]
@@ -11,11 +12,11 @@
     {
         var authenticationState = await authenticationStateTask;
 
-        if (authenticationState.User.IsInRole("Student"))
+        if (authenticationState.User.IsInRole(Roles.Student))
         {
             Navigation.NavigateTo("/my-course");
         }
-        else if (authenticationState.User.IsInRole("Teacher"))
+        else if (authenticationState.User.IsInRole(Roles.Teacher))
         {
             Navigation.NavigateTo("/dashboard");
         } else

@@ -1,4 +1,5 @@
 ﻿@page "/dashboard/courses/{courseId}"
+@using LMS.Shared
 
 <PageTitle>@(IsLoading ? "Loading course details..." : CourseDetails?.Name ?? "Course Details")</PageTitle>
 
@@ -19,7 +20,7 @@
 <div class="d-flex flex-column gap-5 pb-5">
     <CourseDetailsHeader CourseDetails="CourseDetails" IsLoading="IsLoading" OnOpenModal="() => ShowModalAsync(EditCourseModalId)">
         <CourseDetailsHeaderActions>
-            <AuthorizeView Roles="Teacher">
+            <AuthorizeView Roles=@Roles.Teacher>
                 <button class="btn btn-primary my-auto d-flex gap-2"
                         type="button"
                         disabled="@(CourseDetails == null)"
@@ -117,7 +118,7 @@
         </Tab>
         <Tab Title="Students">
             @if (CourseDetails != null) {
-                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Roles.Any(r => r == "Student")).ToList())" />
+                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Roles.Any(r => r == Roles.Student)).ToList())" />
             }
         </Tab>
     </TabContainer>

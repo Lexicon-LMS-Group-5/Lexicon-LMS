@@ -3,6 +3,7 @@
 @using LMS.Shared
 @using Microsoft.AspNetCore.Authorization
 @using LMS.Shared.DTOs
+@using LMS.Shared
 @using LMS.Blazor.Client.Components
 @inject IJSRuntime JS
 
@@ -29,7 +30,7 @@ else
 
         <div class="container py-4">
             <div class="mb-4">
-                <AuthorizeView Roles="Teacher">
+                <AuthorizeView Roles=@Roles.Teacher>
                     <button class="btn btn-outline-secondary btn-sm mb-3"
                             @onclick="DeleteThis">
                         Delete this course
