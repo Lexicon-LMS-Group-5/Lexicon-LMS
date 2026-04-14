@@ -32,7 +32,7 @@
         <div class="mb-3">
             <label class="form-label">Activity Type</label>
             <select class="form-select" @bind="model.ActivityTypeId">
-                @foreach (var type in ActivityTypes)
+                @foreach (var type in ActivityTypes!)
                 {
                     <option value="@type.Id">@type.Name</option>
                 }
@@ -82,7 +82,7 @@
     [Parameter] public EventCallback OnCreated { get; set; }
     [Parameter] public RenderFragment? ModalCloseButton { get; set; }
 
-    private List<ActivityTypeReadDto> ActivityTypes { get; set; } = new();
+    private List<ActivityTypeReadDto>? ActivityTypes { get; set; } = new();
 
     private ActivityFormModel model = new();
 
@@ -127,12 +127,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activitytypes");
+        ActivityTypes = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activities/types");
 
-        if (ActivityTypes != null && ActivityTypes.Any())
-        {
-            model.ActivityTypeId = ActivityTypes.First().Id;
-        }
+        if (ActivityTypes == null || ActivityTypes.Count == 0)
+            throw new NullReferenceException("Failed to load activity types");
+
+        model.ActivityTypeId = ActivityTypes.First().Id;
     }
 
     private void ResetForm()
@@ -142,7 +142,7 @@
         StartDate = DateOnly.FromDateTime(DateTime.Today);
         EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
 
-        if (ActivityTypes.Any())
+        if (ActivityTypes != null && ActivityTypes.Any())
         {
             model.ActivityTypeId = ActivityTypes.First().Id;
         }
