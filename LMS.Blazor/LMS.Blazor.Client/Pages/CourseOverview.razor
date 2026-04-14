@@ -176,7 +176,10 @@ else
     }
     private async Task DeleteThis()
     {
-        await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        if (CourseDetails != null)
+        {
+            await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        }
         Navigation.NavigateTo("/dashboard");
     }
 }

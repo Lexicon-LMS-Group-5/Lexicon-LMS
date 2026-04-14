@@ -105,8 +105,10 @@ public partial class CourseDetailsPage
     }
     private async Task DeleteThis()
     {
-if (CourseDetails != null)
-        await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        if (CourseDetails != null)
+        {
+            await ApiService.DeleteAsync($"api/courses/{CourseDetails!.Id}");
+        }
         Navigation.NavigateTo("/dashboard");
     }
 }
