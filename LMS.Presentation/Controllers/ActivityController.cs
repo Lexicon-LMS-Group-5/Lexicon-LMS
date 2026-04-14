@@ -27,11 +27,17 @@ public class ActivityController : ControllerBase
         return Ok(activities);
     }
 
-    // GET: api/activities/5
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<ActivityReadDto>> GetById(int id, CancellationToken ct)
+    // GET: api/activities/5/28/32
+    [HttpGet("{cid:int}/{mid:int}/{id:int}")]
+    public async Task<ActionResult<ActivityReadDto>> GetById(
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
+        CancellationToken ct)
     {
         var activity = await serviceManager.ActivityService.GetActivityAsync(id, ct);
+        if (mid != activity.ModuleId) return BadRequest($"No ActivityId={id} under ModuleId={mid}");
+        if (cid != activity.CourseId) return BadRequest($"No Activity={id} under a module of CourseId={cid}");
         return Ok(activity);
     }
 
@@ -81,11 +87,13 @@ public class ActivityController : ControllerBase
             created);
     }
 
-    // PUT: api/activities/5
+    // PUT: api/activities/5/2/9
     [Authorize(Roles = Roles.Teacher)]
-    [HttpPut("{id:int}")]
+    [HttpPut("{cid:int}/{mid:int}/{id:int}")]
     public async Task<ActionResult<ActivityReadDto>> Update(
-        int id,
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
         [FromBody] ActivityUpsertDto dto,
         CancellationToken ct)
     {
