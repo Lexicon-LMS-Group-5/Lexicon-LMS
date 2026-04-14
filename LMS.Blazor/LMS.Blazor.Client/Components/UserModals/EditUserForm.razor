@@ -30,12 +30,13 @@ else
         {
             <div class="alert alert-danger">@Error</div>
         }
-
-        <button type="button" class="btn btn-secondary"
-                @onclick="@(() => { Error = string.Empty; OnCancel.InvokeAsync(); })">
-            Cancel
-        </button>
-        <button type="submit" class="btn btn-primary me-2" disabled="@IsSubmitting">Save</button>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary"
+                    @onclick="@(() => { Error = string.Empty; OnCancel.InvokeAsync(); })">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary me-2" disabled="@IsSubmitting">Save</button>
+        </div>
     </EditForm>
 }
 @code {
