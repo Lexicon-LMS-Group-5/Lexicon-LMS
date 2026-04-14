@@ -59,8 +59,8 @@ public partial class CourseController : ControllerBase
 
     [Authorize(Roles = Roles.Teacher)]
     [HttpPost()]
-    [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
+    [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseDetailsDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
     {
         // Get the user ID and add it to the DTO
         command.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -69,19 +69,22 @@ public partial class CourseController : ControllerBase
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
     }
+
     // PUT api/courses/5
     [Authorize(Roles = Roles.Teacher)]
     [HttpPut("{cid:int}")]
-    [ProducesResponseType<CourseReadDto>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<CourseReadDto>> Update(
+    [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseDetailsDto>> Update(
         [FromRoute] int cid,
-        [FromBody] CourseUpsertDto dto,
+        [FromBody] UpdateCourseCommandDto dto,
         CancellationToken ct)
     {
-        CourseReadDto updatedCourse = await serviceManager
-            .CourseService.UpdateCourseAsync(cid, dto, ct);
+        dto.Id = cid;
+        var updatedCourse = await serviceManager
+            .CourseService.UpdateCourseAsync(dto, ct);
         return Ok(updatedCourse);
     }
+
     // DELETE: /api/courses/5
     [Authorize(Roles = Roles.Teacher)]
     [HttpDelete("{cid:int}")]
@@ -93,6 +96,4 @@ public partial class CourseController : ControllerBase
         await serviceManager.CourseService.DeleteCourseAsync(cid, ct);
         return NoContent();
     }
-
-
 }

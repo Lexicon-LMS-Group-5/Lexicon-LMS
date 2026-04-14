@@ -31,10 +31,12 @@ else
 
         <div class="container py-4">
             <div class="mb-4">
-                <button class="btn btn-outline-secondary btn-sm mb-3"
-                        @onclick="DeleteThis">
-                    Delete this course
-                </button>
+                <AuthorizeView Roles="Teacher">
+                    <button class="btn btn-outline-secondary btn-sm mb-3"
+                            @onclick="DeleteThis">
+                        Delete this course
+                    </button>
+                </AuthorizeView>
             </div>
             <div class="card shadow-lg mb-4">
                 <div class="card-body">
@@ -174,7 +176,11 @@ else
     }
     private async Task DeleteThis()
     {
-        await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        if (CourseDetails != null)
+        {
+            await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        }
+        Navigation.NavigateTo("/dashboard");
     }
 }
 

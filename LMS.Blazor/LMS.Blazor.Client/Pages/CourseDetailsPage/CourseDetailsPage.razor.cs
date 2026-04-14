@@ -36,11 +36,24 @@ public partial class CourseDetailsPage
     private CourseDetailsDto? CourseDetails { get; set; }
 
     private EditContext? EditContext { get; set; }
-    private EditCourseCommandDto? EditCourseModel { get; set; }
+    private UpdateCourseCommandDto? EditCourseModel { get; set; }
 
     private const string EditCourseModalId = "editCourseFormModal";
 
-    
+    private bool IsFormLoading { get; set; }
+    private void OnEditCourseSubmissionRequested() => IsFormLoading = true;
+    private void OnEditCourseSubmissionFailed() => IsFormLoading = false;
+    private async Task OnEditCourseSubmissionCanceledAsync()
+    {
+        IsFormLoading = false;
+        await CloseModalAsync();
+    }
+    private async Task OnEditCourseSubmissionSucceededAsync(CourseDetailsDto updatedCourseDetails)
+    {
+        CourseDetails = updatedCourseDetails;
+        IsFormLoading = false;
+        await CloseModalAsync();
+    }
 
     private async Task OpenModalAsync()
     {
@@ -89,5 +102,13 @@ public partial class CourseDetailsPage
         {
             IsLoading = false;
         }
+    }
+    private async Task DeleteThis()
+    {
+        if (CourseDetails != null)
+        {
+            await ApiService.DeleteAsync($"api/courses/{CourseDetails!.Id}");
+        }
+        Navigation.NavigateTo("/dashboard");
     }
 }

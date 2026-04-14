@@ -58,6 +58,13 @@ public class ActivityController : ControllerBase
         return Ok(activities);
     }
 
+    [HttpGet("types")]
+    public async Task<ActionResult<List<ActivityTypeReadDto>>> GetAllTypes(int typeId, CancellationToken ct)
+    {
+        var types = await serviceManager.ActivityTypeService.GetAllActivityTypesAsync(ct);
+        return Ok(types);
+    }
+
     // GET: api/activities/daterange?startDate=...&endDate=...
     [HttpGet("daterange")]
     public async Task<ActionResult<List<ActivityReadDto>>> GetByDateRange(

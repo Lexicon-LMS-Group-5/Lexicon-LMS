@@ -60,7 +60,7 @@ public class DataSeedHostingService : IHostedService
 
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        // // Uncomment to drop current database and re-seed with mock data
+        // Uncomment to drop current database and re-seed with mock data
         // await context.Database.EnsureDeletedAsync(cancellationToken);
         // await context.Database.MigrateAsync(cancellationToken);
 
