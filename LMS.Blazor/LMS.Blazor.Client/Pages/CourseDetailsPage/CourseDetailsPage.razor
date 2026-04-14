@@ -35,7 +35,7 @@
                 <button 
                     class="btn btn-outline-danger my-auto"
                     disabled="@(CourseDetails == null)"
-                        @onclick="() => ShowModalAsync(DeleteConfirmationModalId)">
+                        @onclick="() => ShowModalAsync(DeleteCourseConfirmationModalId)">
                     <TrashIcon />
                 </button>
             </AuthorizeView>
@@ -124,9 +124,9 @@
     </TabContainer>
 </div>
 
-<Modal ModalId="@DeleteConfirmationModalId">
+<Modal ModalId="@DeleteCourseConfirmationModalId">
     <ModalHeader
-        ModalId="@DeleteConfirmationModalId"
+        ModalId="@DeleteCourseConfirmationModalId"
         Title="Are you sure?" />
     <ModalBody>
         <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
@@ -138,12 +138,12 @@
     <ModalFooter>
         <button
             class="btn btn-outline-secondary"
-            @onclick="() => HideModalAsync(DeleteConfirmationModalId)">
+            @onclick="() => HideModalAsync(DeleteCourseConfirmationModalId)">
             Cancel
         </button>
         <button
             class="btn btn-danger"
-            @onclick="DeleteThisAsync">
+            @onclick="ConfirmDeleteThisAsync">
             Delete
         </button>
     </ModalFooter>

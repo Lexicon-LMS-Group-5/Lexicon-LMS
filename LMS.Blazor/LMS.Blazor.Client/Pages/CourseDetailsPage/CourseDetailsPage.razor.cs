@@ -107,8 +107,8 @@ public partial class CourseDetailsPage
         }
     }
 
-    private const string DeleteConfirmationModalId = "deleteConfirmationModal";
-    private async Task DeleteThisAsync()
+    private const string DeleteCourseConfirmationModalId = "deleteCourseConfirmationModal";
+    private async Task ConfirmDeleteThisAsync()
     {
         if (CourseDetails != null)
         {

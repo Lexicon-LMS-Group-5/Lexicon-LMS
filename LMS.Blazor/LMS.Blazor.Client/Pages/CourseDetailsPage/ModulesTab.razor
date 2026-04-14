@@ -17,29 +17,47 @@
             <div class="modules-list rounded-3 overflow-hidden shadow-sm">
                 @foreach (var module in Modules)
                 {
-                    <button class="module-list-item accordion-button d-flex gap-3 p-3 w-100 text-start"
+                    <div class="module-list-item">
+                        <button 
+                            tabindex="0"
+                            class="accordion-button d-flex gap-3 p-3 w-100 text-start focus-ring"
                             @onclick="() => selectedModuleId = selectedModuleId == module.Id ? null : module.Id"
                             data-bs-toggle="collapse" 
                             data-bs-target="@($"#module-item-{module.Id}")"
                             aria-expanded="false" 
                             aria-controls="@($"module-item-{module.Id}")">
-                        <div class="d-flex my-auto rounded-circle bg-primary-subtle text-primary p-2">
-                            <LayersIcon />
-                        </div>
-                        <div class="d-flex flex-column gap-1 flex-grow-1">
-                            <div>
-                                @module.Name
+                            <div class="d-flex my-auto rounded-circle bg-primary-subtle text-primary p-2">
+                                <LayersIcon />
                             </div>
-                            <div class="text-secondary">
-                                @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
+                            <div class="d-flex flex-column gap-1 flex-grow-1">  
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        @module.Name
+                                    </div>
+                                </div>
+                                <div class="text-secondary">
+                                    @module.StartDate.ToShortDateString() - @module.EndDate.ToShortDateString()
+                                </div>
                             </div>
-                        </div>
-                        <div class="my-auto">
-                            <div class="text-secondary" style="@(module.Id == selectedModuleId ? openedChevronIconStyles : closedChevronIconStyles)">
-                                <ChevronUpIcon />
+                            <div class="my-auto">
+                                <div class="text-secondary" style="@(module.Id == selectedModuleId ? openedChevronIconStyles : closedChevronIconStyles)">
+                                    <ChevronUpIcon />
+                                </div>
                             </div>
+                        </button>
+                        <div class="module-list-item-actions">
+                            @* <button tabindex="0"
+                                    class="btn btn-sm btn-outline-primary p-0 rounded"
+                                    style="width: 24px; height: 24px">
+                                <div class="d-flex flex-column justify-content-center p-1 w-100 h-100">
+                                    <PencilIcon Size="16" />
+                                </div>
+                            </button> *@
+                            <DeleteButton 
+                                title="@($"Delete module \"{module.Name}\"")"
+                                @onclick="() => RequestDeleteModuleAsync(module)" />
                         </div>
-                    </button>
+                    </div>
                     <div class="@($"collapse {(module.Id == selectedModuleId ? "show" : "")}")" id="@($"module-item-{module.Id}")">
                         <div class="p-4 d-flex flex-column gap-3">
                             <div>
@@ -58,8 +76,15 @@
                                                     <div class="badge bg-primary-subtle text-primary rounded-pill my-auto">
                                                         @activity.ActivityTypeName
                                                     </div>
-                                                    <div>
-                                                        @activity.Name
+                                                    <div class="d-flex w-100 flex-grow-1 justify-content-between">
+                                                        <div>
+                                                            @activity.Name
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <DeleteButton 
+                                                                title="@($"Delete activity \"{activity.Name}\"")"
+                                                                @onclick="() => RequestDeleteActivityAsync(activity)" />
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="text-secondary fw-bold d-flex gap-2" style="font-size: .75em">
@@ -87,15 +112,6 @@
                             </div>
                         </div>
                     </div>
-                    @* <Modal ModalId="@GetCreateActivityModalId(module.Id)">
-                        <ModalHeader 
-                            ModalId="@CreateActivityModalId" 
-                            Title="@($"Add a new Activity to \"{module.Name}\"")" />
-                        <div class="modal-body">
-                        </div>
-                        <div class="modal-footer">
-                        </div>
-                    </Modal> *@
                 }
             </div>
         </div>
@@ -186,6 +202,56 @@
                 </FormActions>
             </AddActivityForm>
         }
+    </Modal>
+
+    <Modal ModalId="@DeleteModuleConfirmationModalId">
+        <ModalHeader ModalId="@DeleteModuleConfirmationModalId"
+                     Title="Are you sure?" />
+        <ModalBody>
+            <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
+                @if (PendingModuleDelete != null) {
+                    <div>
+                        This will permanently delete the module "@PendingModuleDelete.Name" and all of its @PendingModuleDelete.Activities.Count activities.
+                    </div>
+                } else {
+                    <div>
+                        This will permanently delete this module and all of its activities.
+                    </div>
+                }
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <button class="btn btn-outline-secondary"
+                    @onclick="CancelDeleteModuleAsync">
+                Cancel
+            </button>
+            <button class="btn btn-danger"
+                    @onclick="ConfirmDeleteModuleAsync">
+                Delete
+            </button>
+        </ModalFooter>
+    </Modal>
+
+    <Modal ModalId="@DeleteActivityConfirmationModalId">
+        <ModalHeader ModalId="@DeleteActivityConfirmationModalId"
+                     Title="Are you sure?" />
+        <ModalBody>
+            <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
+                <div>
+                    This will permanently delete the activity @(PendingActivityDelete != null ? $"\"{PendingActivityDelete.Name}\"" : "").
+                </div>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <button class="btn btn-outline-secondary"
+                    @onclick="CancelDeleteActivityAsync">
+                Cancel
+            </button>
+            <button class="btn btn-danger"
+                    @onclick="ConfirmDeleteActivityAsync">
+                Delete
+            </button>
+        </ModalFooter>
     </Modal>
 }
 
@@ -279,13 +345,14 @@
 
     private async Task OnCreateModuleSubmissionSucceededAsync(ModuleReadDto moduleDto)
     {
-        // Re-initialize form state
-        ResetModuleFormState();
-
         // Update the Modules list
-        Modules = [.. Modules, moduleDto];
+        List<ModuleReadDto> updatedModulesList = [.. Modules, moduleDto];
+        Modules = updatedModulesList;
         IsModuleFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
+
+        // Re-initialize form state
+        ResetModuleFormState();
     }
 
     private void InitializeModuleFormState()
@@ -387,5 +454,91 @@
     private async Task HideModalAsync(string modalId)
     {
         await JsRuntime.InvokeVoidAsync("hideModal", modalId);
+    }
+
+    private const string DeleteModuleConfirmationModalId = "deleteModuleConfirmationModal";
+    private ModuleReadDto? PendingModuleDelete { get; set; } = null;
+
+    private async Task RequestDeleteModuleAsync(ModuleReadDto module)
+    {
+        PendingModuleDelete = module;
+        await ShowModalAsync(DeleteModuleConfirmationModalId);
+    }
+
+    private async Task CancelDeleteModuleAsync()
+    {
+        await HideModalAsync(DeleteModuleConfirmationModalId);
+        // Wait for modal to transition out before resetting pending delete data
+        await Task.Delay(300);
+        PendingModuleDelete = null;
+    }
+
+    private async Task ConfirmDeleteModuleAsync()
+    {
+        if (CourseDetails == null || PendingModuleDelete == null)
+            return;
+
+        try
+        {
+            await ApiService.DeleteAsync($"api/modules/{CourseDetails.Id}/{PendingModuleDelete.Id}");
+            Modules = Modules.Where(m => m.Id != PendingModuleDelete.Id).ToList();
+            await HideModalAsync(DeleteModuleConfirmationModalId);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
+        }
+
+        PendingModuleDelete = null;
+    }
+
+    private const string DeleteActivityConfirmationModalId = "deleteActivityConfirmationModal";
+    private ActivityReadDto? PendingActivityDelete { get; set; } = null;
+
+    private async Task RequestDeleteActivityAsync(ActivityReadDto activity)
+    {
+        PendingActivityDelete = activity;
+        await ShowModalAsync(DeleteActivityConfirmationModalId);
+    }
+
+    private async Task CancelDeleteActivityAsync()
+    {
+        await HideModalAsync(DeleteActivityConfirmationModalId);
+        // Wait for modal to transition out before resetting pending delete data
+        await Task.Delay(300);
+        PendingActivityDelete = null;
+    }
+
+    private async Task ConfirmDeleteActivityAsync()
+    {
+        if (CourseDetails == null || PendingActivityDelete == null)
+            return;
+
+        try
+        {
+            await ApiService.DeleteAsync($"api/activities/{PendingActivityDelete.Id}");
+            
+            var module = Modules
+                .Where(m => m.Activities.Contains(PendingActivityDelete))
+                .FirstOrDefault() ?? throw new Exception($"Could not find module for activity \"{PendingActivityDelete.Name}\"");
+            
+            module.Activities = module.Activities
+                .Where(a => a.Id != PendingActivityDelete.Id)
+                .ToList();
+            
+            Modules = Modules
+                .Select(m => m.Id != PendingActivityDelete.Id ? m : module)
+                .ToList();
+            
+            await HideModalAsync(DeleteActivityConfirmationModalId);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
+        }
+
+        PendingModuleDelete = null;
     }
 }
