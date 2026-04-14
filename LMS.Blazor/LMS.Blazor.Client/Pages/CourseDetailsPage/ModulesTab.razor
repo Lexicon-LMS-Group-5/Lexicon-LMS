@@ -1,9 +1,19 @@
 ﻿<ErrorBoundary @ref="ModulesTabErrorBoundary">
     <ChildContent>
         <div class="d-flex flex-column gap-3 p-3">
-            <header>
-                <h2 class="fs-5">Modules</h2>
-            </header>
+            <TabHeader Title="Modules">
+                <TabActions>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary d-flex align-items-middle gap-2" 
+                        @onclick="async () => await ShowModalAsync(CreateModuleModalId)">
+                        <div class="d-flex align-items-middle m-auto">
+                            <CirclePlusIcon Size="20" />
+                        </div>
+                        Add a new Module
+                    </button>
+                </TabActions>
+            </TabHeader>
             <div class="modules-list rounded-3 overflow-hidden shadow-sm">
                 @foreach (var module in Modules)
                 {
@@ -66,9 +76,26 @@
                                         </div>
                                     </div>
                                 }
+                                <button 
+                                    class="d-flex justify-content-center gap-2 p-2 align-items-middle add-activity-button rounded text-secondary"
+                                    @onclick="() => ShowModalAsync(GetCreateActivityModalId(module.Id))">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <CirclePlusIcon Size="20" /> 
+                                    </div>
+                                        Add a new Activity
+                                </button>
                             </div>
                         </div>
                     </div>
+                    <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+                        <ModalHeader 
+                            ModalId="@CreateActivityModalId" 
+                            Title="@($"Add a new Activity to \"{module.Name}\"")" />
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </Modal>
                 }
             </div>
         </div>
@@ -89,12 +116,22 @@
     </ErrorContent>
 </ErrorBoundary>
 
+<Modal ModalId="@CreateModuleModalId">
+    <ModalHeader 
+        ModalId="@CreateModuleModalId" 
+        Title="Add a new Module" />
+    <div class="modal-body">
+    </div>
+    <div class="modal-footer">
+    </div>
+</Modal>
+
 @code {
     [Inject]
     private IApiService ApiService { get; set; } = default!;
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; } = default!;
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Parameter]
     public int CourseId { get; set; }
@@ -106,6 +143,12 @@
     private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
     private string? ErrorMessage { get; set; }
     private ErrorBoundaryBase? ModulesTabErrorBoundary { get; set; }
+
+    private const string CreateModuleModalId = "createModuleModal";
+
+    private string CreateActivityModalId { get; set; } = string.Empty;
+
+    private string GetCreateActivityModalId(int moduleId) => $"createActivityModal-{moduleId}";
 
     private int? selectedModuleId = null;
     private string closedChevronIconStyles = "transform: rotate(90deg);";
@@ -128,5 +171,15 @@
         {
             IsLoading = false;
         }
+    }
+
+    private async Task ShowModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("showModal", modalId);
+    }
+
+    private async Task HideModalAsync(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("hideModal", modalId);
     }
 }
