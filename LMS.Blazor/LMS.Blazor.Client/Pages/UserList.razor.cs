@@ -18,7 +18,7 @@ public partial class UserList
 
     private List<UserReadDto>? _pagedUsers;
 
-    private string _sortColumn = "Roles";
+    private string _sortColumn = "Name";
 
     private bool _sortAscending = true;
 
@@ -40,6 +40,8 @@ public partial class UserList
 
     private ModalType _activeModal = ModalType.None;
 
+    private bool _isModalVisible = false;
+
     private string _selectedUserId = "";
     private string _selectedUserName = "";
     private string? _currentUserId;
@@ -50,16 +52,19 @@ public partial class UserList
     {
         _selectedUserId = userId;
         _activeModal = ModalType.EditUser;
+        ShowModalAnimation();
     }
 
     private void OpenCreateModal()
     {
         _activeModal = ModalType.CreateUser;
+        ShowModalAnimation();
     }
 
     private void OpenTempModal()
     {
         _activeModal = ModalType.CreateStudent;
+        ShowModalAnimation();
     }
 
     private void OpenDeleteModal(string userId, string userName)
@@ -67,13 +72,30 @@ public partial class UserList
         _selectedUserId = userId;
         _selectedUserName = userName;
         _activeModal = ModalType.DeleteUser;
+        ShowModalAnimation();
     }
 
-    private void CloseModal()
+    private async void CloseModal()
     {
+        _isModalVisible = false;
+        StateHasChanged();
+
+        await Task.Delay(200);
+
         _activeModal = ModalType.None;
+        StateHasChanged();
     }
 
+    private async void ShowModalAnimation()
+    {
+        _isModalVisible = false;
+        StateHasChanged();
+
+        await Task.Delay(10); // allow DOM to render first frame
+
+        _isModalVisible = true;
+        StateHasChanged();
+    }
 
     private string SearchTerm
     {

@@ -8,25 +8,26 @@
     {
         <div class="alert alert-danger">@Error</div>
     }
+    <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-secondary"
+                @onclick="Cancel"
+                disabled="@IsDeleting">
+            Cancel
+        </button>
+        <button class="btn btn-danger me-2"
+                @onclick="ConfirmDelete"
+                disabled="@IsDeleting">
+            @if (IsDeleting)
+            {
+                <span class="spinner-border spinner-border-sm"></span>
+            }
+            else
+            {
+                <span>Delete</span>
+            }
+        </button>
+    </div>
 
-    <button class="btn btn-danger me-2"
-            @onclick="ConfirmDelete"
-            disabled="@IsDeleting">
-        @if (IsDeleting)
-        {
-            <span class="spinner-border spinner-border-sm"></span>
-        }
-        else
-        {
-            <span>Delete</span>
-        }
-    </button>
-
-    <button class="btn btn-secondary"
-            @onclick="Cancel"
-            disabled="@IsDeleting">
-        Cancel
-    </button>
 </div>
 
 @code {
