@@ -7,28 +7,28 @@
 else
 {
     <div class="d-flex flex-column gap-2">
-        <InputNumber @bind-Value="Model.CourseId" type="hidden" />
+        <InputNumber @bind-Value="Model.ModuleId" type="hidden" />
         <div class="mb-3">
-            <label for="moduleName" class="form-label">Course Name</label>
+            <label for="activityName" class="form-label">Course Name</label>
             <InputText @bind-Value="Model.Name"
                        type="text"
                        class="form-control"
-                       id="moduleName"
-                       aria-describedby="moduleNameHelp" />
+                       id="activityName"
+                       aria-describedby="activityNameHelp" />
  
             <ValidationMessage For="() => Model.Name" class="text-danger" />
-            <div id="moduleNameHelp" class="form-text">Add a descriptive name for the module.</div>
+            <div id="activityNameHelp" class="form-text">Add a descriptive name for this activity.</div>
         </div>
         <div class="mb-3">
-            <label for="courseDescription" class="form-label">Description</label>
+            <label for="activityDescription" class="form-label">Description</label>
             <InputTextArea @bind-Value="Model!.Description"
                            class="form-control"
-                           id="courseDescription"
+                           id="activityDescription"
                            rows="3"
-                           aria-describedby="moduleDescriptionHelp">
+                           aria-describedby="activityDescriptionHelp">
             </InputTextArea>
             <ValidationMessage For="() => Model.Description" />
-            <div id="moduleDescriptionHelp" class="form-text">Describe the module content.</div>
+            <div id="activityDescriptionHelp" class="form-text">Describe the activity.</div>
         </div>
         <div class="mb-3 d-flex gap-3">
             <InputNumber @bind-Value:get="@durationValue" @bind-Value:set="(val) => SetDuration(val)" />
@@ -40,7 +40,7 @@ else
                            class="form-control"
                            id="startDate" />
                 <ValidationMessage For="() => Model.StartDate" />
-                <div id="startDateHelp" class="form-text">Set the start date for the Module.</div>
+                <div id="startDateHelp" class="form-text">Set the start date for the Activity.</div>
             </div>
             <div class="d-flex flex-column gap-2">
                 <label class="form-check-label" for="endDate">End date</label>
@@ -48,7 +48,7 @@ else
                            class="form-control"
                            id="endDate" />
                 <ValidationMessage For="() => Model.EndDate" />
-                <div id="endDateHelp" class="form-text">Set the end date for the Module.</div>
+                <div id="endDateHelp" class="form-text">Set the end date for the Activity.</div>
             </div>
         </div>
     </div>
@@ -56,10 +56,11 @@ else
 
 @code {
     [Parameter]
-    public ModuleUpsertDto? Model { get; set; }
+    public ActivityUpsertDto? Model { get; set; }
 
     private int durationValue { get => Model?.TimeCond?.Duration.Days ?? 0; }
-    private void SetDuration(int value) {
+    private void SetDuration(int value)
+    {
         if (Model?.TimeCond == null)
             return;
 

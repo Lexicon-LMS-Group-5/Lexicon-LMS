@@ -78,7 +78,7 @@
                                 }
                                 <button 
                                     class="d-flex justify-content-center gap-2 p-2 align-items-middle add-activity-button rounded text-secondary"
-                                    @onclick="() => ShowModalAsync(GetCreateActivityModalId(module.Id))">
+                                        @onclick="() => OnClickAddActivity(module)">
                                     <div class="d-flex flex-column justify-content-center">
                                         <CirclePlusIcon Size="20" /> 
                                     </div>
@@ -87,7 +87,7 @@
                             </div>
                         </div>
                     </div>
-                    <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+                    @* <Modal ModalId="@GetCreateActivityModalId(module.Id)">
                         <ModalHeader 
                             ModalId="@CreateActivityModalId" 
                             Title="@($"Add a new Activity to \"{module.Name}\"")" />
@@ -95,7 +95,7 @@
                         </div>
                         <div class="modal-footer">
                         </div>
-                    </Modal>
+                    </Modal> *@
                 }
             </div>
         </div>
@@ -151,6 +151,43 @@
     </Modal>
 }
 
+@foreach(var module in Modules)
+{
+    <Modal ModalId="@GetCreateActivityModalId(module.Id)">
+        @if (CreateActivityEditContext != null)
+        {
+            <ModalHeader ModalId="@GetCreateActivityModalId(module.Id)"
+                         Title="@($"Add an Activity for \"{module.Name}\"")" />
+            <AddActivityForm Model="CreateActivityModel"
+                           EditContext="CreateActivityEditContext"
+                           OnSubmissionRequested="OnCreateActivitySubmissionRequestedAsync"
+                           OnSubmissionFailed="OnCreateActivitySubmissionFailedAsync"
+                           OnSubmissionCanceled="OnCreateActivitySubmissionCanceledAsync"
+                           OnSubmissionSucceeded="OnCreateActivitySubmissionSucceededAsync">
+                <FormContent>
+                    <ModalBody>
+                        <AddActivityFormContent Model="CreateActivityModel" />
+                    </ModalBody>
+                </FormContent>
+                <FormActions>
+                    <ModalFooter>
+                        <button class="btn btn-secondary"
+                                type="button"
+                                @onclick="OnCreateActivitySubmissionCanceledAsync">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary"
+                                type="submit">
+                            Save changes
+                        </button>
+                    </ModalFooter>
+                </FormActions>
+            </AddActivityForm>
+        }
+    </Modal>
+}
+
+
 @code {
     [Inject]
     private IApiService ApiService { get; set; } = default!;
@@ -193,6 +230,7 @@
                 ?? throw new Exception("Could not fetch modules");
 
             InitializeModuleFormState();
+            InitializeActivityFormState();
         } catch(Exception ex)
         {
             ErrorMessage = ex.Message;
@@ -204,14 +242,13 @@
 
     private EditContext? CreateModuleEditContext { get; set; }
     private ModuleUpsertDto? CreateModuleModel { get; set; }
-
-    private bool IsFormLoading { get; set; }
-    private void OnCreateModuleSubmissionRequestedAsync() => IsFormLoading = true;
-    private void OnCreateModuleSubmissionFailedAsync() => IsFormLoading = false;
+    private bool IsModuleFormLoading { get; set; }
+    private void OnCreateModuleSubmissionRequestedAsync() => IsModuleFormLoading = true;
+    private void OnCreateModuleSubmissionFailedAsync() => IsModuleFormLoading = false;
     private async Task OnCreateModuleSubmissionCanceledAsync()
     {
         ResetModuleFormState();
-        IsFormLoading = false;
+        IsModuleFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
     }
 
@@ -222,7 +259,7 @@
 
         // Update the Modules list
         Modules = [.. Modules, moduleDto];
-        IsFormLoading = false;
+        IsModuleFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
     }
 
@@ -248,8 +285,71 @@
         CreateModuleEditContext = new(CreateModuleModel);
     }
 
-    private void OnCreateActivitySubmissionRequestedAsync() => IsFormLoading = true;
-    private void OnCreateActivitySubmissionFailedAsync() => IsFormLoading = false;
+    private async Task OnClickAddActivity(ModuleReadDto module)
+    {
+        CreateActivityModalId = GetCreateActivityModalId(module.Id);
+        SetActivityFormState(module);
+        await ShowModalAsync(CreateActivityModalId);
+    }
+
+    private EditContext? CreateActivityEditContext { get; set; }
+    private ActivityUpsertDto? CreateActivityModel { get; set; }
+    private bool IsActivityFormLoading { get; set; }
+
+    private void OnCreateActivitySubmissionRequestedAsync() => IsActivityFormLoading = true;
+    private void OnCreateActivitySubmissionFailedAsync() => IsActivityFormLoading = false;
+    private async Task OnCreateActivitySubmissionCanceledAsync()
+    {
+        IsActivityFormLoading = false;
+        await HideModalAsync(CreateActivityModalId);
+        await Task.Delay(300);
+        ResetActivityFormState();
+    }
+
+    private async Task OnCreateActivitySubmissionSucceededAsync(ActivityReadDto activityDto)
+    {
+        // Re-initialize form state
+        ResetActivityFormState();
+
+        // Update the Modules list
+        var updatedModueles = Modules.Select(m =>
+        {
+            if (m.Id != activityDto.ModuleId)
+                return m;
+
+            m.Activities = [.. m.Activities, activityDto];
+            return m;
+        }).ToList();
+        Modules = updatedModueles;
+        IsModuleFormLoading = false;
+        await HideModalAsync(CreateActivityModalId);
+    }
+
+    private void InitializeActivityFormState()
+    {
+        CreateActivityModel ??= new();
+        CreateActivityEditContext ??= new(CreateActivityModel);
+    }
+
+    private void SetActivityFormState(ModuleReadDto module)
+    {
+        var activityStart = module.EndDate;
+        var defaultTimeSpan = new TimeSpan(days: 1, 0, 0, 0);
+        CreateActivityModel ??= new();
+        CreateActivityModel.ModuleId = module.Id;
+        CreateActivityModel.TimeCond ??= new();
+        CreateActivityModel.TimeCond.StartingAfter ??= activityStart;
+        CreateActivityModel.TimeCond.Duration = defaultTimeSpan;
+        CreateActivityModel.StartDate = activityStart;
+        CreateActivityModel.EndDate = activityStart.Add(defaultTimeSpan);
+        CreateActivityEditContext ??= new(CreateActivityModel);
+    }
+
+    private void ResetActivityFormState()
+    {
+        CreateActivityModel = new();
+        CreateActivityEditContext = new(CreateActivityModel);
+    }
 
     private async Task ShowModalAsync(string modalId)
     {
