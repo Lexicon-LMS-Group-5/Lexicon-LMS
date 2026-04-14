@@ -12,7 +12,7 @@ public partial class EditCourseForm
     private IApiService ApiService { get; set; } = default!;
 
     [Parameter]
-    public EditCourseCommandDto? Model { get; set; }
+    public UpdateCourseCommandDto? Model { get; set; }
 
     [Parameter]
     public RenderFragment? FormContent { get; set; }
@@ -21,23 +21,51 @@ public partial class EditCourseForm
     public RenderFragment? FormActions { get; set; }
 
     [Parameter]
-    public EventCallback OnSubmit { get; set; }
+    public EventCallback OnSubmissionRequested { get; set; }
+    
+    [Parameter]
+    public EventCallback OnSubmissionFailed { get; set; }
+    
+    [Parameter]
+    public EventCallback OnSubmissionCanceled { get; set; }
+    
+    [Parameter]
+    public EventCallback<CourseDetailsDto> OnSubmissionSucceeded { get; set; }
 
     [Parameter]
     public EditContext EditContext { get; set; } = default!;
 
     [Parameter]
     public CourseDetailsDto CourseDetails { get; set; } = default!;
-    private bool IsLoading { get; set; }
+    
     private string? ErrorMessage { get; set; }
     private ErrorBoundary? EditCourseFormErrorBoundary { get; set; }
-
     private async Task SubmitAsync()
     {
-        Console.WriteLine($"### submit: {Model?.Name}");
-        if (OnSubmit.HasDelegate)
+        if (Model == null || !EditContext.IsModified())
         {
-            await OnSubmit.InvokeAsync();
+            if (OnSubmissionCanceled.HasDelegate)
+                await OnSubmissionCanceled.InvokeAsync();
+            return;
+        }
+
+        if (OnSubmissionRequested.HasDelegate)
+            await OnSubmissionRequested.InvokeAsync();
+
+        try
+        {
+            EditContext.Validate();
+            var result = await ApiService.PutAsync<UpdateCourseCommandDto, CourseDetailsDto>($"api/courses/{Model.Id}", Model)
+                ?? throw new Exception("Updated course was not received");
+
+            
+            if (OnSubmissionSucceeded.HasDelegate)
+                await OnSubmissionSucceeded.InvokeAsync(result);            
+        } catch(Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            if (OnSubmissionFailed.HasDelegate)
+                await OnSubmissionFailed.InvokeAsync();
         }
     }
 }

@@ -99,10 +99,14 @@ namespace LMS.Shared.DTOs
 
     }
 
-    public class EditCourseCommandDto : CreateCourseCommandDto
+    public class UpdateCourseCommandDto : CreateCourseCommandDto
     {
         public int Id { get; set; }
-        public EditCourseCommandDto(CourseDetailsDto courseDetails)
+        public UpdateCourseCommandDto()
+        {
+            
+        }
+        public UpdateCourseCommandDto(CourseDetailsDto courseDetails)
         {
             Id = courseDetails.Id;
             Name = courseDetails.Name;

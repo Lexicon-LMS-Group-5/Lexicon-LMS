@@ -5,7 +5,6 @@ using Domain.Models.Exceptions;
 using LMS.Shared;
 using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.PagingDtos;
-using Microsoft.AspNetCore.Identity;
 using Service.Contracts;
 
 namespace LMS.Services
@@ -111,22 +110,24 @@ namespace LMS.Services
 
             return courseParticipantsWithRoleInfo;
         }
-        public async Task<CourseReadDto> UpdateCourseAsync(
-        int id,
-        CourseUpsertDto dto,
+        public async Task<CourseDetailsDto> UpdateCourseAsync(
+        UpdateCourseCommandDto dto,
         CancellationToken ct = default)
         {
             Course? course = await unitOfWork
                 .Courses
-                .GetCourseDetailsByIdAsync(id, true, ct);
-            if (course == null) throw new CourseNotFoundException(id);
+                .GetCourseDetailsByIdAsync(dto.Id, true, ct) 
+                ?? throw new CourseNotFoundException(dto.Id);
+
+            // Course scheduling validation
             DateRangeHelper drh = new(course);
-            StartEnd oldInt = new(course);
+            // StartEnd oldInternal = new(course); // <- Not used?
             mapper.Map(dto, course);
-            StartEnd newInt = new(course, persistent: false);
-            drh.CheckNewBounds(newInt);
+            StartEnd newInterval = new(course, persistent: false);
+            drh.CheckNewBounds(newInterval);
+
             await unitOfWork.CompleteAsync(ct);
-            return mapper.Map<CourseReadDto>(course);
+            return mapper.Map<CourseDetailsDto>(course);
         }
 
         public async Task DeleteCourseAsync(int id, CancellationToken ct = default)
