@@ -37,8 +37,10 @@ public class ActivityService : IActivityService
 
         var activityDto = mapper.Map<ActivityReadDto>(activity);
 
-        var module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(activityDto.ModuleId);
-		var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId);
+        var module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(activityDto.ModuleId)
+            ?? throw new NotFoundException($"Couold not find module with ID={activityDto.ModuleId}");
+		var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId)
+            ?? throw new CourseNotFoundException(module.CourseId);
 
 		activityDto.CourseName = course.Name;
         activityDto.ModuleName = module.Name;
