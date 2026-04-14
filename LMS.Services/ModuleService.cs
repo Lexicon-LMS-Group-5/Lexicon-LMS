@@ -106,17 +106,7 @@ namespace LMS.Services
                     trackChanges,
                     ct);
 
-            var moduleReadDtos = modules.Select(m => {
-                var moduleDto = mapper.Map<ModuleReadDto>(m);
-				moduleDto.Activities = m.Activities.Select(a => {
-                    var activityDto = mapper.Map<ActivityReadDto>(a);
-                    activityDto.ActivityTypeName = a.Type.Name;                    
-					return activityDto;
-                }).ToList();
-                return moduleDto;
-            }).ToList();
-
-            return moduleReadDtos;
+            return mapper.Map<List<ModuleReadDto>>(modules);
         }
 
         public async Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto dto, CancellationToken ct = default)

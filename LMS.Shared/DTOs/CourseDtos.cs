@@ -24,16 +24,16 @@ namespace LMS.Shared.DTOs
 
     public class CourseDetailsDto : CourseReadDto
     {
-        public List<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
+        public List<CourseParticipantDto> Participants { get; set; } = [];
         public List<CourseModuleListItemDto> Modules { get; set; } = [];
     }
 
-    public class CourseParticipantWithRoleInfoDto
+    public class CourseParticipantDto
     {
         public string Id { get; set; } = default!;
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public List<string> Roles { get; set; } = [];
     }
 
     public class CourseModuleListItemDto

@@ -96,19 +96,12 @@ namespace LMS.Services
             return mapper.Map<CreateCourseResultDto>(course);
         }
 
-        private async Task<List<CourseParticipantWithRoleInfoDto>> GetCourseParticipantsWithRoleInfoAsync(
+        private async Task<List<CourseParticipantDto>> GetCourseParticipantsWithRoleInfoAsync(
             Course course, CancellationToken ct)
         {
             var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
-            var courseParticipantsWithRoleInfo = participants
-                .Select(p =>
-                {
-                    var participantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(p);
-                    participantWithRoleInfo.Role = p.Roles.Single();
-                    return participantWithRoleInfo;
-                }).ToList();
 
-            return courseParticipantsWithRoleInfo;
+            return mapper.Map<List<CourseParticipantDto>>(participants);
         }
         public async Task<CourseDetailsDto> UpdateCourseAsync(
         UpdateCourseCommandDto dto,

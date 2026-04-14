@@ -117,7 +117,7 @@
         </Tab>
         <Tab Title="Students">
             @if (CourseDetails != null) {
-                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Role == "Student").ToList())" />
+                <StudentsTab CourseId="CourseDetails.Id" Students="@(CourseDetails.Participants.Where(s => s.Roles.Any(r => r == "Student")).ToList())" />
             }
         </Tab>
     </TabContainer>

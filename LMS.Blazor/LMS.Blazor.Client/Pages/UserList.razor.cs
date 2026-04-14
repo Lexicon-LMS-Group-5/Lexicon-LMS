@@ -72,6 +72,8 @@ public partial class UserList
     private void CloseModal()
     {
         _activeModal = ModalType.None;
+        _selectedUserId = "";
+        _selectedUserName = "";
     }
 
 
@@ -131,7 +133,7 @@ public partial class UserList
                 u.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                u.Course != null && u.Course.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.CourseName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 (u.Roles != null && u.Roles.Any(r =>
                     r.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))));
         }

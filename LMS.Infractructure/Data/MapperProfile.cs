@@ -18,14 +18,16 @@ public class MapperProfile : Profile
         CreateMap<Course, CourseDetailsDto>();
         CreateMap<UpdateCourseCommandDto, Course>();
         CreateMap<Course, UpdateCourseCommandDto>();
-        CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
+        CreateMap<ApplicationUser, CourseParticipantDto>();
         CreateMap<Module, CourseModuleListItemDto>();
 		CreateMap<Activity, ActivityReadDto>();
         CreateMap<ActivityUpsertDto, Activity>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
         CreateMap<Course, CourseReadDto>();
         CreateMap<ApplicationUser, UserReadDto>()
-            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
+            .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()))
+            .ForMember(dest => dest.CourseName,
+                opt => opt.MapFrom(src => src.Course != null ? src.Course.Name : ""));
         CreateMap<UserUpdateDto, ApplicationUser>()
             .ForMember(dest => dest.Roles, opt => opt.Ignore())
             .ForMember(dest => dest.Id, opt => opt.Ignore());
@@ -34,8 +36,14 @@ public class MapperProfile : Profile
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
         CreateMap<Module, ModuleReadDto>();
 		CreateMap<ActivityUpsertDto, Activity>();
+        CreateMap<ModuleUpsertDto, Module>();
+        CreateMap<Module, ModuleReadDto>()
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
+        CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ActivityType, ActivityTypeReadDto>();
-		CreateMap<Activity, ActivityReadDto>()
-	        .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.Type.Name));
-	}
+        CreateMap<Activity, ActivityReadDto>()
+            .ForMember(dest => dest.ModuleName, opt => opt.MapFrom(src => src.Module.Name))
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Module.Course.Id))
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Module.Course.Name));
+    }
 }

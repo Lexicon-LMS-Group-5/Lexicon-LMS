@@ -92,7 +92,7 @@
     public int CourseId { get; set; }
 
     [Parameter]
-    public IReadOnlyList<CourseParticipantWithRoleInfoDto> Students { get; set; } = [];
+    public IReadOnlyList<CourseParticipantDto> Students { get; set; } = [];
 
     private const string AddStudentModalId = "addStudentModal";
 
