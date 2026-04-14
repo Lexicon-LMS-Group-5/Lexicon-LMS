@@ -20,7 +20,6 @@ public class MapperProfile : Profile
         CreateMap<Course, UpdateCourseCommandDto>();
         CreateMap<ApplicationUser, CourseParticipantWithRoleInfoDto>();
         CreateMap<Module, CourseModuleListItemDto>();
-		CreateMap<Activity, ActivityReadDto>();
         CreateMap<Course, CourseReadDto>();
         CreateMap<ApplicationUser, UserReadDto>()
             .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles ?? new List<string>()));
@@ -30,6 +29,9 @@ public class MapperProfile : Profile
         CreateMap<UserCreateDto, ApplicationUser>();
         CreateMap<ModuleUpsertDto, Module>();
         CreateMap<Module, ModuleReadDto>();
+		CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ActivityType, ActivityTypeReadDto>();
-    }
+		CreateMap<Activity, ActivityReadDto>()
+	        .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.Type.Name));
+	}
 }
