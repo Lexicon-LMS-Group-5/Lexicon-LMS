@@ -30,35 +30,21 @@ namespace LMS.Services
                 .GetCourseDetailsByIdAsync(dto.CourseId, true, ct);
             if (course == null) throw new CourseNotFoundException(dto.CourseId);
 
-            //DateRangeHelper drh = new DateRangeHelper(course);
-            //if (DateRangeHelper.Absent(dto.StartDate)
-            //    || DateRangeHelper.Absent(dto.EndDate))
-            //{
-            //    if (dto.TimeCond == null) throw new BadRequestException("time parameters");
-            //    var timeResp = drh.GetDateRange(dto.TimeCond!);
-            //    if (timeResp != null)
-            //    {
-            //        dto.StartDate = DateRangeHelper.OneOf(dto.StartDate, timeResp.Start);
-            //        dto.EndDate = DateRangeHelper.OneOf(dto.EndDate, timeResp.End);
-            //    }
-            //}
-            //Module module = mapper.Map<Module>(dto);
-            //StartEnd newStartEnd = new(module);
-            //drh.CheckNew(newStartEnd);
-
             if (dto.StartDate == null || dto.EndDate == null)
                 throw new BadRequestException("Start and End dates are required for Module creation");
 
             if (dto.EndDate < dto.StartDate)
                 throw new BadRequestException("The module's End date must be after the End date");
 
-            if (course.Modules.Count > 0) { 
+            if (course.Modules.Count > 0)
+            {
                 var lastModule = course.Modules.LastOrDefault();
                 if (lastModule != null && lastModule.EndDate > dto.StartDate)
                     throw new BadRequestException("The new module must begin after the current last module in the course");
             }
 
             var module = mapper.Map<Module>(dto);
+
             unitOfWork.Modules.Create(module);
             course.Modules.Add(module);
 
