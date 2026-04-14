@@ -1,5 +1,6 @@
 ﻿@using LMS.Shared.DTOs
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
 @inject IApiService ApiService
 
 <EditForm Model="@model" OnValidSubmit="SaveActivity">
@@ -40,6 +41,15 @@
             <ValidationMessage For="@(() => model.ActivityTypeId)" class="text-danger" />
         </div>
 
+        <div class="mb-3 form-check">
+            <InputCheckbox id="enableUpload"
+                           class="form-check-input"
+                           @bind-Value="model.EnableUpload" />
+            <label class="form-check-label" for="enableUpload">
+                Enable student upload
+            </label>
+        </div>
+
         <div class="d-flex justify-content-end gap-2">
             <button class="btn btn-secondary" type="button" @onclick="HandleClose">
                 @ModalCloseButton
@@ -75,6 +85,8 @@
         public string Description { get; set; } = "";
 
         public int ActivityTypeId { get; set; }
+
+        public bool EnableUpload { get; set; }
     }
 
     [Parameter] public int CourseId { get; set; }
@@ -88,8 +100,6 @@
 
     private DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     private DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
-
-    private bool EnableUpload { get; set; }
 
     private bool IsSaving;
     private string? Error;
@@ -109,6 +119,7 @@
                 EndDate = EndDate.ToDateTime(TimeOnly.MinValue),
                 ModuleId = ModuleId,
                 ActivityTypeId = model.ActivityTypeId,
+                EnableUpload = model.EnableUpload
             };
 
             await ApiService.PostAsync<ActivityUpsertDto, ActivityReadDto>(
@@ -143,13 +154,13 @@
 
         StartDate = DateOnly.FromDateTime(DateTime.Today);
         EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
-        EnableUpload = false;
 
         if (ActivityTypes != null && ActivityTypes.Any())
         {
             model.ActivityTypeId = ActivityTypes.First().Id;
         }
 
+        model.EnableUpload = false;
         Error = null;
     }
 
