@@ -13,22 +13,30 @@ public class ActivityRepository : RepositoryBase<Activity>, IActivityRepository
     }
 
     public async Task<List<Activity>> GetAllAsync(bool trackChanges, CancellationToken ct) =>
-        await FindAll(trackChanges).Include(a => a.Type)
-            .ToListAsync();
+        await FindAll(trackChanges)
+        .Include(a => a.Type)
+        .Include(a=>a.Module)
+        .ToListAsync(ct);
 
     public async Task<Activity?> GetByIdAsync(int id, bool trackChanges, CancellationToken ct) =>
         await FindByCondition(x => x.Id == id, trackChanges)
-            .Include(a => a.Type)
-            .FirstOrDefaultAsync();
+        .Include(a => a.Type)
+        .Include(a => a.Module)
+        .FirstOrDefaultAsync(ct);
     public async Task<List<Activity>> GetActivitiesByModuleIdAsync(int moduleId, bool trackChanges, CancellationToken ct) =>
        await FindByCondition(a => a.ModuleId == moduleId, trackChanges)
             .Include(a => a.Type)
-            .ToListAsync();
+            .Include(a => a.Module)
+            .ToListAsync(ct);
     public async Task<List<Activity>> GetActivitiesByTypeIdAsync(int typeId, bool trackChanges, CancellationToken ct) =>
         await FindByCondition(a => a.ActivityTypeId == typeId)
             .Include(a => a.Type)
-            .ToListAsync();
+            .Include(a => a.Module)
+            .ToListAsync(ct);
     public async Task<List<Activity>> GetActivitiesByDateRangeAsync(DateTime startDate, DateTime endDate, bool trackChanges, CancellationToken ct) =>
         await FindByCondition(a => a.StartDate >= startDate && a.EndDate <= endDate)
-            .Include(a => a.Type).ToListAsync();
+            .Include(a => a.Type)
+            .Include(a => a.Module)
+            .ToListAsync(ct);
+
 }

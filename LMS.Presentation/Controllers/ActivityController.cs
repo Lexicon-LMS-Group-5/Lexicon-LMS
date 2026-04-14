@@ -113,11 +113,16 @@ public class ActivityController : ControllerBase
 
     // DELETE: api/activities/5
     [Authorize(Roles = Roles.Teacher)]
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{cid:int}/{mid:int}/{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    public async Task<IActionResult> Delete(
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
+        CancellationToken ct)
     {
-        await serviceManager.ActivityService.DeleteActivityAsync(id, ct);
+        ActivityParentsDto dto = new ActivityParentsDto { CourseId = cid, ModuleId = mid };
+        await serviceManager.ActivityService.DeleteActivityAsync(id, dto, ct);
         return NoContent();
     }
 }

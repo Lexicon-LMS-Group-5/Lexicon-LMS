@@ -28,4 +28,9 @@
         public string ActivityTypeName { get; set; } = "";
         public bool ActivityTypeTimeExclusive { get; set; }
     }
+    public record ActivityParentsDto
+    {
+        public int ModuleId { get; set; }
+        public int CourseId { get; set; }
+    }
 }
