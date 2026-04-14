@@ -3,8 +3,9 @@
     public class ActivityTypeUpsertDto
     {
         public string Name { get; set; } = "";
-        public bool TimeExclusive { get; set; }
-    }
+		public bool TimeExclusive { get; set; }
+		public int ActivityTypeId { get; set; }
+	}
 
     public class ActivityTypeReadDto
     {
