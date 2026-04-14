@@ -33,6 +33,9 @@ public class MapperProfile : Profile
         CreateMap<ModuleUpsertDto, Module>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
         CreateMap<Module, ModuleReadDto>();
+		CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ActivityType, ActivityTypeReadDto>();
-    }
+		CreateMap<Activity, ActivityReadDto>()
+	        .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.Type.Name));
+	}
 }

@@ -56,7 +56,9 @@ public class ActivityService : IActivityService
             activityUpsertDto.EndDate = DateRangeHelper.OneOf(activityUpsertDto.EndDate, timeResp.End);
         }
         Activity activity = mapper.Map<Activity>(activityUpsertDto);
-        StartEnd newStartEnd = new(activity);
+		activity.Module = module;
+
+		StartEnd newStartEnd = new(activity);
         drh.CheckNew(newStartEnd);
 
         //var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(

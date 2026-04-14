@@ -13,6 +13,12 @@
         </span>
         Back to Dashboard
     </NavLink>
+    <AuthorizeView Roles="Teacher">
+        <button class="btn btn-outline-secondary btn-sm mb-3"
+                @onclick="DeleteThis">
+            Delete this course
+        </button>
+    </AuthorizeView>
     </div>
 }
 
