@@ -12,17 +12,13 @@ public class ActivityService : IActivityService
 {
     private readonly IMapper mapper;
     private readonly IUnitOfWork unitOfWork;
-    private readonly IModuleService moduleService;
-    private readonly ICourseService courseService;
 
     public ActivityService(
-        IMapper mapper, IUnitOfWork unitOfWork, IModuleService moduleService, ICourseService courseService
+        IMapper mapper, IUnitOfWork unitOfWork
 		)
     {
         this.mapper = mapper;
         this.unitOfWork = unitOfWork;
-        this.moduleService = moduleService;
-        this.courseService = courseService;
 
 	}
 
@@ -41,9 +37,8 @@ public class ActivityService : IActivityService
 
         var activityDto = mapper.Map<ActivityReadDto>(activity);
 
-        var module = await moduleService.GetModuleDetailsByIdAsync(activity.ModuleId);
-		var query = new CourseDetailsQueryDto(module.CourseId);
-		var course = await courseService.GetCourseDetailsAsync(query);
+        var module = await unitOfWork.Modules.GetModuleDetailsByIdAsync(activityDto.ModuleId);
+		var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId);
 
 		activityDto.CourseName = course.Name;
         activityDto.ModuleName = module.Name;

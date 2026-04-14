@@ -15,13 +15,11 @@ namespace LMS.Services
         // Injected with AddScoped().
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly ICourseService courseService;
 
-        public ModuleService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService)
+        public ModuleService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.courseService = courseService;
         }
 
         public async Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default)
@@ -86,8 +84,7 @@ namespace LMS.Services
 
             var modulesDto = mapper.Map<ModuleReadDto>(module);
 
-            var query = new CourseDetailsQueryDto(module.CourseId);
-            var course = await courseService.GetCourseDetailsAsync(query);
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(module.CourseId);
 			modulesDto.CourseName = course.Name;
 
 			return modulesDto;
