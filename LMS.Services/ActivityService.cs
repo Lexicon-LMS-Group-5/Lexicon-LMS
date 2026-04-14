@@ -98,10 +98,6 @@ public class ActivityService : IActivityService
     public async Task<List<ActivityReadDto>> GetActivitiesByModuleIdAsync(int moduleId, CancellationToken ct)
     {
         var activities = await unitOfWork.Activities.GetActivitiesByModuleIdAsync(moduleId, trackChanges: false, ct);
-        foreach (var activity in activities)
-        {
-            Console.WriteLine(activity.ActivityType?.Name);
-        }
         return mapper.Map<List<ActivityReadDto>>(activities);
     }
 
