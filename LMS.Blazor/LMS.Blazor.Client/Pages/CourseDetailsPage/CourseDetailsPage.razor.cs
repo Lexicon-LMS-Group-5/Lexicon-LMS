@@ -34,7 +34,6 @@ public partial class CourseDetailsPage
     private bool IsLoading { get; set; } = true;
     private string? ErrorMessage { get; set; }
     private CourseDetailsDto? CourseDetails { get; set; }
-    
     private EditContext? EditContext { get; set; }
     private UpdateCourseCommandDto? EditCourseModel { get; set; }
 
