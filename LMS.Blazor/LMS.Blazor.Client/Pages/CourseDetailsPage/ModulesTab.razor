@@ -76,8 +76,15 @@
                                                     <div class="badge bg-primary-subtle text-primary rounded-pill my-auto">
                                                         @activity.ActivityTypeName
                                                     </div>
-                                                    <div>
-                                                        @activity.Name
+                                                    <div class="d-flex w-100 flex-grow-1 justify-content-between">
+                                                        <div>
+                                                            @activity.Name
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <DeleteButton 
+                                                                title="@($"Delete activity \"{activity.Name}\"")"
+                                                                @onclick="() => RequestDeleteActivityAsync(activity)" />
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="text-secondary fw-bold d-flex gap-2" style="font-size: .75em">
@@ -215,11 +222,33 @@
         </ModalBody>
         <ModalFooter>
             <button class="btn btn-outline-secondary"
-                    @onclick="() => HideModalAsync(DeleteModuleConfirmationModalId)">
+                    @onclick="CancelDeleteModuleAsync">
                 Cancel
             </button>
             <button class="btn btn-danger"
-                    @onclick="ConfirmDeleteModuleAsyc">
+                    @onclick="ConfirmDeleteModuleAsync">
+                Delete
+            </button>
+        </ModalFooter>
+    </Modal>
+
+    <Modal ModalId="@DeleteActivityConfirmationModalId">
+        <ModalHeader ModalId="@DeleteActivityConfirmationModalId"
+                     Title="Are you sure?" />
+        <ModalBody>
+            <div class="d-flex w-100 h-100 justify-content-center align-items-middle">
+                <div>
+                    This will permanently delete the activity @(PendingActivityDelete != null ? $"\"{PendingActivityDelete.Name}\"" : "").
+                </div>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <button class="btn btn-outline-secondary"
+                    @onclick="CancelDeleteActivityAsync">
+                Cancel
+            </button>
+            <button class="btn btn-danger"
+                    @onclick="ConfirmDeleteActivityAsync">
                 Delete
             </button>
         </ModalFooter>
@@ -321,7 +350,7 @@
         Modules = updatedModulesList;
         IsModuleFormLoading = false;
         await HideModalAsync(CreateModuleModalId);
-        
+
         // Re-initialize form state
         ResetModuleFormState();
     }
@@ -439,10 +468,12 @@
     private async Task CancelDeleteModuleAsync()
     {
         await HideModalAsync(DeleteModuleConfirmationModalId);
+        // Wait for modal to transition out before resetting pending delete data
+        await Task.Delay(300);
         PendingModuleDelete = null;
     }
 
-    private async Task ConfirmDeleteModuleAsyc()
+    private async Task ConfirmDeleteModuleAsync()
     {
         if (CourseDetails == null || PendingModuleDelete == null)
             return;
@@ -452,6 +483,55 @@
             await ApiService.DeleteAsync($"api/modules/{CourseDetails.Id}/{PendingModuleDelete.Id}");
             Modules = Modules.Where(m => m.Id != PendingModuleDelete.Id).ToList();
             await HideModalAsync(DeleteModuleConfirmationModalId);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
+        }
+
+        PendingModuleDelete = null;
+    }
+
+    private const string DeleteActivityConfirmationModalId = "deleteActivityConfirmationModal";
+    private ActivityReadDto? PendingActivityDelete { get; set; } = null;
+
+    private async Task RequestDeleteActivityAsync(ActivityReadDto activity)
+    {
+        PendingActivityDelete = activity;
+        await ShowModalAsync(DeleteActivityConfirmationModalId);
+    }
+
+    private async Task CancelDeleteActivityAsync()
+    {
+        await HideModalAsync(DeleteActivityConfirmationModalId);
+        // Wait for modal to transition out before resetting pending delete data
+        await Task.Delay(300);
+        PendingActivityDelete = null;
+    }
+
+    private async Task ConfirmDeleteActivityAsync()
+    {
+        if (CourseDetails == null || PendingActivityDelete == null)
+            return;
+
+        try
+        {
+            await ApiService.DeleteAsync($"api/activities/{PendingActivityDelete.Id}");
+            
+            var module = Modules
+                .Where(m => m.Activities.Contains(PendingActivityDelete))
+                .FirstOrDefault() ?? throw new Exception($"Could not find module for activity \"{PendingActivityDelete.Name}\"");
+            
+            module.Activities = module.Activities
+                .Where(a => a.Id != PendingActivityDelete.Id)
+                .ToList();
+            
+            Modules = Modules
+                .Select(m => m.Id != PendingActivityDelete.Id ? m : module)
+                .ToList();
+            
+            await HideModalAsync(DeleteActivityConfirmationModalId);
         }
         catch (Exception ex)
         {
