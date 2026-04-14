@@ -27,11 +27,17 @@ public class ActivityController : ControllerBase
         return Ok(activities);
     }
 
-    // GET: api/activities/5
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<ActivityReadDto>> GetById(int id, CancellationToken ct)
+    // GET: api/activities/5/28/32
+    [HttpGet("{cid:int}/{mid:int}/{id:int}")]
+    public async Task<ActionResult<ActivityReadDto>> GetById(
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
+        CancellationToken ct)
     {
         var activity = await serviceManager.ActivityService.GetActivityAsync(id, ct);
+        if (mid != activity.ModuleId) return BadRequest($"No ActivityId={id} under ModuleId={mid}");
+        if (cid != activity.CourseId) return BadRequest($"No Activity={id} under a module of CourseId={cid}");
         return Ok(activity);
     }
 
@@ -88,11 +94,13 @@ public class ActivityController : ControllerBase
             created);
     }
 
-    // PUT: api/activities/5
+    // PUT: api/activities/5/2/9
     [Authorize(Roles = Roles.Teacher)]
-    [HttpPut("{id:int}")]
+    [HttpPut("{cid:int}/{mid:int}/{id:int}")]
     public async Task<ActionResult<ActivityReadDto>> Update(
-        int id,
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
         [FromBody] ActivityUpsertDto dto,
         CancellationToken ct)
     {
@@ -105,11 +113,16 @@ public class ActivityController : ControllerBase
 
     // DELETE: api/activities/5
     [Authorize(Roles = Roles.Teacher)]
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{cid:int}/{mid:int}/{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    public async Task<IActionResult> Delete(
+        [FromRoute] int cid,
+        [FromRoute] int mid,
+        [FromRoute] int id,
+        CancellationToken ct)
     {
-        await serviceManager.ActivityService.DeleteActivityAsync(id, ct);
+        ActivityParentsDto dto = new ActivityParentsDto { CourseId = cid, ModuleId = mid };
+        await serviceManager.ActivityService.DeleteActivityAsync(id, dto, ct);
         return NoContent();
     }
 }

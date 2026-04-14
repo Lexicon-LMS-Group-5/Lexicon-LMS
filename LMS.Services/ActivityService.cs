@@ -94,14 +94,24 @@ public class ActivityService : IActivityService
         return mapper.Map<ActivityReadDto>(activity);
     }
 
-    public async Task DeleteActivityAsync(int id, CancellationToken ct)
+    public async Task DeleteActivityAsync(int id, ActivityParentsDto dto, CancellationToken ct)
     {
         var activity = await unitOfWork.Activities.GetByIdAsync(id, trackChanges: true, ct);
-
         if (activity == null) throw new NotFoundException($"Activity {id} not found");
-
+        if (activity!.ModuleId != dto.ModuleId) 
+        { 
+            throw new BadRequestException($" No ActivityId={id} under ModuleId={dto.ModuleId}");
+        }
+        if (activity!.Module == null) 
+        {
+            throw new BadRequestException($" No ActivityId={id} under ModuleId={dto.ModuleId}"); 
+        }
+        if (activity.CourseId != dto.CourseId)
+        {
+            throw new BadRequestException(
+                $"No ActivityId={id} under ModuleId={dto.ModuleId} under CourseId={dto.CourseId}");
+        }
         unitOfWork.Activities.Delete(activity);
-
         await unitOfWork.CompleteAsync(ct);
     }
 

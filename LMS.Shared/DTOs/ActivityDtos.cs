@@ -25,6 +25,8 @@ namespace LMS.Shared.DTOs
     public class ActivityReadDto
     {
         public int Id { get; set; }
+        public int ModuleId { get; set; }
+        public int CourseId { get; set; }
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
         public DateTime StartDate { get; set; }
@@ -36,5 +38,10 @@ namespace LMS.Shared.DTOs
 		public string ModuleName { get; set; } = "";
 		public int CourseId { get; set; }
 		public string CourseName { get; set; } = "";
+    }
+    public record ActivityParentsDto
+    {
+        public int ModuleId { get; set; }
+        public int CourseId { get; set; }
     }
 }

@@ -69,7 +69,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         Activity = await ApiService.GetAsync<ActivityReadDto>(
-            $"api/activities/{ActivityId}");
+            $"api/activities/{CourseId}/{ModuleId}/{ActivityId}");
     }
 
     private void GoBack()
@@ -78,7 +78,7 @@ else
     }
     private async Task DeleteThis()
     {
-        await ApiService.DeleteAsync($"api/activities/{ActivityId}");
+        await ApiService.DeleteAsync($"api/activities/{CourseId}/{ModuleId}/{ActivityId}");
         GoBack();
     }
 }
