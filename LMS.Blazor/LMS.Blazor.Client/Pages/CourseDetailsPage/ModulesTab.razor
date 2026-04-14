@@ -166,7 +166,9 @@
                            OnSubmissionSucceeded="OnCreateActivitySubmissionSucceededAsync">
                 <FormContent>
                     <ModalBody>
-                        <AddActivityFormContent Model="CreateActivityModel" />
+                        <AddActivityFormContent 
+                            Model="CreateActivityModel" 
+                            ActivityTypes="ActivityTypes" />
                     </ModalBody>
                 </FormContent>
                 <FormActions>
@@ -201,6 +203,9 @@
     [Parameter]
     public CourseDetailsDto CourseDetails { get; set; } = default!;
 
+    private bool IsActivitiesLoading { get; set; }
+    private IReadOnlyList<ActivityTypeReadDto> ActivityTypes { get; set; } = [];
+
     private bool IsLoading { get; set; }
     private IReadOnlyList<ModuleReadDto> Modules { get; set; } = [];
     private string? ErrorMessage { get; set; }
@@ -222,8 +227,25 @@
             throw new Exception("Could not find a Course for this Module");
         selectedModuleId = CourseDetails.Modules.FirstOrDefault()?.Id ?? null;
 
-        IsLoading = true;
+        IsActivitiesLoading = true;
+        try
+        {
+            var activitiesResult = await ApiService.GetAsync<List<ActivityTypeReadDto>>("api/activities/types")
+            ?? throw new Exception("Could not fetch activity types");
 
+            ActivityTypes = activitiesResult.ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            throw;
+        }
+        finally
+        {
+            IsActivitiesLoading = false;
+        }
+
+        IsLoading = true;
         try
         {
             Modules = await ApiService.GetAsync<IReadOnlyList<ModuleReadDto>>($"api/modules/{CourseId}")

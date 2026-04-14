@@ -1,4 +1,5 @@
-﻿<ErrorBoundary @ref="StudentsTabErrorBoundary">
+﻿@using LMS.Blazor.Client.Components.UserModals
+<ErrorBoundary @ref="StudentsTabErrorBoundary">
     <ChildContent>
         <div class="d-flex flex-column gap-3 p-3">
             <TabHeader Title="Students">
@@ -70,6 +71,11 @@
 <Modal ModalId="@AddStudentModalId">
     <ModalHeader ModalId="@AddStudentModalId" Title="Add Student" />
     <ModalBody>
+        <CreateStudentForm 
+            @key="CourseId"
+            CourseId="CourseId"
+            OnSaved="OnSavedAsync"
+            OnCancel="HideAddStudentModalAsync" />
     </ModalBody>
     <ModalFooter>
     </ModalFooter>
@@ -93,7 +99,7 @@
     private async Task ShowAddStudentModalAsync() {
         await JsRuntime.InvokeVoidAsync("showModal", AddStudentModalId);
     }
-    
+
     private async Task HideAddStudentModalAsync() {
         await JsRuntime.InvokeVoidAsync("hideModal", AddStudentModalId);
     }
@@ -101,4 +107,22 @@
     private bool IsLoading { get; set; }
     private string? ErrorMessage { get; set; }
     private ErrorBoundaryBase? StudentsTabErrorBoundary { get; set; }
+
+    private async Task OnSavedAsync(UserReadDto? user)
+    {
+        if (user != null)
+        {
+            var newStudent = new CourseParticipantWithRoleInfoDto
+            {
+                Id = user.Id,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Role = user.Roles.FirstOrDefault() ?? ""
+            };
+
+            Students = [newStudent, .. Students];
+        }
+
+        await HideAddStudentModalAsync();
+    }
 }
