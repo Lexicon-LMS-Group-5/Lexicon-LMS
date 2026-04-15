@@ -1,10 +1,10 @@
-﻿using System.Linq.Expressions;
-using Domain.Contracts.Repositories;
+﻿using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using LMS.Infractructure.Data;
 using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.PagingDtos;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace LMS.Infractructure.Repositories
 {

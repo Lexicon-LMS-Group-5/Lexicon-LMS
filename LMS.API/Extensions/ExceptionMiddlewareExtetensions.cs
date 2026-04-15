@@ -1,6 +1,5 @@
 ﻿using Domain.Models.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace LMS.API.Extensions;

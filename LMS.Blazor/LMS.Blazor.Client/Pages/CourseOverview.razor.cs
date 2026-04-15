@@ -31,8 +31,9 @@ public partial class CourseOverview
         {
             var result = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/my-course");
 
-            if (result == null) { 
-            Navigation.NotFound();
+            if (result == null)
+            {
+                Navigation.NotFound();
                 return;
             }
 
@@ -51,10 +52,12 @@ public partial class CourseOverview
             students.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
             teachers.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
 
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Error = ex.Message;
-        } finally
+        }
+        finally
         {
             IsLoading = false;
         }

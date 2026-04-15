@@ -1,5 +1,4 @@
 ﻿using LMS.Shared.DTOs;
-using System.Security.Claims;
 
 namespace Service.Contracts;
 

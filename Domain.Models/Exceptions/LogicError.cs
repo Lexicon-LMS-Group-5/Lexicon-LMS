@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Models.Exceptions
+﻿namespace Domain.Models.Exceptions
 {
-    public class LogicError: Exception
+    public class LogicError : Exception
     {
         private LogicError(string message = "") : base(message) { }
         public static void Check(Func<bool> cond, string message = "")

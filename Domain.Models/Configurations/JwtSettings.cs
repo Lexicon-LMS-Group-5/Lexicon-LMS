@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models.Configurations;
+
 public class JwtSettings
 {
     public const string Section = "JwtSettings";

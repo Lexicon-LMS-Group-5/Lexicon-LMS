@@ -2,6 +2,7 @@
 using LMS.Infractructure.Data;
 
 namespace LMS.Infractructure.Repositories;
+
 public class UnitOfWork : IUnitOfWork
 {
     private readonly Lazy<ICourseRepository> courseRepository;

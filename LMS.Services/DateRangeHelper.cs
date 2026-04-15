@@ -1,9 +1,6 @@
 ﻿using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LMS.Services
 {
@@ -57,20 +54,23 @@ namespace LMS.Services
             : this(
                   c.StartDate,
                   c.EndDate,
-                  MakeContext(c), 
-                  persistent?? (c.Id != 0)) { }
-        public StartEnd(Module m, bool? persistent = null) 
+                  MakeContext(c),
+                  persistent ?? (c.Id != 0))
+        { }
+        public StartEnd(Module m, bool? persistent = null)
             : this(
-                  m.StartDate, 
-                  m.EndDate, 
+                  m.StartDate,
+                  m.EndDate,
                   MakeContext(m),
-                  persistent?? (m.Id!= 0)) {}
-        public StartEnd(Activity a, bool? persistent=null)
+                  persistent ?? (m.Id != 0))
+        { }
+        public StartEnd(Activity a, bool? persistent = null)
             : this(
                   a.StartDate,
                   a.EndDate,
                   MakeContext(a),
-                  persistent?? (a.Id != 0)) {}
+                  persistent ?? (a.Id != 0))
+        { }
         public bool Includes(StartEnd other)
         {
             if (Start > other.Start) return false;
@@ -165,17 +165,17 @@ namespace LMS.Services
         }
 
         public DateRangeHelper(Course course)
-            :this(
+            : this(
                  new StartEnd(course),
                  course.Modules.Select(m => new StartEnd(m)).ToList())
-        {}
+        { }
         public DateRangeHelper(Module module)
-            :this(
+            : this(
                  new StartEnd(module),
                  module.Activities.Select(a => new StartEnd(a)).ToList())
-        {}
+        { }
         public DateRangeResponseDto? GetDateRange(DateRangeRequestDto request)
-        { 
+        {
             if (request == null)
             {
                 return null;
@@ -183,9 +183,9 @@ namespace LMS.Services
 
             foreach (var f in freeIntervals_)
             {
-                DateTime startingAfter = OneOf(request.StartingAfter,f.Start);
+                DateTime startingAfter = OneOf(request.StartingAfter, f.Start);
                 DateTime endingBefore = OneOf(request.EndingBefore, f.End);
-                StartEnd? se = f.Fit(startingAfter, 
+                StartEnd? se = f.Fit(startingAfter,
                     endingBefore,
                     request.Duration);
                 if (se != null) return new DateRangeResponseDto

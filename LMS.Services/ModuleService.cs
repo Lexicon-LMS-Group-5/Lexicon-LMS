@@ -1,13 +1,9 @@
-﻿using Domain.Contracts.Repositories;
+﻿using AutoMapper;
+using Domain.Contracts.Repositories;
+using Domain.Models.Entities;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
-using Domain.Models.Entities;
 using Service.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoMapper;
-using System.Data;
 
 namespace LMS.Services
 {
@@ -66,7 +62,7 @@ namespace LMS.Services
             if (module == null) throw new NotFoundException($"ModuleId={id}");
             if (module!.CourseId != dto.CourseId) throw new BadRequestException(
                 $"No ModuleId={id} under CourseId={dto.CourseId}");
-            DateRangeHelper courseDRH = new (module!.Course);
+            DateRangeHelper courseDRH = new(module!.Course);
             DateRangeHelper moduleDRH = new(module!);
             StartEnd oldInt = new(module);
             mapper.Map(dto, module);
@@ -89,10 +85,10 @@ namespace LMS.Services
                 throw new NotFoundException($"ModuleId={moduleId}.");
             }
 
-			return mapper.Map<ModuleReadDto>(module);
+            return mapper.Map<ModuleReadDto>(module);
         }
         public async Task<List<ModuleReadDto>> GetModulesByCourseIdAsync(
-            int courseId, 
+            int courseId,
             bool trackChanges = false,
             CancellationToken ct = default)
         {
