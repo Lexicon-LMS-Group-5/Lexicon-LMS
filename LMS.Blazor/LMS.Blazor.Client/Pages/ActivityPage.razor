@@ -1,5 +1,6 @@
 @page "/activity/{CourseId:int}/{ModuleId:int}/{ActivityId:int}"
 @using LMS.Shared.DTOs
+@using LMS.Shared
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
 
@@ -18,13 +19,14 @@ else
                  ActivityName="@Activity.Name" />
 
     <div class="container py-4">
-
+        
         <div class="mb-4">
-            <button class="btn btn-outline-secondary btn-sm mb-3"
-                    @onclick="DeleteThis">
-                Delete this activity
-            </button>
-
+            <AuthorizeView Roles=@Roles.Teacher>
+                <button class="btn btn-outline-secondary btn-sm mb-3"
+                        @onclick="DeleteThis">
+                    Delete this activity
+                </button>
+            </AuthorizeView>
             <h1 class="fw-bold">@Activity.Name</h1>
             <p class="text-muted">@Activity.Description</p>
             <div class="mt-2">
