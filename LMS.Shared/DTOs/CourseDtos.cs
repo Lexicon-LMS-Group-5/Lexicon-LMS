@@ -39,7 +39,7 @@ namespace LMS.Shared.DTOs
 
     public class CoursesQueryResultDto : BasePagedResultDto<CourseListItemDto>
     {
-        
+
     }
 
     public class CreateCourseDto : IValidatableObject
@@ -55,7 +55,7 @@ namespace LMS.Shared.DTOs
 
         [Required]
         [DataType(DataType.Date)]
-        [Display(Name="Start date")]
+        [Display(Name = "Start date")]
         public DateTime? StartDate { get; set; }
 
         [Required]
@@ -80,7 +80,7 @@ namespace LMS.Shared.DTOs
         }
     }
 
-    public class CreateCourseResultDto: CourseReadDto
+    public class CreateCourseResultDto : CourseReadDto
     {
 
     }
@@ -90,7 +90,7 @@ namespace LMS.Shared.DTOs
         public int Id { get; set; }
         public CourseUpdateDto()
         {
-            
+
         }
         public CourseUpdateDto(CourseDetailsDto courseDetails)
         {

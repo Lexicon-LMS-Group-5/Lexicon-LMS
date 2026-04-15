@@ -19,7 +19,7 @@ public partial class CourseController : ControllerBase
     private readonly ILogger<CourseController> logger;
 
     public CourseController(
-        IServiceManager serviceManager, 
+        IServiceManager serviceManager,
         ILogger<CourseController> logger)
     {
         this.serviceManager = serviceManager;
@@ -28,7 +28,7 @@ public partial class CourseController : ControllerBase
 
     [HttpGet()]
     [ProducesResponseType<CoursesQueryResultDto>(StatusCodes.Status200OK)]
-    public async Task <IActionResult> GetAllCourses([FromQuery] CoursesQueryDto query)
+    public async Task<IActionResult> GetAllCourses([FromQuery] CoursesQueryDto query)
     {
         var result = await serviceManager.CourseService.GetCoursesAsync(query);
 

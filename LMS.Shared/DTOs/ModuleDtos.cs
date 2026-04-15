@@ -43,10 +43,10 @@ namespace LMS.Shared.DTOs
     }
 }
 public class ModuleCourseIdDto
-    // This class serves to prevent a service-level API from including
-    // 2 int arguments (for moduleId and courseId) in a way that could be
-    // confusing for the caller.
-{ 
-    public int CourseId{ get; set; }
+// This class serves to prevent a service-level API from including
+// 2 int arguments (for moduleId and courseId) in a way that could be
+// confusing for the caller.
+{
+    public int CourseId { get; set; }
     public ModuleCourseIdDto(int cid) { CourseId = cid; }
 }

@@ -1,4 +1,5 @@
 ﻿namespace Domain.Contracts.Repositories;
+
 public interface IRepositoryBase<T>
 {
     void Create(T entity);

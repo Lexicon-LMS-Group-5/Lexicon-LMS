@@ -33,8 +33,8 @@ namespace LMS.Shared.DTOs
         public string ActivityTypeName { get; set; } = "";
         public bool ActivityTypeTimeExclusive { get; set; }
         public int ModuleId { get; set; }
-		public string ModuleName { get; set; } = "";
-		public int CourseId { get; set; }
-		public string CourseName { get; set; } = "";
+        public string ModuleName { get; set; } = "";
+        public int CourseId { get; set; }
+        public string CourseName { get; set; } = "";
     }
 }

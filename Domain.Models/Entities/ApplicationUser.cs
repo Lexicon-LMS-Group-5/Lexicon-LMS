@@ -5,8 +5,8 @@ namespace Domain.Models.Entities;
 
 public class ApplicationUser : IdentityUser
 {
-    public string FirstName { get; set; } = String.Empty;
-    public string LastName { get; set; } = String.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public string FullName => FirstName + " " + LastName;
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpireTime { get; set; }

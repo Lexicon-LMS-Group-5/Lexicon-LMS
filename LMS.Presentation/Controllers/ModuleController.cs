@@ -20,44 +20,44 @@ namespace LMS.Presentation.Controllers
         {
             this.serviceManager = serviceManager;
         }
-        [HttpGet("{cid:int}")]
+        [HttpGet("{courseId:int}")]
         [ProducesResponseType<List<ModuleReadDto>>(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetModulesByCourseId([FromRoute] int cid)
+        public async Task<IActionResult> GetModulesByCourseId([FromRoute] int courseId)
         {
             // TODO: CancellationToken ?!
             List<ModuleReadDto> module_dtos = await serviceManager
-                .ModuleService.GetModulesByCourseIdAsync(cid);
+                .ModuleService.GetModulesByCourseIdAsync(courseId);
 
-			return Ok(module_dtos);
+            return Ok(module_dtos);
         }
-        [HttpGet("{cid:int}/{mid:int}")]
+        [HttpGet("{courseId:int}/{moduleId:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetModuleDetails(
-            [FromRoute] int cid,
-            [FromRoute] int mid)
+            [FromRoute] int courseId,
+            [FromRoute] int moduleId)
         {
             ModuleReadDto module_dto = await serviceManager
-                .ModuleService.GetModuleDetailsByIdAsync(mid, false);
-            if (module_dto.CourseId != cid)
+                .ModuleService.GetModuleDetailsByIdAsync(moduleId, false);
+            if (module_dto.CourseId != courseId)
             {
                 return BadRequest(
-                    $"No module with id={mid} in course with id={cid}.");
+                    $"No module with id={moduleId} in course with id={courseId}.");
             }
             return Ok(module_dto);
         }
         [Authorize(Roles = Roles.Teacher)]
-        [HttpPost("{cid:int}")]
+        [HttpPost("{courseId:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateModule(
-            [FromRoute] int cid,
+            [FromRoute] int courseId,
             [FromBody] ModuleUpsertDto dto)
         {
-            if (dto.CourseId != cid)
+            if (dto.CourseId != courseId)
             {
                 return BadRequest(
-                    $"CourseId in body ({dto.CourseId}) does not match course id in route ({cid}).");
+                    $"CourseId in body ({dto.CourseId}) does not match course id in route ({courseId}).");
             }
-           
+
             ModuleReadDto createdModule = await serviceManager
                 .ModuleService.CreateModuleAsync(dto);
             return CreatedAtAction(
@@ -67,31 +67,31 @@ namespace LMS.Presentation.Controllers
         }
         // PUT: api/modules/33/17
         [Authorize(Roles = Roles.Teacher)]
-        [HttpPut("{cid:int}/{mid:int}")]
+        [HttpPut("{courseId:int}/{moduleId:int}")]
         [ProducesResponseType<ModuleReadDto>(StatusCodes.Status200OK)]
         public async Task<ActionResult<ModuleReadDto>> Update(
-            [FromRoute] int cid,
-            [FromRoute] int mid,
+            [FromRoute] int courseId,
+            [FromRoute] int moduleId,
             [FromBody] ModuleUpsertDto dto,
             CancellationToken ct)
         {
-            if (dto.CourseId != cid) return BadRequest(
-                $"CourseId in body ({dto.CourseId}) does not match course id in route ({cid}).");
+            if (dto.CourseId != courseId) return BadRequest(
+                $"CourseId in body ({dto.CourseId}) does not match course id in route ({courseId}).");
             ModuleReadDto updatedModule = await serviceManager
-                .ModuleService.UpdateModuleAsync(mid, dto, ct);
+                .ModuleService.UpdateModuleAsync(moduleId, dto, ct);
             return Ok(updatedModule);
         }
         // DELETE: /api/modules/33/17
         [Authorize(Roles = Roles.Teacher)]
 
-        [HttpDelete("{cid:int}/{mid:int}")]
+        [HttpDelete("{courseId:int}/{moduleId:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(
-            [FromRoute] int cid,
-            [FromRoute] int mid,
+            [FromRoute] int courseId,
+            [FromRoute] int moduleId,
             CancellationToken ct)
         {
-            await serviceManager.ModuleService.DeleteModuleAsync(mid, new ModuleCourseIdDto(cid), ct);
+            await serviceManager.ModuleService.DeleteModuleAsync(moduleId, new ModuleCourseIdDto(courseId), ct);
             return NoContent();
         }
     }

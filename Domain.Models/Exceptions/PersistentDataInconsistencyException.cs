@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Models.Exceptions
+﻿namespace Domain.Models.Exceptions
 {
-    public class PersistentDataInconsistencyException: Exception
+    public class PersistentDataInconsistencyException : Exception
     {
         public enum Diagnostic
         {
@@ -16,7 +12,7 @@ namespace Domain.Models.Exceptions
 
         public PersistentDataInconsistencyException(
             Diagnostic diagnostic,
-            string context) 
-            : base($"{diagnostic.ToString("F")} at {context}") {}
+            string context)
+            : base($"{diagnostic.ToString("F")} at {context}") { }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using Domain.Models.Entities;
+﻿using Domain.Models.Entities;
 using LMS.Shared.DTOs;
+using System.Linq.Expressions;
 
 namespace Domain.Contracts.Repositories
 {

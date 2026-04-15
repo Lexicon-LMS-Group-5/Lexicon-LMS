@@ -19,7 +19,7 @@ public class ServiceManager : IServiceManager
     public IUserService UserService => userService.Value;
 
     public ServiceManager(
-        Lazy<IAuthService> authService, 
+        Lazy<IAuthService> authService,
         Lazy<ICourseService> courseService,
         Lazy<IModuleService> moduleService,
         Lazy<IActivityService> activityService,

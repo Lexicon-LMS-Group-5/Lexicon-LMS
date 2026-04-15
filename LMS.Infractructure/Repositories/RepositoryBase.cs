@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace LMS.Infractructure.Repositories;
+
 public abstract class RepositoryBase<T> : IRepositoryBase<T>, IInternalRepositoryBase<T> where T : class //Do Entitybase
 {
     protected DbSet<T> DbSet { get; }

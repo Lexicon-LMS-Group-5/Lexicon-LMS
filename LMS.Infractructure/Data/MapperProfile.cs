@@ -19,7 +19,7 @@ public class MapperProfile : Profile
         CreateMap<CourseUpdateDto, Course>();
         CreateMap<Course, CourseUpdateDto>();
         CreateMap<ApplicationUser, CourseParticipantDto>();
-		CreateMap<Activity, ActivityReadDto>();
+        CreateMap<Activity, ActivityReadDto>();
         CreateMap<ActivityUpsertDto, Activity>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
         CreateMap<Course, CourseReadDto>();
@@ -33,7 +33,7 @@ public class MapperProfile : Profile
         CreateMap<UserCreateDto, ApplicationUser>();
         CreateMap<ModuleUpsertDto, Module>()
             .ForSourceMember(src => src.TimeCond, opt => opt.DoNotValidate());
-		CreateMap<ActivityUpsertDto, Activity>();
+        CreateMap<ActivityUpsertDto, Activity>();
         CreateMap<ModuleUpsertDto, Module>();
         CreateMap<ModuleReadDto, Module>();
         CreateMap<Module, ModuleReadDto>()

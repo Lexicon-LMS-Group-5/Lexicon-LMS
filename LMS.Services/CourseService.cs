@@ -109,7 +109,7 @@ namespace LMS.Services
         {
             Course? course = await unitOfWork
                 .Courses
-                .GetCourseDetailsByIdAsync(dto.Id, true, ct) 
+                .GetCourseDetailsByIdAsync(dto.Id, true, ct)
                 ?? throw new CourseNotFoundException(dto.Id);
 
             // Course scheduling validation

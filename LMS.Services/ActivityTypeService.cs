@@ -2,7 +2,6 @@
 using Domain.Contracts.Repositories;
 using Domain.Models.Exceptions;
 using LMS.Shared.DTOs;
-using Domain.Models.Entities;
 
 using Service.Contracts;
 

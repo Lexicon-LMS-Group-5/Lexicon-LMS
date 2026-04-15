@@ -44,16 +44,18 @@ public partial class Dashboard
             MyCourseState = new(isLoading: true, data: null);
 
             var result = await ApiService.GetAsync<CourseDetailsDto>("api/courses/my-course");
-                
+
             if (result != null)
             {
                 MyCourseState = new(isLoading: false, data: result);
                 MyCourse = result;
             }
-        } catch
+        }
+        catch
         {
             MyCourseState = new(isLoading: false, data: null, error: "Could not load your Course");
-        } finally
+        }
+        finally
         {
             MyCourseState = new(isLoading: false, data: null);
         }
@@ -67,9 +69,10 @@ public partial class Dashboard
             AllCourses = [.. result.Items];
             ActiveCourses = [.. result.Items.Where(c => c.EndDate > DateTime.Now)];
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             PageState = new(isLoading: false, data: null, error: ex.Message);
-        } 
+        }
     }
 
     private async Task UpdateCourseListsAsync(Func<IReadOnlyList<CourseListItemDto>, IReadOnlyList<CourseListItemDto>> updateList)
