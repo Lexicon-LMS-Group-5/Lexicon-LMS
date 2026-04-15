@@ -1,0 +1,15 @@
+﻿<div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@($"{ModalId}Label")">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content overflow-y-auto">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ModalId { get; set;} = string.Empty;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!; 
+}

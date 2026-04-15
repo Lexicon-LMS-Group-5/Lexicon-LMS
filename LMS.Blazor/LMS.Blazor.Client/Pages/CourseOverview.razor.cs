@@ -1,5 +1,5 @@
-using System;
 using LMS.Blazor.Client.Services;
+using LMS.Shared;
 using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 
@@ -13,24 +13,44 @@ public partial class CourseOverview
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
 
-    private int? courseId { get; set; } = null;
-
     private bool IsLoading { get; set; }
     private string? Error { get; set; } = null;
     private CourseDetailsDto? CourseDetails { get; set; } = null;
+
+    private readonly List<CourseParticipantDto> students = [];
+
+    private readonly List<CourseParticipantDto> teachers = [];
 
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
 
-        // ToDo: Get courseId from logged in user
-        courseId = 4;
-        if (courseId is null)
-            Navigation.NotFound();
+        students.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
 
         try
         {
-            CourseDetails = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{courseId}");
+            var result = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/my-course");
+
+            if (result == null) { 
+            Navigation.NotFound();
+                return;
+            }
+
+            CourseDetails = result;
+
+            foreach (var participant in CourseDetails.Participants)
+            {
+                if (participant.Roles == null) continue;
+
+                if (participant.Roles.Contains(Roles.Student))
+                    students.Add(participant);
+
+                if (participant.Roles.Contains(Roles.Teacher))
+                    teachers.Add(participant);
+            }
+            students.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
+            teachers.Sort((a, b) => string.Compare(a.FullName, b.FullName, StringComparison.Ordinal));
+
         } catch (Exception ex)
         {
             Error = ex.Message;

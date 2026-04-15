@@ -94,6 +94,9 @@ public static class ServiceExtensions
         services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped(provider => new Lazy<IActivityRepository>(() => provider.GetRequiredService<IActivityRepository>()));
 
+        services.AddScoped<IActivityTypeRepository, ActivityTypeRepository>();
+        services.AddScoped(provider => new Lazy<IActivityTypeRepository>(() => provider.GetRequiredService<IActivityTypeRepository>()));
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped(provider => new Lazy<IUserRepository>(() => provider.GetRequiredService<IUserRepository>()));
     }
@@ -115,6 +118,9 @@ public static class ServiceExtensions
 
         services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped(provider => new Lazy<IActivityService>(() => provider.GetRequiredService<IActivityService>()));
+
+        services.AddScoped<IActivityTypeService, ActivityTypeService>();
+        services.AddScoped(provider => new Lazy<IActivityTypeService>(() => provider.GetRequiredService<IActivityTypeService>()));
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped(provider => new Lazy<IUserService>(() => provider.GetRequiredService<IUserService>()));

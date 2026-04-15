@@ -1,8 +1,11 @@
-﻿using LMS.Shared.DTOs;
+﻿using LMS.Shared;
+using LMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.Contracts;
+using System.Security.Claims;
 
 namespace LMS.Presentation.Controllers;
 
@@ -13,10 +16,14 @@ namespace LMS.Presentation.Controllers;
 public partial class CourseController : ControllerBase
 {
     private readonly IServiceManager serviceManager;
+    private readonly ILogger<CourseController> logger;
 
-    public CourseController(IServiceManager serviceManager)
+    public CourseController(
+        IServiceManager serviceManager, 
+        ILogger<CourseController> logger)
     {
         this.serviceManager = serviceManager;
+        this.logger = logger;
     }
 
     [HttpGet()]
@@ -32,18 +39,61 @@ public partial class CourseController : ControllerBase
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCourseDetails([FromRoute] int id)
     {
-        var result = await serviceManager.CourseService.GetCourseDetailsAsync(new CourseDetailsQueryDto(id));
+        var result = await serviceManager.CourseService.GetCourseDetailsAsync(id);
 
         return Ok(result);
     }
 
-    [Authorize(Roles = "Teacher")]
-    [HttpPost()]
-    [ProducesResponseType<CreateCourseResultDto>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<CreateCourseCommandDto>> CreateCourse([FromBody] CreateCourseCommandDto command)
+    [HttpGet("my-course")]
+    public async Task<ActionResult<CourseDetailsDto?>> GetMyCourse()
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+            return BadRequest();
+
+        var result = await serviceManager.CourseService.GetCourseDetailsByUserIdAsync(userId);
+
+        return Ok(result);
+    }
+
+    [Authorize(Roles = Roles.Teacher)]
+    [HttpPost()]
+    [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseDetailsDto>> CreateCourse([FromBody] CreateCourseDto command)
+    {
+        // Get the user ID and add it to the DTO
+        command.CreatorId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+
         var result = await serviceManager.CourseService.CreateCourseAsync(command);
 
         return CreatedAtRoute("GetCourseDetails", new { id = result.Id }, result);
+    }
+
+    // PUT api/courses/5
+    [Authorize(Roles = Roles.Teacher)]
+    [HttpPut("{cid:int}")]
+    [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<CourseDetailsDto>> Update(
+        [FromRoute] int cid,
+        [FromBody] CourseUpdateDto dto,
+        CancellationToken ct)
+    {
+        dto.Id = cid;
+        var updatedCourse = await serviceManager
+            .CourseService.UpdateCourseAsync(dto, ct);
+        return Ok(updatedCourse);
+    }
+
+    // DELETE: /api/courses/5
+    [Authorize(Roles = Roles.Teacher)]
+    [HttpDelete("{cid:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete(
+        [FromRoute] int cid,
+        CancellationToken ct)
+    {
+        await serviceManager.CourseService.DeleteCourseAsync(cid, ct);
+        return NoContent();
     }
 }

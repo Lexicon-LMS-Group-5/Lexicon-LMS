@@ -1,0 +1,13 @@
+﻿<header class="d-flex justify-content-between align-items-middle">
+    <h2 class="fs-5 my-auto">@Title</h2>
+    <div>
+        @TabActions
+    </div>
+</header>
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    
+    [Parameter]
+    public RenderFragment TabActions { get; set; } = default!;
+}

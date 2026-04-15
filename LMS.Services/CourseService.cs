@@ -2,9 +2,9 @@
 using Domain.Contracts.Repositories;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
+using LMS.Shared;
 using LMS.Shared.DTOs;
 using LMS.Shared.DTOs.PagingDtos;
-using Microsoft.AspNetCore.Identity;
 using Service.Contracts;
 
 namespace LMS.Services
@@ -12,16 +12,13 @@ namespace LMS.Services
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork unitOfWork;
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly IMapper mapper;
 
         public CourseService(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager, 
             IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
-            this.userManager = userManager;
             this.mapper = mapper;
         }
 
@@ -29,8 +26,16 @@ namespace LMS.Services
         {
             var courses = await unitOfWork.Courses.FindAllByConditionAsync(query, false, ct);
 
-            // Construct query result Items and MetaData
-            var items = courses.Select(c => mapper.Map<CourseListItemDto>(c)).ToList();
+            List<CourseListItemDto> items = [];
+
+            foreach (var course in courses)
+            {
+                var dto = mapper.Map<CourseListItemDto>(course);
+                var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
+                dto.StudentsCount = participants.Count(p => p.Roles.Contains(Roles.Student));
+                items.Add(dto);
+            }
+
             var totalItems = courses.Count();
             var metaData = mapper.Map<PagedResultMetaDataDto>(query);
             metaData.TotalCount = totalItems;
@@ -43,30 +48,32 @@ namespace LMS.Services
             };
         }
 
-        public async Task<CourseDetailsDto> GetCourseDetailsAsync(CourseDetailsQueryDto query, CancellationToken ct = default)
+        public async Task<CourseDetailsDto> GetCourseDetailsAsync(int courseId, CancellationToken ct = default)
         {
-            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(query.CourseId, trackChanges: false, ct) ?? throw new CourseNotFoundException();
-
-            List<CourseParticipantWithRoleInfoDto> courceParticipantsWithRoleInfo = [];
+            var course = await unitOfWork.Courses.GetCourseDetailsByIdAsync(courseId, trackChanges: false, ct)
+                ?? throw new CourseNotFoundException(courseId);
 
             var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
 
-            foreach (var user in course.Participants)
-            {
-                var roles = await userManager.GetRolesAsync(user);
-                var coursePaticipantWithRoleInfo = mapper.Map<CourseParticipantWithRoleInfoDto>(user);
-                coursePaticipantWithRoleInfo.Role = roles.FirstOrDefault() ?? "";
-
-                courceParticipantsWithRoleInfo.Add(coursePaticipantWithRoleInfo);
-            }
-
-            courseDetailsDto.Participants = courceParticipantsWithRoleInfo;
+            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course, ct);
             return courseDetailsDto;
         }
 
-        public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseCommandDto command, CancellationToken ct = default)
+        public async Task<CourseDetailsDto> GetCourseDetailsByUserIdAsync(string userId, CancellationToken ct = default)
         {
-            ApplicationUser user = await userManager.FindByIdAsync(command.CreatorId) 
+            var course = await unitOfWork.Courses.GetCourseDetailsByConditionAsync(
+                c => c.Participants.FirstOrDefault(p => p.Id == userId) != null, false, ct)
+                ?? throw new NotFoundException($"Could not find Course for User with ID {userId}");
+
+            var courseDetailsDto = mapper.Map<CourseDetailsDto>(course);
+
+            courseDetailsDto.Participants = await GetCourseParticipantsWithRoleInfoAsync(course, ct);
+            return courseDetailsDto;
+        }
+
+        public async Task<CreateCourseResultDto> CreateCourseAsync(CreateCourseDto command, CancellationToken ct = default)
+        {
+            ApplicationUser user = await unitOfWork.Users.GetByIdAsync(command.CreatorId, true, ct)
                 ?? throw new UserNotFoundException($"User with ID {command.CreatorId} could not be found");
 
             var course = mapper.Map<Course>(command);
@@ -84,9 +91,46 @@ namespace LMS.Services
 
             unitOfWork.Courses.Create(course);
 
-            await unitOfWork.CompleteAsync();
+            await unitOfWork.CompleteAsync(ct);
 
             return mapper.Map<CreateCourseResultDto>(course);
+        }
+
+        private async Task<List<CourseParticipantDto>> GetCourseParticipantsWithRoleInfoAsync(
+            Course course, CancellationToken ct)
+        {
+            var participants = await unitOfWork.Users.GetByCourseIdAsync(course.Id, false, ct);
+
+            return mapper.Map<List<CourseParticipantDto>>(participants);
+        }
+        public async Task<CourseDetailsDto> UpdateCourseAsync(
+        CourseUpdateDto dto,
+        CancellationToken ct = default)
+        {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(dto.Id, true, ct) 
+                ?? throw new CourseNotFoundException(dto.Id);
+
+            // Course scheduling validation
+            DateRangeHelper drh = new(course);
+            // StartEnd oldInternal = new(course); // <- Not used?
+            mapper.Map(dto, course);
+            StartEnd newInterval = new(course, persistent: false);
+            drh.CheckNewBounds(newInterval);
+
+            await unitOfWork.CompleteAsync(ct);
+            return mapper.Map<CourseDetailsDto>(course);
+        }
+
+        public async Task DeleteCourseAsync(int id, CancellationToken ct = default)
+        {
+            Course? course = await unitOfWork
+                .Courses
+                .GetCourseDetailsByIdAsync(id, true, ct);
+            if (course == null) throw new CourseNotFoundException(id);
+            unitOfWork.Courses.Delete(course);
+            await unitOfWork.CompleteAsync(ct);
         }
     }
 }

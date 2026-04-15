@@ -19,7 +19,9 @@ namespace LMS.Infractructure.Repositories
             CancellationToken ct = default)
         {
             return await FindByCondition(m => m.Id == moduleId, trackChanges)
+                .Include(m => m.Course)
                 .Include(m => m.Activities)
+                    .ThenInclude(a => a.ActivityType)
                 .SingleAsync(ct);
         }
         public async Task<List<Module>> GetModulesByCourseIdAsync(
@@ -28,7 +30,9 @@ namespace LMS.Infractructure.Repositories
             CancellationToken ct = default)
         {
             return await FindByCondition(m => m.CourseId == courseId, trackChanges)
+                .Include(m => m.Course)
                 .Include(m => m.Activities)
+                    .ThenInclude(a => a.ActivityType)
                 .ToListAsync(ct);
         }
     }
