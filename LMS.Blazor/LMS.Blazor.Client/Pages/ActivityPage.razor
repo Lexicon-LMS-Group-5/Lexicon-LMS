@@ -1,7 +1,11 @@
 @page "/activity/{CourseId:int}/{ModuleId:int}/{ActivityId:int}"
 @using LMS.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Net.Http.Headers
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AntiforgeryStateProvider AntiforgeryStateProvider
 
 @if (Activity == null)
 {
@@ -18,18 +22,9 @@ else
                     @onclick="GoBack">
                 ← Back to module
             </button>
-            <button class="btn btn-outline-secondary btn-sm mb-3"
-                    @onclick="DeleteThis">
-                Delete this activity
-            </button>
 
             <h1 class="fw-bold">@Activity.Name</h1>
             <p class="text-muted">@Activity.Description</p>
-            <div class="mt-2">
-                <span class="badge bg-primary fs-6 px-3 py-2">
-                    @Activity.ActivityTypeName
-                </span>
-            </div>
         </div>
 
         <div class="card shadow-sm border-0 mb-4">
@@ -54,6 +49,56 @@ else
             </div>
         </div>
 
+        @if (Activity.EnableUpload)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upload attachment</h5>
+
+                    <AntiforgeryToken />
+                    <InputFile OnChange="HandleFileSelected" class="form-control" />
+
+                    @if (SelectedFile != null)
+                    {
+                        <div class="mt-3">
+                            <p class="mb-1"><strong>File:</strong> @SelectedFile.Name</p>
+                            <p class="mb-1"><strong>Size:</strong> @SelectedFile.Size bytes</p>
+                            <p class="mb-0"><strong>Type:</strong> @SelectedFile.ContentType</p>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(UploadMessage))
+                    {
+                        <div class="alert alert-success mt-3 mb-0">
+                            @UploadMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(UploadError))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">
+                            @UploadError
+                        </div>
+                    }
+
+                    <div class="mt-3">
+                        <button class="btn btn-primary"
+                                @onclick="UploadAttachment"
+                                disabled="@(SelectedFile == null || IsUploading)">
+                            @if (IsUploading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <span>Uploading...</span>
+                            }
+                            else
+                            {
+                                <span>Upload file</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 }
 
@@ -63,19 +108,85 @@ else
     [Parameter] public int ActivityId { get; set; }
 
     private ActivityReadDto? Activity;
+    private IBrowserFile? SelectedFile;
+    private bool IsUploading;
+    private string? UploadMessage;
+    private string? UploadError;
+    private string? RequestVerificationToken;
 
     protected override async Task OnInitializedAsync()
     {
-        Activity = await ApiService.GetAsync<ActivityReadDto>(
-            $"api/activities/{ActivityId}");
+        var antiforgeryToken = AntiforgeryStateProvider.GetAntiforgeryToken();
+        RequestVerificationToken = antiforgeryToken?.Value;
+
+        Activity = await ApiService.GetAsync<ActivityReadDto>($"./api/activities/{ActivityId}");
     }
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo($"/module/{CourseId}/{ModuleId}");
+        NavigationManager.NavigateTo($"module/{CourseId}/{ModuleId}");
     }
-    private async Task DeleteThis()
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        await ApiService.DeleteAsync($"api/activities/{ActivityId}");
+        SelectedFile = e.File;
+        UploadMessage = null;
+        UploadError = null;
+    }
+
+    private async Task UploadAttachment()
+    {
+        if (SelectedFile == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(RequestVerificationToken))
+        {
+            UploadError = "Antiforgery token is missing.";
+            return;
+        }
+
+        IsUploading = true;
+        UploadMessage = null;
+        UploadError = null;
+
+        try
+        {
+            await using var stream = SelectedFile.OpenReadStream(50 * 1024 * 1024);
+
+            using var fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(
+                string.IsNullOrWhiteSpace(SelectedFile.ContentType)
+                    ? "application/octet-stream"
+                    : SelectedFile.ContentType);
+
+            using var content = new MultipartFormDataContent();
+            content.Add(fileContent, "file", SelectedFile.Name);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"./api/activities/{ActivityId}/attachments");
+            request.Content = content;
+            request.Headers.Add("RequestVerificationToken", RequestVerificationToken);
+
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                UploadMessage = "File uploaded successfully.";
+                SelectedFile = null;
+            }
+            else
+            {
+                UploadError = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(UploadError))
+                    UploadError = $"Upload failed. Status code: {(int)response.StatusCode} {response.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            UploadError = ex.Message;
+        }
+        finally
+        {
+            IsUploading = false;
+        }
     }
 }

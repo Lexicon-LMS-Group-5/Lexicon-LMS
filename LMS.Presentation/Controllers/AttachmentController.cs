@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using System.Security.Claims;
 
-namespace LMS.Presentation.Controllers;
-
 [Route("api")]
 [ApiController]
 [Authorize]
@@ -20,6 +18,7 @@ public class AttachmentsController : ControllerBase
     }
 
     [HttpPost("activities/{activityId:int}/attachments")]
+    [ValidateAntiForgeryToken]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<AttachmentReadDto>> UploadAttachment(
         int activityId,
@@ -31,6 +30,9 @@ public class AttachmentsController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
+
+        if (file is null || file.Length == 0)
+            return BadRequest("No file was uploaded.");
 
         var dto = new AttachmentUpsertDto
         {
@@ -57,7 +59,7 @@ public class AttachmentsController : ControllerBase
         var attachment = await serviceManager.AttachmentService.GetAttachmentByIdAsync(attachmentId, ct);
 
         if (!System.IO.File.Exists(attachment.FilePath))
-            return NotFound("File not found on server");
+            return NotFound("File not found on server.");
 
         var contentType = string.IsNullOrWhiteSpace(attachment.ContentType)
             ? "application/octet-stream"
