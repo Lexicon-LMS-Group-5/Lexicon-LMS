@@ -72,14 +72,14 @@ public partial class CourseController : ControllerBase
 
     // PUT api/courses/5
     [Authorize(Roles = Roles.Teacher)]
-    [HttpPut("{cid:int}")]
+    [HttpPut("{courseId:int}")]
     [ProducesResponseType<CourseDetailsDto>(StatusCodes.Status200OK)]
     public async Task<ActionResult<CourseDetailsDto>> Update(
-        [FromRoute] int cid,
+        [FromRoute] int courseId,
         [FromBody] CourseUpdateDto dto,
         CancellationToken ct)
     {
-        dto.Id = cid;
+        dto.Id = courseId;
         var updatedCourse = await serviceManager
             .CourseService.UpdateCourseAsync(dto, ct);
         return Ok(updatedCourse);
@@ -87,13 +87,13 @@ public partial class CourseController : ControllerBase
 
     // DELETE: /api/courses/5
     [Authorize(Roles = Roles.Teacher)]
-    [HttpDelete("{cid:int}")]
+    [HttpDelete("{courseId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(
-        [FromRoute] int cid,
+        [FromRoute] int courseId,
         CancellationToken ct)
     {
-        await serviceManager.CourseService.DeleteCourseAsync(cid, ct);
+        await serviceManager.CourseService.DeleteCourseAsync(courseId, ct);
         return NoContent();
     }
 }

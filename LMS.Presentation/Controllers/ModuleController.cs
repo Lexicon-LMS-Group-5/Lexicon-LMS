@@ -62,7 +62,7 @@ namespace LMS.Presentation.Controllers
                 .ModuleService.CreateModuleAsync(dto);
             return CreatedAtAction(
                 nameof(GetModuleDetails),
-                new { cid = createdModule.CourseId, mid = createdModule.Id },
+                new { courseId = createdModule.CourseId, moduleId = createdModule.Id },
                 createdModule);
         }
         // PUT: api/modules/33/17

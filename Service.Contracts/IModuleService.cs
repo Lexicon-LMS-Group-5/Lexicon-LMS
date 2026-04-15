@@ -14,6 +14,6 @@ namespace Service.Contracts
             CancellationToken ct = default);
         public Task<ModuleReadDto> CreateModuleAsync(ModuleUpsertDto dto, CancellationToken ct = default);
         public Task<ModuleReadDto> UpdateModuleAsync(int id, ModuleUpsertDto dto, CancellationToken ct = default);
-        public Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto cid, CancellationToken ct = default);
+        public Task DeleteModuleAsync(int moduleId, ModuleCourseIdDto courseId, CancellationToken ct = default);
     }
 }

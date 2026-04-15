@@ -48,5 +48,5 @@ public class ModuleCourseIdDto
 // confusing for the caller.
 {
     public int CourseId { get; set; }
-    public ModuleCourseIdDto(int cid) { CourseId = cid; }
+    public ModuleCourseIdDto(int courseId) { CourseId = courseId; }
 }
