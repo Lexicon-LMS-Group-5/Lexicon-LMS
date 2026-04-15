@@ -1,0 +1,86 @@
+﻿@if (Model?.TimeCond == null)
+{
+    <div>
+        Loading...
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-2">
+        <InputNumber @bind-Value="Model.CourseId" type="hidden" />
+        <div class="mb-3">
+            <label for="moduleName" class="form-label">Module Name</label>
+            <InputText @bind-Value="Model.Name"
+                       type="text"
+                       class="form-control"
+                       id="moduleName"
+                       aria-describedby="moduleNameHelp" />
+ 
+            <ValidationMessage For="() => Model.Name" class="text-danger" />
+            <div id="moduleNameHelp" class="form-text">Add a descriptive name for the module.</div>
+        </div>
+        <div class="mb-3">
+            <label for="courseDescription" class="form-label">Description</label>
+            <InputTextArea @bind-Value="Model!.Description"
+                           class="form-control"
+                           id="courseDescription"
+                           rows="3"
+                           aria-describedby="moduleDescriptionHelp">
+            </InputTextArea>
+            <ValidationMessage For="() => Model.Description" />
+            <div id="moduleDescriptionHelp" class="form-text">Describe the module content.</div>
+        </div>
+        <div class="mb-3 d-flex flex-column gap-1">
+            <label class="form-check-label" for="moduleDuration">Days</label>
+            <InputNumber 
+                @bind-Value:get="@durationValue" 
+                @bind-Value:set="(val) => SetDuration(val)"
+                min="1"
+                max="365"
+                class="form-control"
+                id="moduleDuration" />
+            <div id="moduleDurationHelp" class="form-text">How many days long is this module?</div>
+        </div>
+        <div class="mb-3 d-flex gap-3">
+            <div class="d-flex flex-column gap-1">
+                <label class="form-check-label" for="startDate">Start date</label>
+                <InputDate @bind-Value="Model.StartDate"
+                           class="form-control"
+                           id="startDate" />
+                <ValidationMessage For="() => Model.StartDate" />
+                <div id="startDateHelp" class="form-text">Set the start date for the Module.</div>
+            </div>
+            <div class="d-flex flex-column gap-1">
+                <label class="form-check-label" for="endDate">End date</label>
+                <InputDate @bind-Value="Model.EndDate"
+                           class="form-control"
+                           id="endDate" />
+                <ValidationMessage For="() => Model.EndDate" />
+                <div id="endDateHelp" class="form-text">Set the end date for the Module.</div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public ModuleUpsertDto? Model { get; set; }
+
+    private int durationValue { get => Model?.TimeCond?.Duration.Days ?? 0; }
+    private void SetDuration(int value) {
+        if (Model?.TimeCond == null)
+            return;
+
+        var currentTimeCondition = Model.TimeCond;
+        var duration = new TimeSpan(days: value, 0, 0, 0);
+
+        Model.TimeCond = new DateRangeRequestDto
+        {
+            StartingAfter = Model.TimeCond.StartingAfter,
+            EndingBefore = Model.TimeCond.EndingBefore,
+            Duration = duration
+        };
+
+        Model.EndDate = Model.StartDate + duration;
+    }
+}

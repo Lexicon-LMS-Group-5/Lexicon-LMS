@@ -19,6 +19,19 @@
     <script src="@Assets["lib/bootstrap/dist/js/bootstrap.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="@Assets["Components/Account/Shared/PasskeySubmit.razor.js"]" type="module"></script>
+    <script>
+        function showModal(modalId) {
+            const modalNode = document.getElementById(modalId)
+            const modal = bootstrap.Modal.getOrCreateInstance(modalNode)
+            modal.show()
+        }
+
+        function hideModal(modalId) {
+            const modalNode = document.getElementById(modalId)
+            const modal = bootstrap.Modal.getInstance(modalNode)
+            modal.hide()
+        }
+    </script>
 </body>
 
 </html>

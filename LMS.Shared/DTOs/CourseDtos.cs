@@ -3,14 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LMS.Shared.DTOs
 {
-    public class CourseUpsertDto
-    {
-        public virtual string Name { get; set; } = string.Empty;
-        public virtual string Description { get; set; } = string.Empty;
-        public virtual DateTime? StartDate { get; set; }
-        public virtual DateTime? EndDate { get; set; }
-    }
-
     public class CourseReadDto
     {
         public int Id { get; set; }
@@ -20,31 +12,25 @@ namespace LMS.Shared.DTOs
         public DateTime EndDate { get; set; }
     }
 
-    public record CourseDetailsQueryDto(int CourseId);
-
     public class CourseDetailsDto : CourseReadDto
     {
-        public List<CourseParticipantWithRoleInfoDto> Participants { get; set; } = [];
-        public List<CourseModuleListItemDto> Modules { get; set; } = [];
+        public List<CourseParticipantDto> Participants { get; set; } = [];
+        public List<ModuleReadDto> Modules { get; set; } = [];
     }
 
-    public class CourseParticipantWithRoleInfoDto
+    public class CourseListItemDto : CourseReadDto
+    {
+        public int StudentsCount { get; set; }
+        public int ModulesCount { get; set; }
+    }
+
+    public class CourseParticipantDto
     {
         public string Id { get; set; } = default!;
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public List<string> Roles { get; set; } = [];
     }
-
-    public class CourseModuleListItemDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-		public DateTime StartDate { get; set; }
-		public DateTime EndDate { get; set; }
-		public List<ActivityReadDto> Activities { get; set; } = [];
-	}
 
     public class CoursesQueryDto : BasePageQueryDto
     {
@@ -56,24 +42,26 @@ namespace LMS.Shared.DTOs
         
     }
 
-    public class CreateCourseCommandDto : CourseUpsertDto, IValidatableObject
+    public class CreateCourseDto : IValidatableObject
     {
         public string CreatorId { get; set; } = string.Empty;
 
         [Required]
         [StringLength(35, MinimumLength = 1)]
-        public override string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         [StringLength(160)]
-        public override string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         [DataType(DataType.Date)]
-        public override DateTime? StartDate { get; set; }
+        [Display(Name="Start date")]
+        public DateTime? StartDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        public override DateTime? EndDate { get; set; }
+        [Display(Name = "End date")]
+        public DateTime? EndDate { get; set; }
 
         [Required]
         public bool AddCreator { get; set; }
@@ -82,7 +70,7 @@ namespace LMS.Shared.DTOs
         {
             if (EndDate <= StartDate)
             {
-                yield return new ValidationResult("End date must be after the start date.", [nameof(EndDate)]);
+                yield return new ValidationResult("End date must be after the start date.", [nameof(EndDate), nameof(StartDate)]);
             }
 
             if (EndDate <= DateTime.UtcNow)
@@ -97,9 +85,20 @@ namespace LMS.Shared.DTOs
 
     }
 
-    public class CourseListItemDto : CourseReadDto
+    public class CourseUpdateDto : CreateCourseDto
     {
-
+        public int Id { get; set; }
+        public CourseUpdateDto()
+        {
+            
+        }
+        public CourseUpdateDto(CourseDetailsDto courseDetails)
+        {
+            Id = courseDetails.Id;
+            Name = courseDetails.Name;
+            Description = courseDetails.Description;
+            StartDate = courseDetails.StartDate;
+            EndDate = courseDetails.EndDate;
+        }
     }
-
 }

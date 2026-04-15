@@ -1,0 +1,128 @@
+﻿@using LMS.Blazor.Client.Components.UserModals
+<ErrorBoundary @ref="StudentsTabErrorBoundary">
+    <ChildContent>
+        <div class="d-flex flex-column gap-3 p-3">
+            <TabHeader Title="Students">
+                <TabActions>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary d-flex align-items-middle gap-2" 
+                        @onclick="async () => await ShowAddStudentModalAsync()"
+                        >
+                        <div class="d-flex align-items-middle m-auto">
+                            <CirclePlusIcon Size="20" />
+                        </div>
+                        Add Student
+                    </button>
+                </TabActions>
+            </TabHeader>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Progress</th>
+                        <th scope="col">Last active</th>
+                        <th scope="col"><span class="visually-hidden">My assigned course</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var student in Students) {
+                        <tr @key="student.Id">
+                            <td>
+                                @student.FullName
+                            </td>
+                            <td>
+                                @student.Email
+                            </td>
+                            <td style="width: 164px;">
+                                <div class="d-flex gap-3 align-items-middle w-100">
+                                    <div class="w-100 d-flex flex-column justify-content-center">
+                                        <div class="progress" role="progressbar" aria-label="Example 20px high" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="height: 8px">
+                                            <div class="progress-bar" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="fs-6 text-secondary fw-bold d-flex flex-column justify-content-center">
+                                        24%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @DateTime.Now.ToShortDateString()
+                            </td>
+                            <td>
+                                <NavLink
+                                    href="@($"/students/{student.Id}")" 
+                                    class="text-primary link-underline-primary link-underline-opacity-0 link-underline-opacity-75-hover">
+                                    Show details
+                                </NavLink>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                
+            </table>
+        </div>
+    </ChildContent>
+    <ErrorContent>
+    </ErrorContent>
+</ErrorBoundary>
+
+<Modal ModalId="@AddStudentModalId">
+    <ModalHeader ModalId="@AddStudentModalId" Title="Add Student" />
+    <ModalBody>
+        <CreateStudentForm 
+            @key="CourseId"
+            CourseId="CourseId"
+            OnSaved="OnSavedAsync"
+            OnCancel="HideAddStudentModalAsync" />
+    </ModalBody>
+    <ModalFooter>
+    </ModalFooter>
+</Modal>
+
+@code {
+    [Inject]
+    private IApiService ApiService { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
+    [Parameter]
+    public int CourseId { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<CourseParticipantDto> Students { get; set; } = [];
+
+    private const string AddStudentModalId = "addStudentModal";
+
+    private async Task ShowAddStudentModalAsync() {
+        await JsRuntime.InvokeVoidAsync("showModal", AddStudentModalId);
+    }
+
+    private async Task HideAddStudentModalAsync() {
+        await JsRuntime.InvokeVoidAsync("hideModal", AddStudentModalId);
+    }
+
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+    private ErrorBoundaryBase? StudentsTabErrorBoundary { get; set; }
+
+    private async Task OnSavedAsync(UserReadDto? user)
+    {
+        if (user != null)
+        {
+            var newStudent = new CourseParticipantDto
+            {
+                Id = user.Id,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Roles = user.Roles
+            };
+
+            Students = [newStudent, .. Students];
+        }
+
+        await HideAddStudentModalAsync();
+    }
+}

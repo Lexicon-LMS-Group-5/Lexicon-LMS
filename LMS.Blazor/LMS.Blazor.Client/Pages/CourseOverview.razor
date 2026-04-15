@@ -2,12 +2,21 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using LMS.Shared.DTOs
+@using LMS.Shared
 @using LMS.Blazor.Client.Components
+@inject IJSRuntime JS
 
 @attribute [Authorize]
 
 <PageTitle>@(CourseDetails?.Name ?? "Loading course details...")</PageTitle>
 
+@if (ShowSuccessMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Module created successfully!
+        <button type="button" class="btn-close" @onclick="() => ShowSuccessMessage = false"></button>
+    </div>
+}
 
 @if (IsLoading)
 {
@@ -17,31 +26,51 @@ else
 {
     if (CourseDetails != null)
     {
-        <div class="container py-4">
 
+        <div class="container py-4">
+            <div class="mb-4">
+                <AuthorizeView Roles=@Roles.Teacher>
+                    <button class="btn btn-outline-secondary btn-sm mb-3"
+                            @onclick="DeleteThis">
+                        Delete this course
+                    </button>
+                </AuthorizeView>
+            </div>
             <div class="card shadow-lg mb-4">
                 <div class="card-body">
                     <h1 class="card-title">@CourseDetails.Name</h1>
 
                     <p class="text-muted">
                         <strong>Led by:</strong>
-                        @foreach (var participant in CourseDetails.Participants.Where(p => p.Role == "Teacher"))
-            {
-                            <span class="badge bg-primary me-1">@participant.FullName</span>
-            }
-        </p>
+                        @foreach (var teacher in teachers)
+                        {
+                            <span class="badge bg-primary me-1">@teacher.FullName</span>
+                        }
+                    </p>
 
-        <p>@CourseDetails.Description</p>
+                    <p>@CourseDetails.Description</p>
+
+                    <p class="text-muted">
+                        <strong>Start:</strong> @CourseDetails.StartDate.ToString("yyyy-MM-dd")
+                        <br />
+                        <strong>End:</strong> @CourseDetails.EndDate.ToString("yyyy-MM-dd")
+                    </p>
 
                     <div class="mt-3">
-            <AuthorizeView Roles="Teacher">
-                            <div class="alert alert-info">Teacher content</div>
-            </AuthorizeView>
-            <AuthorizeView Roles="Student">
-                            <div class="alert alert-success">Student content</div>
-            </AuthorizeView>
-                        <div class="alert alert-secondary">General content</div>
-        </div>
+                        <AuthorizeView Roles=@Roles.Teacher>
+                            <div data-bs-toggle="modal"
+                                 data-bs-target="#createModuleFormModal">
+                                <QuickActionButton>
+                                    <ButtonIcon>
+                                        <CirclePlusIcon />
+                                    </ButtonIcon>
+                                    <ButtonText>
+                                        Add a new Module
+                                    </ButtonText>
+                                </QuickActionButton>
+                            </div>
+                        </AuthorizeView>
+                    </div>
                 </div>
             </div>
 
@@ -50,29 +79,30 @@ else
                 <div class="card-body">
                     <h3>Participants</h3>
                     <div class="d-flex flex-wrap gap-2 mt-2">
-                @foreach (var participant in CourseDetails.Participants.Where(p => p.Role != "Teacher"))
-                {
+
+                        @foreach (var student in students)
+                        {
                             <span class="badge bg-light text-dark border">
-                                @participant.FullName
+                                @student.FullName
                             </span>
-                }
-            </div>
-        </div>
+                        }
+                    </div>
+                </div>
             </div>
 
             <!-- Modules -->
-        <div>
+            <div>
                 <h2 class="mb-3">Course Modules</h2>
 
                 <div class="row">
                     @foreach (var module in CourseDetails.Modules)
-                {
-                        <div class="col-md-6 col-lg-4">
+                    {
+                        <div class="col-12 mb-3 ">
                             <ModuleComponent Module="module"
                                              Activities="module.Activities"
                                              CourseId="@CourseDetails.Id" />
                         </div>
-                }
+                    }
                 </div>
             </div>
 
@@ -86,4 +116,88 @@ else
             <p>@Error</p>
         </div>
     }
+
+    if (CourseDetails != null)
+    {
+        <AuthorizeView Roles=@Roles.Teacher>
+            <div class="modal fade" id="createModuleFormModal" tabindex="-1" aria-labelledby="createModuleFormModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title fs-5" id="createModuleFormModalLabel">
+                                Create a new Module
+                            </h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body modal-dialog-scrollable">
+                            <CreateModuleForm CourseId="@CourseDetails.Id" OnCreated="@HandleModuleCreated">
+                                <ModalCloseButton>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </ModalCloseButton>
+                            </CreateModuleForm>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AuthorizeView>
+    }
+   
+
+
 }
+
+@code {
+    private bool ShowSuccessMessage = false;
+
+    private async Task HandleModuleCreated()
+    {
+        ShowSuccessMessage = true;
+
+        // Close the modal
+        await JS.InvokeVoidAsync("closeBootstrapModal", "#createModuleFormModal");
+
+        // Reload course details to get the new module
+        await LoadCourseDetails();
+    }
+
+    private async Task LoadCourseDetails()
+    {
+        IsLoading = true;
+        Error = null;
+
+        try
+        {
+            CourseDetails = await ApiService.GetAsync<CourseDetailsDto>($"api/courses/{CourseDetails?.Id}");
+        }
+        catch (Exception ex)
+        {
+            Error = $"Could not load course details: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+    private async Task DeleteThis()
+    {
+        if (CourseDetails != null)
+        {
+            await ApiService.DeleteAsync($"api/courses/{CourseDetails?.Id}");
+        }
+        Navigation.NavigateTo("/dashboard");
+    }
+}
+
+<script>
+       window.closeBootstrapModal = (modalId) => {
+        const modalEl = document.querySelector(modalId);
+
+        if (modalEl !== null) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+
+            if (modal !== null) {
+                modal.hide();
+            }
+        }
+    }
+</script>

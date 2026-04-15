@@ -1,16 +1,18 @@
 ﻿
-@if (CurrentTab == Slug && ChildContent != null)
+@if (CurrentTab == slug && ChildContent != null)
 {
     @ChildContent
 }
 
 @code {
     [Parameter]
-    public string Slug { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     [SupplyParameterFromQuery(Name = "tab")]
     private string CurrentTab { get; set; } = string.Empty;
+
+    private string slug { get => Title.ToLower().Replace(" ", "-"); }
 }

@@ -3,6 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using LMS.Blazor.Components.Icons
 @using LMS.Blazor.Services
+@using LMS.Shared
 @using LMS.Shared.DTOs.AuthDtos
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
@@ -65,12 +66,12 @@
 
                         <InputRadioGroup @bind-Value="Input.Role" class="d-flex gap-4">
                             <div class="form-check">
-                                <InputRadio Value="Student" id="role-student" class="form-check-input" />
+                                <InputRadio Value=Roles.Student id="role-student" class="form-check-input" />
                                 <label for="role-student" class="form-check-label">Student</label>
                             </div>
 
                             <div class="form-check">
-                                <InputRadio Value="Teacher" id="role-teacher" class="form-check-input" />
+                                <InputRadio Value=Roles.Teacher id="role-teacher" class="form-check-input" />
                                 <label for="role-teacher" class="form-check-label">Teacher</label>
                             </div>
                         </InputRadioGroup> 
@@ -102,7 +103,7 @@
                             Resend email confirmation
                         </a>
                     </div>
-
+                    @* Crashes if logged in with wrong password
                     <div class="text-center mt-4">
                         <div class="text-muted small mb-2">or</div>
                         <PasskeySubmit Operation="PasskeyOperation.Request"
@@ -112,6 +113,7 @@
                             Log in with a passkey
                         </PasskeySubmit>
                     </div>
+                    *@
                 </EditForm>
             </div>
         </div>
@@ -185,13 +187,7 @@
                 }
             }
 
-            if (Input.Role == "Teacher")
-            {
-                RedirectManager.RedirectTo("/teacher");
-                return;
-            }
-
-            RedirectManager.RedirectTo(ReturnUrl ?? "/student");
+            RedirectManager.RedirectTo(ReturnUrl ?? "/my-course");
         }
         else if (result.RequiresTwoFactor)
         {
@@ -293,7 +289,7 @@
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
-        public string Role { get; set; } = "Student";
+        public string Role { get; set; } = Roles.Student;
 
         public bool RememberMe { get; set; }
 

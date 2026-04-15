@@ -1,0 +1,25 @@
+﻿.modules-list > button {
+    border: none;
+    border-top: 2px solid var(--bs-light-border-subtle);
+    background-color: var(--bs-body-bg);
+}
+
+.modules-list > button:hover {
+    background-color: var(--bs-light);
+}
+
+.modules-list > button:first-child {
+    border-top: 0px;
+}
+
+.add-activity-button
+{
+    border: 2px dashed var(--bs-light-border-subtle);
+    background-color: unset;
+    transition: border 0.3s;
+}
+.add-activity-button:hover
+{
+    border: 2px dashed var(--bs-dark-border-subtle);
+}
+
